@@ -9,6 +9,7 @@ module top
     input rst,
 
     // LED_SECTION
+    output lec,
     output [3:0] led,
 
     // ETH SECTION
