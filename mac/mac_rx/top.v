@@ -293,7 +293,7 @@ module top
     );
 
 
-    fifoc
+    fifod
     fifoc_dut(
         .rst(rst_fifoc),
         .wr_clk(gmii_rxc),
@@ -354,6 +354,17 @@ module top
         .cmd_reg6(cmd_reg6),
         .cmd_reg7(cmd_reg7)
     );
+
+    led 
+    led_dut (
+        .sys_clk(sys_clk),
+        .rst(rst),
+        .data(adc_reg00),
+        .lec(lec),
+        .led(led)
+    );
+
+    
 
 
 

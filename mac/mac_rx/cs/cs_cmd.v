@@ -70,6 +70,9 @@ module cs_cmd(
     reg [2:0] adc_state, adc_next_state;
     reg [2:0] mac_state, mac_next_state;
 
+    reg [3:0] num_cnt;
+    reg [2:0] dev_num_int;
+
 
     reg prev_fs_adc;
     wire [1:0] cache_fs_adc;
@@ -83,7 +86,7 @@ module cs_cmd(
     assign dev_smpr = cmd_smpr;
     assign cache_fs_adc = {prev_fs_adc, fs_adc};
 
-    localparam MAIN_IDLE = 3'h0, MAIN_INIT = 3'h1, MAIN_PREP = 3'h2, MAIN_OP = 3'h3;
+    localparam MAIN_IDLE = 3'h0, MAIN_INIT = 3'h1, MAIN_PREP = 3'h2, MAIN_WORK = 3'h3;
     localparam INIT_IDLE = 3'h0, INIT_URXS = 3'h1, INIT_UTOF = 3'h2, INIT_FTOC = 3'h3;
     localparam INIT_URXD = 3'h4, INIT_CSNM = 3'h5, INIT_ADCK = 3'h6;
     localparam ADC_IDLE = 3'h0, ADC_CONF = 3'h1, ADC_PREP = 3'h2, ADC_READ = 3'h3;
@@ -112,7 +115,7 @@ module cs_cmd(
     end
 
     always @(posedge clk or posedge rst_dev) begin
-        if(rst_dev) adc_state <= ADC_ADCK;
+        if(rst_dev) adc_state <= ADC_IDLE;
         else adc_state <= adc_next_state;
     end
 
@@ -171,18 +174,18 @@ module cs_cmd(
         endcase
     end
 
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk or posedge rst_dev) begin
         if(rst_dev) prev_fs_adc <= 1'b1;
         else prev_fs_adc <= fs_adc;
     end
 
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk or posedge rst_dev) begin
         if(rst_dev) dev_num_int <= 3'h0;
         else if(adc_state == ADC_PREP && cache_fs_adc == 2'b01) dev_num_int <= dev_num_int + 1'b1;
         else dev_num_int <= dev_num_int;
     end
 
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk or posedge rst_dev) begin
         if(rst_dev) num_cnt <= 4'h0;
         else if(adc_state == ADC_PREP && cache_fs_adc == 2'b01 && num_cnt < fifo2mac_num) begin
             num_cnt <= num_cnt + 1'b1;

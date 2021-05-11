@@ -185,7 +185,7 @@ module cs(
         .cmd_kdev(cmd_kdev),
         .adc_rx_len(adc_rx_len),
         .eth_tx_len(eth_tx_len),
-        .fifo2mac_num(fifo2mac_num)
+        .data_cnt(fifo2mac_num)
     );
 
 
