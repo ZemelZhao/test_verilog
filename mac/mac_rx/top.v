@@ -6,33 +6,24 @@ module top
     output rgmii_txc,
 
     // RST
-    input rst,
+    input rst_n,
 
     // LED_SECTION
     output lec,
     output [3:0] led,
 
-    // ETH SECTION
+// ETH SECTION
     output e_mdc,
     inout e_mdio,
     output rgmii_txctl,
     output[3:0] rgmii_txd,
     input rgmii_rxctl,
-    input [3:0] rgmii_rxd,
+    input [3:0] rgmii_rxd
 
     // ADC
-    input [3:0] cache_misop,
-    input [3:0] cache_mison,
-    output [3:0] cache_mosip,
-    output [3:0] cache_mosin,
-    output [3:0] cache_sclkp,
-    output [3:0] cache_sclkn,
-    output [3:0] cache_csp,
-    output [3:0] cache_csn,
-
-    // CS
-    input fs_adc_ext,
-    input [2:0] dev_num_ext
+    // TEST
+    // input fs_adc_ext,
+    // input [2:0] dev_num_ext
 );
 
 
@@ -47,6 +38,11 @@ module top
     parameter MAC_TTL = 8'h80;
 
 ////// WIRE SECTION //////
+    wire rst;
+    wire fs_adc_ext;
+    wire [2:0] dev_num_ext;
+    assign fs_adc_ext = 1'b1;
+    assign dev_num_ext = 3'h2;
 // DATA_LEN
     wire [11:0] eth_rx_len;
     wire [11:0] eth_tx_len;
@@ -164,10 +160,8 @@ module top
 // ERROR
     wire err_fifoc2cs;
 
-
-
 //  LVDS
-
+    assign rst = ~rst_n;
 // ## IP SECTION
 // #region
 
@@ -359,16 +353,10 @@ module top
     led_dut (
         .sys_clk(sys_clk),
         .rst(rst),
-        .data(adc_reg00),
+        .data(adc_reg07),
         .lec(lec),
         .led(led)
     );
-
-    
-
-
-
-
 
 endmodule
 
