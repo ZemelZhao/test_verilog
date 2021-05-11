@@ -164,6 +164,15 @@ module top
     assign rst = ~rst_n;
 // ## IP SECTION
 // #region
+    reg reg_fs_fifod2mac;
+    assign fs_fifod2mac = reg_fs_fifod2mac;
+
+    always @(posedge sys_clk or posedge rst) begin
+        if(rst) reg_fs_fifod2mac <= 1'b0;
+        else if(fd_mac2fifoc) reg_fs_fifod2mac <= 1'b1;
+        else if(fd_fifod2mac) reg_fs_fifod2mac <= 1'b0;
+        else reg_fs_fifod2mac <= reg_fs_fifod2mac;
+    end
 
 // #### 1. NODE SECTION
     mac 
@@ -256,14 +265,29 @@ module top
         .dev_rx_len(eth_rx_len)
     );
 
-    led
-    led_dut (
-        .sys_clk(sys_clk),
+    fifod2mac 
+    fifod2mac_dut (
+        .clk(sys_clk),
         .rst(rst),
-        .data(udp_rx_len[7:0]),
-        .lec(lec),
-        .led(led)
+        .fs(fs_fifod2mac),
+        .fd(fd_fifod2mac),
+        .data_len(eth_rx_len),
+        .fifod_rxen(fifoc_rxen),
+        .fifod_rxd(fifoc_rxd),
+        .udp_txen(udp_txen),
+        .udp_txd(udp_txd),
+        .flag_udp_tx_prep(flag_udp_tx_prep),
+        .flag_udp_tx_req(flag_udp_tx_req)
     );
+
+    // led
+    // led_dut (
+    //     .sys_clk(sys_clk),
+    //     .rst(rst),
+    //     .data(udp_rx_len[7:0]),
+    //     .lec(lec),
+    //     .led(led)
+    // );
 
 endmodule
 
