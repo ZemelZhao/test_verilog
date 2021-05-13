@@ -14,13 +14,13 @@ module led(
     always @(posedge sys_clk or posedge rst) begin
         if(rst) begin
             lec <= 1'b1;
-            led <= 4'h1;
+            led <= 4'hF;
         end
-        else if(cnt < NUM) begin
+        else if(cnt == NUM) begin
             lec <= 1'b0;
             led <= ~data[7:4];
         end
-        else if(cnt <= ALL) begin
+        else if(cnt == ALL) begin
             lec <= 1'b1;
             led <= ~data[3:0];
         end

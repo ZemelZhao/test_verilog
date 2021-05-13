@@ -32,9 +32,9 @@ module top
 // ETHERNET 
     parameter SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     parameter SOURCE_IP_ADDR = 32'hC0_A8_00_02;
-    parameter SOURCE_PORT = 16'h1F90;
+    parameter SOURCE_PORT = 16'd8080;
     parameter DESTINATION_IP_ADDR = 32'hC0_A8_00_03;
-    parameter DESTINATION_PORT = 16'h1F90;
+    parameter DESTINATION_PORT = 16'd8080;
     parameter MAC_TTL = 8'h80;
 
 ////// WIRE SECTION //////
@@ -44,8 +44,8 @@ module top
     assign fs_adc_ext = 1'b1;
     assign dev_num_ext = 3'h2;
 // DATA_LEN
-    wire [11:0] eth_rx_len;
-    wire [11:0] eth_tx_len;
+    wire [11:0] act_rx_len;
+    wire [11:0] act_tx_len;
     wire [9:0] adc_rx_len;
 
 // CMD
@@ -162,23 +162,72 @@ module top
 
 //  LVDS
     assign rst = ~rst_n;
+
+    wire [10:0] data_test;
 // ## IP SECTION
 // #region
-    reg reg_fs_fifod2mac;
-    assign fs_fifod2mac = reg_fs_fifod2mac;
+    // reg reg_fs_fifod2mac;
+    // assign fs_fifod2mac = reg_fs_fifod2mac;
+
+    // always @(posedge sys_clk or posedge rst) begin
+    //     if(rst) reg_fs_fifod2mac <= 1'b0;
+    //     else if(fd_mac2fifoc) reg_fs_fifod2mac <= 1'b1;
+    //     else if(fd_fifod2mac) reg_fs_fifod2mac <= 1'b0;
+    //     else reg_fs_fifod2mac <= reg_fs_fifod2mac;
+    // end
+
+    // reg reg_fs_mac2fifoc;
+    // reg reg_fd_udp_rx;
+
+    // assign fs_mac2fifoc = fs_udp_rx;
+    // assign fd_udp_rx = fd_mac2fifoc;
+
+    reg reg_fs_udp_tx;
+    assign fs_udp_tx = reg_fs_udp_tx;
+    assign rst_mac = rst;
+    assign rst_fifoc = rst;
+    assign rst_eth2mac = rst;
+    assign rst_mac2fifoc = rst;
+    assign rst_fifod2mac = rst;
+    assign act_tx_len = act_rx_len;
 
     always @(posedge sys_clk or posedge rst) begin
-        if(rst) reg_fs_fifod2mac <= 1'b0;
-        else if(fd_mac2fifoc) reg_fs_fifod2mac <= 1'b1;
-        else if(fd_fifod2mac) reg_fs_fifod2mac <= 1'b0;
-        else reg_fs_fifod2mac <= reg_fs_fifod2mac;
+        if(rst) reg_fs_udp_tx <= 1'b0;
+        else if(fd_udp_rx) reg_fs_udp_tx <= 1'b1;
+        else if(fd_udp_tx) reg_fs_udp_tx <= 1'b0;
+        else reg_fs_udp_tx <= reg_fs_udp_tx;
     end
 
-    assign fs_mac2fifoc = fs_udp_rx;
-    assign fd_mac2fifoc = fd_udp_rx;
 
-    assign fs_udp_tx = fs_fifod2mac;
-    assign fd_udp_tx = fd_fifod2mac;
+    // #region
+    // always @(posedge sys_clk or posedge rst) begin
+    //     if(rst) begin
+    //         reg_fs_mac2fifoc <= 1'b0;
+    //         reg_fd_udp_rx <= 1'b0;
+    //     end
+    //     else if(fs_udp_rx) begin
+    //         reg_fs_mac2fifoc <= 1'b1;
+    //         reg_fd_udp_rx <= 1'b0;
+    //     end
+    //     else if(fd_mac2fifoc) begin
+    //         reg_fs_mac2fifoc <= 1'b0;
+    //         reg_fd_udp_rx <= 1'b1;
+    //     end
+    //     else if(fs_udp_rx == 1'b0) begin
+    //         reg_fs_mac2fifoc <= 1'b0;
+    //         reg_fd_udp_rx <= 1'b0;
+    //     end
+    //     else begin
+    //         reg_fs_mac2fifoc <= reg_fs_mac2fifoc;
+    //         reg_fd_udp_rx <= reg_fd_udp_rx;
+    //     end
+    // end
+
+    // assign fs_mac2fifoc = reg_fs_mac2fifoc;
+    // assign fd_udp_rx = reg_fd_udp_rx;
+
+    // assign fs_udp_tx = fs_fifod2mac;
+    // assign fd_udp_tx = fd_fifod2mac;
 
     // reg [7:0] data_test;
 
@@ -187,6 +236,7 @@ module top
     //     else if(udp_rxd[7] == 1'b1) data_test <= udp_rxd;
     //     else data_test <= data_test;
     // end
+    // #endregion
 
 // #### 1. NODE SECTION
     mac 
@@ -206,7 +256,7 @@ module top
         .mac_txd(mac_txd),
         .fs_udp_tx(fs_udp_tx),
         .fd_udp_tx(fd_udp_tx),
-        .udp_tx_len(eth_tx_len),
+        .udp_tx_len(act_tx_len),
         .flag_udp_tx_req(flag_udp_tx_req),
         .udp_txen(udp_txen),
         .flag_udp_tx_prep(flag_udp_tx_prep),
@@ -243,9 +293,10 @@ module top
         .wr_clk(gmii_rxc),
         .din(fifoc_txd),
         .wr_en(fifoc_txen),
-        .rd_clk(sys_clk),
+        .rd_clk(gmii_txc),
         .dout(fifoc_rxd),
-        .rd_en(fifoc_rxen)
+        .rd_en(fifoc_rxen),
+        .rd_data_count(data_test)
     );
 
 // #### 2. MODE SECTION
@@ -269,23 +320,23 @@ module top
     mac2fifoc_dut(
         .clk(gmii_rxc),
         .rst(rst_mac2fifoc),
-        .fs(fs_mac2fifoc),
-        .fd(fd_mac2fifoc),
+        .fs(fs_udp_rx),
+        .fd(fd_udp_rx),
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
         .udp_rx_len(udp_rx_len),
         .fifoc_txd(fifoc_txd),
         .fifoc_txen(fifoc_txen),
-        .dev_rx_len(eth_rx_len)
+        .dev_rx_len(act_rx_len)
     );
 
     fifod2mac 
     fifod2mac_dut (
-        .clk(sys_clk),
+        .clk(gmii_txc),
         .rst(rst),
-        .fs(fs_fifod2mac),
-        .fd(fd_fifod2mac),
-        .data_len(eth_rx_len),
+        .fs(fs_udp_tx),
+        .fd(fd_udp_tx),
+        .data_len(act_rx_len),
         .fifod_rxen(fifoc_rxen),
         .fifod_rxd(fifoc_rxd),
         .udp_txen(udp_txen),
@@ -294,14 +345,14 @@ module top
         .flag_udp_tx_req(flag_udp_tx_req)
     );
 
-    // led
-    // led_dut (
-    //     .sys_clk(sys_clk),
-    //     .rst(rst),
-    //     .data(data_test),
-    //     .lec(lec),
-    //     .led(led)
-    // );
+    led
+    led_dut (
+        .sys_clk(sys_clk),
+        .rst(rst),
+        .data(data_test[7:0]),
+        .lec(lec),
+        .led(led)
+    );
 
 endmodule
 
