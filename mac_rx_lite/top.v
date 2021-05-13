@@ -349,7 +349,7 @@ module top
     led_dut (
         .sys_clk(sys_clk),
         .rst(rst),
-        .data(data_test[7:0]),
+        .data(act_rx_len[7:0]),
         .lec(lec),
         .led(led)
     );
