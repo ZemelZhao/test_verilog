@@ -18,3 +18,15 @@ set_property PACKAGE_PIN B16 [get_ports uart_rx]
 
 set_property IOSTANDARD LVCMOS33 [get_ports uart_tx]
 set_property PACKAGE_PIN D11 [get_ports uart_tx]
+
+set_property IOSTANDARD LVCMOS33 [get_ports {led[*]}]
+set_property PACKAGE_PIN J15 [get_ports {led[0]}]
+set_property PACKAGE_PIN K15 [get_ports {led[1]}]
+set_property PACKAGE_PIN G16 [get_ports {led[2]}]
+set_property PACKAGE_PIN H16 [get_ports {led[3]}]
+
+# set_property IOSTANDARD LVCMOS33 [get_ports key]
+# set_property PACKAGE_PIN AA21 [get_ports key]
+
+set_property IOSTANDARD LVCMOS33 [get_ports lec]
+set_property PACKAGE_PIN G15 [get_ports lec]
