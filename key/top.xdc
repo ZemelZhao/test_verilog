@@ -25,4 +25,7 @@ create_clock -period 20 [get_ports sys_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports sys_clk]
 set_property PACKAGE_PIN P15 [get_ports sys_clk]
 
+set_property IOSTANDARD LVCMOS33 [get_ports key]
+set_property PACKAGE_PIN M15 [get_ports key]
+
 
