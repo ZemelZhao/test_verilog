@@ -5,6 +5,8 @@ input                           rst_n,        //reset ,low active
 input                           uart_rx,      //fpga receive data
 output                          uart_tx,      //fpga send data
 
+input key,
+
 output lec,
 output [3:0] led
 );
@@ -23,8 +25,10 @@ output [3:0] led
     wire [7:0] fifo_rxd;
 
     wire [7:0] data_len;
+    wire fs, fd;
 
     assign fifo_rxen = 1'b0;
+    assign data_len = 8'd12;
 
     
 
@@ -60,29 +64,26 @@ output [3:0] led
 ADD
 ****************************************************************************/
 
-    fifo
-    fifo_dut(
-        .wr_clk(sys_clk),
-        .wr_en(fifo_txen),
-        .din(fifo_txd),
-        .rd_clk(sys_clk),
-        .rd_en(fifo_rxen),
-        .dout(fifo_rxd),
-        .rst(rst)
+    key 
+    key_dut (
+        .clk(sys_clk),
+        .key(key),
+        .fs(fs),
+        .fd(fd)
     );
-
-    uart2fifo 
-    uart2fifo_dut (
+        
+    fifo2uart 
+    fifo2uart_dut(
         .clk(sys_clk),
         .rst(rst),
-        .uart_rxdv(uart_rxdv),
-        .uart_rxdr(uart_rxdr),
-        .uart_rxd(uart_rxd),
-        .fifo_txd(fifo_txd),
-        .fifo_txen(fifo_txen),
-        .fd(),
-        .fs(),
-        .data_len(data_len)
+        .fs(fs),
+        .fd(fd),
+        .uart_txdr(uart_txdr),
+        .uart_txdv(uart_txdv),
+        .fifo_rxen(fifo_rxen),
+        .data_len(data_len),
+        .fifo_rxd(fifo_rxd),
+        .uart_txd(uart_txd)
     );
 
     led 
