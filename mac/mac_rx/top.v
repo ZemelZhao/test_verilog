@@ -9,8 +9,7 @@ module top
     input rst_n,
 
     // LED_SECTION
-    output lec,
-    output [3:0] led,
+    
 
 // ETH SECTION
     output e_mdc,
@@ -349,14 +348,15 @@ module top
         .cmd_reg7(cmd_reg7)
     );
 
-    led 
-    led_dut (
-        .sys_clk(sys_clk),
-        .rst(rst),
-        .data(adc_reg07),
-        .lec(lec),
-        .led(led)
+    led(
+        .reg00(),
+        .reg01(),
+        .reg02(),
+        .reg03(),
+
+        led()
     );
+
 
 endmodule
 
