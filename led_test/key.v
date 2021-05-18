@@ -6,7 +6,7 @@ module key(
     input fd
 );
 
-    localparam TIME_CNT = 32'd500_000, TIME = 32'd50_000_000;
+    localparam TIME_CNT = 32'd500_000, TIME = 32'd500_000;
 
     localparam IDLE = 4'h0, PREP = 4'h1, WORK = 4'h2;
     reg [31:0] cnt;
