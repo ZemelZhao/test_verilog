@@ -145,6 +145,4 @@ module led(
         else data_cnt <= data_cnt;
     end
 
-
-
 endmodule
