@@ -9,7 +9,11 @@ module top
     input rst_n,
 
     // LED_SECTION
-    
+    input keyu,
+    input keyd,
+
+    output [3:0] lec,
+    output [31:0] led,
 
 // ETH SECTION
     output e_mdc,
@@ -19,10 +23,6 @@ module top
     input rgmii_rxctl,
     input [3:0] rgmii_rxd
 
-    // ADC
-    // TEST
-    // input fs_adc_ext,
-    // input [2:0] dev_num_ext
 );
 
 
@@ -158,6 +158,9 @@ module top
     
 // ERROR
     wire err_fifoc2cs;
+
+// LED
+wire fs_keyu, fs_keyd, fd_keyu, fd_keyd;
 
 //  LVDS
     assign rst = ~rst_n;
@@ -348,13 +351,36 @@ module top
         .cmd_reg7(cmd_reg7)
     );
 
-    led(
-        .reg00(),
-        .reg01(),
-        .reg02(),
-        .reg03(),
+    key
+    key_dutu(
+        .clk(sys_clk),
+        .key(keyu),
+        .fs(fs_keyu),
+        .fd(fd_keyu)
+    );
 
-        led()
+    key
+    key_dutd(
+        .clk(sys_clk),
+        .key(keyd),
+        .fs(fs_keyd),
+        .fd(fd_keyd)
+    );
+
+    led
+    led_dut(
+        .clk(sys_clk),
+        .rst(~rst_n),
+        .num(8'h2),
+        .lec(lec),
+        .led(led),
+        .fsu(fs_keyu),
+        .fsd(fs_keyd),
+        .fdu(fd_keyu),
+        .fdd(fd_keyd),
+        .reg00(cmd_kdev), .reg01(cmd_smpr), .reg02(cmd_filt), .reg03(8'h6B),
+        .reg04(cmd_mix0), .reg05(cmd_mix1), .reg06(8'h55), .reg07(8'hAA),
+        .reg08(cmd_reg4), .reg09(cmd_reg5), .reg0A(cmd_reg6), .reg0B(cmd_reg7)
     );
 
 

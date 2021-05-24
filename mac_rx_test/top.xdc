@@ -50,10 +50,9 @@ set_property PACKAGE_PIN U22 [get_ports {led[2]}]
 set_property PACKAGE_PIN P22 [get_ports {led[1]}]
 set_property PACKAGE_PIN AB21 [get_ports {led[0]}]
 
-set_property IOSTANDARD LVCMOS33 [get_ports keyu]
-set_property PACKAGE_PIN AB19 [get_ports keyu]
-set_property IOSTANDARD LVCMOS33 [get_ports keyd]
-set_property PACKAGE_PIN AA21 [get_ports keyd]
+set_property IOSTANDARD LVCMOS33 [get_ports key[*]]
+set_property PACKAGE_PIN AB19 [get_ports key[1]]
+set_property PACKAGE_PIN AA21 [get_ports key[0]]
 
 create_clock -period 20 [get_ports sys_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports sys_clk]
