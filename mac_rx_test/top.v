@@ -68,107 +68,96 @@ module top(
     wire [7:0] adc_reg09, adc_reg10, adc_reg11;
     wire [7:0] adc_reg12, adc_reg13, adc_regap;
 
+    wire [7:0] fifoc_txd, fifoc_rxd;
+    wire fifoc_txen, fifoc_rxen;
+
 // CS 
 // #region
-    cs 
-    cs_dut(
-        .clk(sys_clk),
-        .rst(~rst_n),
-        .spi_mc(),
-        .fs_adc_ext(),
-        .dev_num_ext(),
-        .dev_info(dev_info),
-        .dev_kind(dev_kind),
-        .dev_smpr(dev_smpr),
-        .eth_rx_len(eth_rx_len),
-        .eth_tx_len(eth_tx_len),
-        .adc_rx_len(adc_rx_len),
-        .cmd_kdev(cmd_kdev),
-        .cmd_smpr(cmd_smpr),
-        .cmd_filt(cmd_filt),
-        .cmd_mix0(cmd_mix0),
-        .cmd_mix1(cmd_mix1),
-        .cmd_reg4(cmd_reg4),
-        .cmd_reg5(cmd_reg5),
-        .cmd_reg6(cmd_reg6),
-        .cmd_reg7(cmd_reg7),
-        .adc_reg00(adc_reg00),
-        .adc_reg01(adc_reg01),
-        .adc_reg02(adc_reg02),
-        .adc_reg03(adc_reg03),
-        .adc_reg04(adc_reg04),
-        .adc_reg05(adc_reg05),
-        .adc_reg06(adc_reg06),
-        .adc_reg07(adc_reg07),
-        .adc_reg08(adc_reg08),
-        .adc_reg09(adc_reg09),
-        .adc_reg10(adc_reg10),
-        .adc_reg11(adc_reg11),
-        .adc_reg12(adc_reg12),
-        .adc_reg13(adc_reg13),
-        .adc_regap(adc_regap),
-        .fs_udp_rx(fs_udp_rx),
-        .fs_udp_tx(fs_udp_tx),
-        .fs_fifod2mac(),
-        .fs_mac2fifoc(fs_mac2fifoc),
-        .fs_fifoc2cs(fs_fifoc2cs),
-        .fs_adc_check(),
-        .fs_adc_conf(),
-        .fs_adc_read(),
-        .fs_adc_fifo(),
-        .fd_udp_rx(fd_udp_rx),
-        .fd_udp_tx(fd_udp_tx),
-        .fd_fifod2mac(),
-        .fd_mac2fifoc(fd_mac2fifoc),
-        .fd_fifoc2cs(fd_fifoc2cs),
-        .fd_adc_check(),
-        .fd_adc_conf(),
-        .fd_adc_read(),
-        .fd_adc_fifo(),
-        .rst_mac(rst_mac),
-        .rst_adc(),
-        .rst_fifod(),
-        .rst_fifoc(rst_fifoc),
-        .rst_eth2mac(rst_eth2mac),
-        .rst_fifod2mac(),
-        .rst_mac2fifoc(rst_mac2fifoc),
-        .rst_adc2fifod(),
-        .rst_fifoc2cs(rst_fifoc2cs)
-    );
+    // cs 
+    // cs_dut(
+    //     .clk(sys_clk),
+    //     .rst(~rst_n),
+    //     .spi_mc(),
+    //     .fs_adc_ext(),
+    //     .dev_num_ext(),
+    //     .dev_info(dev_info),
+    //     .dev_kind(dev_kind),
+    //     .dev_smpr(dev_smpr),
+    //     .eth_rx_len(eth_rx_len),
+    //     .eth_tx_len(eth_tx_len),
+    //     .adc_rx_len(adc_rx_len),
+    //     .cmd_kdev(cmd_kdev),
+    //     .cmd_smpr(cmd_smpr),
+    //     .cmd_filt(cmd_filt),
+    //     .cmd_mix0(cmd_mix0),
+    //     .cmd_mix1(cmd_mix1),
+    //     .cmd_reg4(cmd_reg4),
+    //     .cmd_reg5(cmd_reg5),
+    //     .cmd_reg6(cmd_reg6),
+    //     .cmd_reg7(cmd_reg7),
+    //     .adc_reg00(adc_reg00),
+    //     .adc_reg01(adc_reg01),
+    //     .adc_reg02(adc_reg02),
+    //     .adc_reg03(adc_reg03),
+    //     .adc_reg04(adc_reg04),
+    //     .adc_reg05(adc_reg05),
+    //     .adc_reg06(adc_reg06),
+    //     .adc_reg07(adc_reg07),
+    //     .adc_reg08(adc_reg08),
+    //     .adc_reg09(adc_reg09),
+    //     .adc_reg10(adc_reg10),
+    //     .adc_reg11(adc_reg11),
+    //     .adc_reg12(adc_reg12),
+    //     .adc_reg13(adc_reg13),
+    //     .adc_regap(adc_regap),
+    //     .fs_udp_rx(fs_udp_rx),
+    //     .fs_udp_tx(fs_udp_tx),
+    //     .fs_fifod2mac(),
+    //     .fs_mac2fifoc(fs_mac2fifoc),
+    //     .fs_fifoc2cs(fs_fifoc2cs),
+    //     .fs_adc_check(),
+    //     .fs_adc_conf(),
+    //     .fs_adc_read(),
+    //     .fs_adc_fifo(),
+    //     .fd_udp_rx(fd_udp_rx),
+    //     .fd_udp_tx(fd_udp_tx),
+    //     .fd_fifod2mac(),
+    //     .fd_mac2fifoc(fd_mac2fifoc),
+    //     .fd_fifoc2cs(fd_fifoc2cs),
+    //     .fd_adc_check(),
+    //     .fd_adc_conf(),
+    //     .fd_adc_read(),
+    //     .fd_adc_fifo(),
+    //     .rst_mac(rst_mac),
+    //     .rst_adc(),
+    //     .rst_fifod(),
+    //     .rst_fifoc(rst_fifoc),
+    //     .rst_eth2mac(rst_eth2mac),
+    //     .rst_fifod2mac(),
+    //     .rst_mac2fifoc(rst_mac2fifoc),
+    //     .rst_adc2fifod(),
+    //     .rst_fifoc2cs(rst_fifoc2cs)
+    // );
 
-    mac2fifoc 
-    mac2fifoc_dut(
-        .clk(clk),
-        .rst(rst_mac2fifoc),
-        .fs(fs_mac2fifoc),
-        .fd(fd_mac2fifoc),
-        .udp_rxd(udp_rxd),
-        .udp_rx_addr(udp_rx_addr),
-        .udp_rx_len(udp_rx_len),
-        .fifoc_txd(fifoc_txd),
-        .fifoc_txen(fifoc_txen),
-        .dev_rx_len(dev_rx_len)
-    );
-
-    fifoc2cs 
-    fifoc2cs_dut(
-        .clk(clk),
-        .rst(rst_fifoc2cs),
-        .err(),
-        .fs(fs_fifoc2cs),
-        .fd(fd_fifoc2cs),
-        .fifoc_rxen(fifoc_rxen),
-        .fifoc_rxd(fifoc_rxd),
-        .kind_dev(cmd_kdev),
-        .info_sr(cmd_smpr),
-        .cmd_filt(cmd_filt),
-        .cmd_mix0(cmd_mix0),
-        .cmd_mix1(cmd_mix1),
-        .cmd_reg4(cmd_reg4),
-        .cmd_reg5(cmd_reg5),
-        .cmd_reg6(cmd_reg6),
-        .cmd_reg7(cmd_reg7)
-    );
+    // fifoc2cs 
+    // fifoc2cs_dut(
+    //     .clk(clk),
+    //     .rst(rst_fifoc2cs),
+    //     .err(),
+    //     .fs(fs_fifoc2cs),
+    //     .fd(fd_fifoc2cs),
+    //     .fifoc_rxen(fifoc_rxen),
+    //     .fifoc_rxd(fifoc_rxd),
+    //     .kind_dev(cmd_kdev),
+    //     .info_sr(cmd_smpr),
+    //     .cmd_filt(cmd_filt),
+    //     .cmd_mix0(cmd_mix0),
+    //     .cmd_mix1(cmd_mix1),
+    //     .cmd_reg4(cmd_reg4),
+    //     .cmd_reg5(cmd_reg5),
+    //     .cmd_reg6(cmd_reg6),
+    //     .cmd_reg7(cmd_reg7)
+    // );
 
 
 // #endregion
@@ -235,10 +224,35 @@ module top(
         .fd_udp_rx(fd_udp_rx),
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
-        .udp_rx_len(udp_rx_len)
+        .udp_rx_len(eth_rx_len)
     );
 
+    fifod
+    fifoc_dut(
+        .rst(~rst_n),
 
+        .wr_clk(gmii_rxc),
+        .din(fifoc_txd),
+        .wr_en(fifoc_txen),
+
+        .rd_clk(sys_clk),
+        .dout(fifoc_rxd),
+        .rd_en(fifoc_rxen)
+    );
+
+    mac2fifoc 
+    mac2fifoc_dut(
+        .clk(gmii_rxc),
+        .rst(~rst_n),
+        .fs(fs_mac2fifoc),
+        .fd(fd_mac2fifoc),
+        .udp_rxd(udp_rxd),
+        .udp_rx_addr(udp_rx_addr),
+        .udp_rx_len(udp_rx_len),
+        .fifoc_txd(fifoc_txd),
+        .fifoc_txen(fifoc_txen),
+        .dev_rx_len(eth_rx_len)
+    );
 
 // #endregion
 
