@@ -4,12 +4,17 @@ module fifo_write
     input rst,
     input err,
 
-    output [7:0] dout,
+    output [7:0] fifo_txd,
     output fifo_txen,
 
     input fs,
     output fd,
-    input [11:0] data_len
+    input [11:0] data_len,
+
+    output [3:0] state_fw,
+    output [11:0] fifo_num_fw,
+    output judge_fw,
+    output [11:0] num_fw
 );
 
 
@@ -21,7 +26,11 @@ module fifo_write
     reg [11:0] bag_num, fifo_num;
     assign fd = (state == LAST);
     assign fifo_txen = (state == WORK);
-    assign dout = cache_data[bag_num];
+    assign fifo_txd = cache_data[bag_num];
+    assign state_fw = state;
+    assign fifo_num_fw = fifo_num;
+    assign num_fw = data_len;
+    assign judge_fw = (fifo_num == (data_len - 2'h1));
 
     assign cache_data[0] = 8'h55;
     assign cache_data[1] = 8'hAA;
