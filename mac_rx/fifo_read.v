@@ -7,7 +7,6 @@ module fifo_read(
     input [7:0] fifo_rxd,
     output fifo_rxen,
     output reg [0 : 95] res,
-    output [3:0] state_fr,
 
     input fs,
     output fd
@@ -22,7 +21,6 @@ module fifo_read(
     reg [11:0] fifo_num;
     assign fd = (state == LAST);
     assign fifo_rxen = (state == WORK || state == PRE1);
-    assign state_fr = state;
 
     always @(negedge clk or posedge rst) begin
         if(rst) begin

@@ -1,7 +1,7 @@
 module top(
     input sysc,
-    input rgmii_txc,
     input rgmii_rxc,
+    output rgmii_txc,
 
     input rst_n,
 
@@ -26,9 +26,9 @@ module top(
 // MAC
     parameter SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     parameter SOURCE_IP_ADDR = 32'hC0_A8_00_02;
-    parameter SOURCE_PORT = 16'h1F90;
+    parameter SOURCE_PORT = 32'd8080;
     parameter DESTINATION_IP_ADDR = 32'hC0_A8_00_03;
-    parameter DESTINATION_PORT = 16'h1F90;
+    parameter DESTINATION_PORT = 32'd8080;
     parameter MAC_TTL = 8'h80;
     wire mac_rxdv, mac_txdv;
     wire [7:0] mac_rxd, mac_txd;
@@ -36,8 +36,8 @@ module top(
     wire fd_udp_rx, fd_udp_tx;
     wire [7:0] udp_rxd, udp_txd;
     wire flag_udp_tx_req, flag_udp_tx_prep;
-    wire [11:0] dat_tx_len;
-    wire [15:0] udp_rx_len, dat_rx_len;
+    wire [11:0] dat_tx_len, dat_rx_len;
+    wire [15:0] udp_rx_len;
     wire udp_txen;
     wire [10:0] udp_rx_addr;
 
@@ -46,6 +46,9 @@ module top(
     wire fifo_rxen, fifo_txen;
     wire [7:0] fifo_rxd, fifo_txd;
     wire fifo_empty, fifo_full;
+
+    reg fs_fiforead;
+    wire fd_fiforead;
 
 // LED
     wire ledc;
@@ -56,7 +59,6 @@ module top(
 // DATA
     wire [95:0] data;
     wire rst;
-    wire fs_mac2fifoc, fd_mac2fifoc;
     
     assign rst = ~rst_n;
     assign fifo_rxc = sysc;
@@ -64,17 +66,15 @@ module top(
     assign ledc = sysc;
     assign led_num = 4'h2;
 
-    reg [3:0] state, next_state;
-    localparam IDLE = 4'h0, UPRX = 4'h1;
-
-
     always@(posedge sysc or posedge rst) begin
-        if(rst) state <= IDLE;
-        else state <= next_state;
+        if (rst) fs_fiforead <= 1'b0;
+        else if(fd_udp_rx) fs_fiforead <= 1'b1;
+        else if(fd_fiforead) fs_fiforead <= 1'b0;
+        else fs_fiforead <= fs_fiforead;
     end
 
-    assign fs_mac2fifoc = fs_udp_rx;
-    assign fd_udp_rx = fd_mac2fifoc;
+
+
 
 
 // #region
@@ -111,8 +111,8 @@ module top(
         .mac_rxd(mac_rxd),
         .mac_txdv(mac_txdv),
         .mac_txd(mac_txd),
-        .fs_udp_tx(fs_udp_tx),
-        .fd_udp_tx(fd_udp_tx),
+        .fs_udp_tx(),
+        .fd_udp_tx(),
         .udp_tx_len(),
         .flag_udp_tx_req(flag_udp_tx_req),
         .udp_txen(udp_txen),
@@ -149,7 +149,7 @@ module top(
         .fsd(led_fsd),
         .fdu(led_fdu),
         .fdd(led_fdd),
-        .reg00(data[95:88]),
+        .reg00(dat_rx_len[7:0]),
         .reg01(data[87:80]),
         .reg02(data[79:72]),
         .reg03(data[71:64]),
@@ -180,6 +180,19 @@ module top(
         .fd(led_fdd)
     );    
 
+    fifo_read 
+    fifo_read_dut (
+        .clk(sysc),
+        .rst(rst),
+        .err(),
+        .FIFO_NUM(dat_rx_len),
+        .fifo_rxd(fifo_rxd),
+        .fifo_rxen(fifo_rxen),
+        .res(data),
+        .fs(fs_fiforead),
+        .fd(fd_fiforead)
+    );
+
     eth2mac 
     eth2mac_dut (
         .rst(rst),
@@ -199,8 +212,8 @@ module top(
     mac2fifoc_dut (
         .clk(gmii_rxc),
         .rst(rst),
-        .fs(fs_mac2fifoc),
-        .fd(fd_mac2fifoc),
+        .fs(fs_udp_rx),
+        .fd(fd_udp_rx),
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
         .udp_rx_len(udp_rx_len),
