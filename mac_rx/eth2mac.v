@@ -17,7 +17,7 @@ module eth2mac(
 always@(posedge gmii_rxc or posedge rst) begin
     if(rst) begin
         mac_rxdv <= 1'b0;
-        mac_rxd   <= 8'd0;
+        mac_rxd <= 8'd0;
     end
     else begin
         mac_rxdv <= gmii_rxdv;
@@ -28,11 +28,11 @@ end
 always@(posedge gmii_txc or posedge rst) begin
     if(rst) begin
         gmii_txen <= 1'b0;
-        gmii_txd   <= 8'd0;
+        gmii_txd <= 8'd0;
     end
     else begin
         gmii_txen <= mac_txdv;
-        gmii_txd   <= mac_txd;
+        gmii_txd <= mac_txd;
     end
 end
 

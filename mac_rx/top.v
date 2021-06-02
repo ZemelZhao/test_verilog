@@ -32,7 +32,8 @@ module top(
     parameter MAC_TTL = 8'h80;
     wire mac_rxdv, mac_txdv;
     wire [7:0] mac_rxd, mac_txd;
-    wire fs_udp_rx, fs_udp_tx;
+    wire fs_udp_rx;
+    reg fs_udp_tx;
     wire fd_udp_rx, fd_udp_tx;
     wire [7:0] udp_rxd, udp_txd;
     wire flag_udp_tx_req, flag_udp_tx_prep;
@@ -66,16 +67,18 @@ module top(
     assign ledc = sysc;
     assign led_num = 4'h2;
 
-    always@(posedge sysc or posedge rst) begin
-        if (rst) fs_fiforead <= 1'b0;
-        else if(fd_udp_rx) fs_fiforead <= 1'b1;
-        else if(fd_fiforead) fs_fiforead <= 1'b0;
-        else fs_fiforead <= fs_fiforead;
+    // always@(posedge sysc or posedge rst) begin
+    //     if (rst) fs_fiforead <= 1'b0;
+    //     else if(fd_udp_rx) fs_fiforead <= 1'b1;
+    //     else if(fd_fiforead) fs_fiforead <= 1'b0;
+    //     else fs_fiforead <= fs_fiforead;
+    // end
+    always @(posedge sysc or posedge rst) begin
+        if(rst) fs_udp_tx <= 1'b0;
+        else if(fd_udp_rx) fs_udp_tx <= 1'b1;
+        else if(fd_udp_tx) fs_udp_tx <= 1'b0;
+        else fs_udp_tx <= fs_udp_tx;
     end
-
-
-
-
 
 // #region
     eth 
@@ -111,9 +114,9 @@ module top(
         .mac_rxd(mac_rxd),
         .mac_txdv(mac_txdv),
         .mac_txd(mac_txd),
-        .fs_udp_tx(),
-        .fd_udp_tx(),
-        .udp_tx_len(),
+        .fs_udp_tx(fs_udp_tx),
+        .fd_udp_tx(fd_udp_tx),
+        .udp_tx_len(dat_tx_len),
         .flag_udp_tx_req(flag_udp_tx_req),
         .udp_txen(udp_txen),
         .flag_udp_tx_prep(flag_udp_tx_prep),
@@ -138,60 +141,76 @@ module top(
         .empty(fifo_empty)
     );
 
-    led 
-    led_dut (
-        .clk(ledc),
+    fifod2mac 
+    fifod2mac_dut(
+        .clk(gmii_txc),
         .rst(rst),
-        .num(led_num),
-        .lec(lec),
-        .led(led),
-        .fsu(led_fsu),
-        .fsd(led_fsd),
-        .fdu(led_fdu),
-        .fdd(led_fdd),
-        .reg00(dat_rx_len[7:0]),
-        .reg01(data[87:80]),
-        .reg02(data[79:72]),
-        .reg03(data[71:64]),
-        .reg04(data[63:56]),
-        .reg05(data[55:48]),
-        .reg06(data[47:40]),
-        .reg07(data[39:32]),
-        .reg08(data[31:24]),
-        .reg09(data[23:16]),
-        .reg0A(data[15:8]),
-        .reg0B(data[7:0])
+        .fs(fs_udp_tx),
+        .fd(fd_udp_tx),
+        .data_len(dat_tx_len),
+        .fifod_rxen(fifo_rxen),
+        .fifod_rxd(fifo_rxd),
+        .udp_txen(udp_txen),
+        .udp_txd(udp_txd),
+        .flag_udp_tx_prep(flag_udp_tx_prep),
+        .flag_udp_tx_req(flag_udp_tx_req)
     );
 
 
-    key 
-    key_dutu (
-        .clk(sysc),
-        .key(key[1]),
-        .fs(led_fsu),
-        .fd(led_fdu)
-    );
+    // led 
+    // led_dut (
+    //     .clk(ledc),
+    //     .rst(rst),
+    //     .num(led_num),
+    //     .lec(lec),
+    //     .led(led),
+    //     .fsu(led_fsu),
+    //     .fsd(led_fsd),
+    //     .fdu(led_fdu),
+    //     .fdd(led_fdd),
+    //     .reg00(dat_rx_len[7:0]),
+    //     .reg01(data[87:80]),
+    //     .reg02(data[79:72]),
+    //     .reg03(data[71:64]),
+    //     .reg04(data[63:56]),
+    //     .reg05(data[55:48]),
+    //     .reg06(data[47:40]),
+    //     .reg07(data[39:32]),
+    //     .reg08(data[31:24]),
+    //     .reg09(data[23:16]),
+    //     .reg0A(data[15:8]),
+    //     .reg0B(data[7:0])
+    // );
 
-    key 
-    key_dutd(
-        .clk(sysc),
-        .key(key[0]),
-        .fs(led_fsd),
-        .fd(led_fdd)
-    );    
 
-    fifo_read 
-    fifo_read_dut (
-        .clk(sysc),
-        .rst(rst),
-        .err(),
-        .FIFO_NUM(dat_rx_len),
-        .fifo_rxd(fifo_rxd),
-        .fifo_rxen(fifo_rxen),
-        .res(data),
-        .fs(fs_fiforead),
-        .fd(fd_fiforead)
-    );
+    // key 
+    // key_dutu (
+    //     .clk(sysc),
+    //     .key(key[1]),
+    //     .fs(led_fsu),
+    //     .fd(led_fdu)
+    // );
+
+    // key 
+    // key_dutd(
+    //     .clk(sysc),
+    //     .key(key[0]),
+    //     .fs(led_fsd),
+    //     .fd(led_fdd)
+    // );    
+
+    // fifo_read 
+    // fifo_read_dut (
+    //     .clk(sysc),
+    //     .rst(rst),
+    //     .err(),
+    //     .FIFO_NUM(dat_rx_len),
+    //     .fifo_rxd(fifo_rxd),
+    //     .fifo_rxen(fifo_rxen),
+    //     .res(data),
+    //     .fs(fs_fiforead),
+    //     .fd(fd_fiforead)
+    // );
 
     eth2mac 
     eth2mac_dut (

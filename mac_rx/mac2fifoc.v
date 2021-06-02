@@ -70,6 +70,4 @@ module mac2fifoc(
         else fifoc_txen <= 1'b0;
     end
 
-
-
 endmodule

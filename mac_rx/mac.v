@@ -1,41 +1,6 @@
-// ## 0. DOCUMENT SECTION
-// #region 
-//////////////////////////////////////////////////////////////////////////////////
-//                                                                              //
-//                                                                              //
-//      Author: ZemZhao                                                         //
-//      E-mail: zemzhao@163.com                                                 //
-//      Please feel free to contact me if there are BUGs in my program.         //
-//      For I know they are everywhere.                                         //
-//      I can do nothing but encourage you to debug desperately.                //
-//      GOOD LUCK, HAVE FUN!!                                                   //
-//////////////////////////////////////////////////////////////////////////////////
-//                                                                              //
-//                              SJTU BCI-Lab 205                                //
-//                            All rights reserved                               //
-//                                                                              //
-//////////////////////////////////////////////////////////////////////////////////
-// mac.v:
-// 该文件在
-
-// ## 1. 具体功能
-// * 
-
-// ## 2. 变量综述
-// * fifo_rxen 
-// * up_txen 
-// *  
-
-// ! 这个还是有一个问题，在发送多次数据之后，会出现无法继续运行的问题
-// ! 现在怀疑是flag_udp_tx_prep在多次发送之后未准备完成
-// ! 究其原因，就是udp_tx中的fifo满了，导致后面的问题，但是这个问题现在还没法修改
-
-//////////////////////////////////////////////////////////////////////////////////
-// #endregion 
-
 module mac(
-    input gmii_txc,
-    input gmii_rxc,
+    input gmii_tx_clk ,
+    input gmii_rx_clk ,
     input rst,     
 
     // MAC_INFO
@@ -47,9 +12,9 @@ module mac(
     input [31:0] det_port,
 
     // ETH
-    input mac_rxdv,
+    input mac_rx_dv,
     input [7:0] mac_rxd,
-    output mac_txdv,
+    output mac_tx_dv,
     output [7:0] mac_txd,
 
 
@@ -80,6 +45,7 @@ localparam WAIT = 4'h7;
 localparam SEND = 4'h8, RECV = 4'h9;
 
 reg [31:0] wait_cnt;
+
 reg [11:0] tx_len;
 
 wire arp_request_req;
@@ -89,14 +55,16 @@ wire udp_tx_end;
 wire mac_send_end;
 wire arp_found;
 wire mac_not_exist;
-wire flag_udp_rxdv;
+wire flag_udp_rx_dv;
 
 reg [3:0] state, next_state;
+
 assign fs_udp_rx = (state == RECV);
+
 assign arp_request_req = (state == ARP_REQ);
 
 
-always @(posedge gmii_txc or posedge rst) begin
+always @(posedge gmii_tx_clk or posedge rst) begin
     if(rst) state <= IDLE;
     else state <= next_state;
 end
@@ -131,7 +99,7 @@ always @(*) begin
         end
         WAIT: begin
             if(fs_udp_tx) next_state <= SEND;
-            if(flag_udp_rxdv) next_state <= RECV;
+            if(flag_udp_rx_dv) next_state <= RECV;
             else next_state <= WAIT;
         end
         SEND: begin
@@ -146,16 +114,16 @@ always @(*) begin
     endcase
 end
 
-always @(posedge gmii_txc or posedge rst) begin
+always @(posedge gmii_tx_clk or posedge rst) begin
     if(rst) wait_cnt <= 32'h0;
-    else if(state == IDLE || state == ARP_WAIT || state == ARP_NAP ) wait_cnt <= wait_cnt + 1'b1;
+    else if(state == IDLE || state == ARP_WAIT || state == ARP_NAP) wait_cnt <= wait_cnt + 1'b1;
     else wait_cnt <= 32'h0;
 end
 
 
 mac_top mac_top0(
-	.gmii_tx_clk				 (gmii_txc),
-	.gmii_rx_clk                 (gmii_rxc),
+	.gmii_tx_clk				 (gmii_tx_clk),
+	.gmii_rx_clk                 (gmii_rx_clk),
 	.rst_n                       (~rst),
 	
 	.source_mac_addr             (src_mac_addr),
@@ -165,9 +133,9 @@ mac_top mac_top0(
 	.udp_send_source_port        (src_port),
 	.udp_send_destination_port   (det_port),
 
-	.mac_data_valid              (mac_txdv),
+	.mac_data_valid              (mac_tx_dv),
 	.mac_tx_data                 (mac_txd),
-	.rx_dv                       (mac_rxdv),
+	.rx_dv                       (mac_rx_dv),
 	.mac_rx_datain               (mac_rxd),
 	
 	.ram_wr_data                 (udp_txd),
@@ -181,12 +149,13 @@ mac_top mac_top0(
 	.udp_rec_ram_rdata           (udp_rxd),
 	.udp_rec_ram_read_addr       (udp_rx_addr),
 	.udp_rec_data_length         (udp_rx_len),
-	.udp_rec_data_valid          (flag_udp_rxdv),
+	.udp_rec_data_valid          (flag_udp_rx_dv),
 
 	.arp_request_req             (arp_request_req),
 	.mac_send_end                (mac_send_end),
 	.arp_found                   (arp_found),
 	.mac_not_exist               (mac_not_exist)
 );
+
 
 endmodule
