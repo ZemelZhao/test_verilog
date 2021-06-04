@@ -8,7 +8,8 @@ module top(
 );
 
     parameter LEN = 12'hC;
-    localparam IDLE = 3'h0, FIWR = 3'h1, WAIT = 3'h2, FIRD = 3'h3, LAST = 3'h4;
+    localparam IDLE = 3'h0, FIWR = 3'h1, WAIT = 3'h2, FIRD = 3'h3;
+    localparam LAST = 3'h4, LAT0 = 3'h5, LAT1 = 3'h6;
 
     wire rst;
     wire fs_fw, fs_fr;
@@ -33,13 +34,16 @@ module top(
         else begin
             case(state)
                 IDLE: begin
-                    if(fifo_full) state <= FIWR;
+                    if(~fifo_full) state <= FIWR;
                     else state <= IDLE;
                 end
                 FIWR: if(fd_fw) state <= WAIT;
                 WAIT: state <= FIRD;
                 FIRD: if(fd_fr) state <= LAST;
-                LAST: state <= LAST;
+                LAST: state <= LAT0;
+                LAT0: state <= LAT1;
+                LAT1: state <= LAT1;
+                default: state <= IDLE;
             endcase
         end
     end
@@ -131,6 +135,23 @@ module top(
         .key(key[0]),
         .fs(fsd),
         .fd(fdd)
+    );
+
+    ilap
+    ilap_dut(
+        .clk(sys_clk),
+        .probe0(fifo_txd),
+        .probe1(fifo_rxd),
+        .probe2(data),
+        .probe3(state),
+        .probe4(fs_fw),
+        .probe5(fd_fw),
+        .probe6(fs_fr),
+        .probe7(fd_fr),
+        .probe8(fifo_txen),
+        .probe9(fifo_rxen),
+        .probe10(fifo_full),
+        .probe11(fifo_empty)
     );
 // #endregion
 
