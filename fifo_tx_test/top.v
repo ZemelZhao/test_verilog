@@ -32,13 +32,13 @@ module top(
     // wire fd_udp_rx, fd_udp_tx;
     // wire [7:0] udp_rxd, udp_txd;
     // wire flag_udp_tx_req, flag_udp_tx_prep;
-    wire [11:0] dat_tx_len, dat_rx_len;
+    // wire [11:0] dat_tx_len, dat_rx_len;
     // wire [15:0] udp_rx_len;
     // wire udp_txen;
     // wire [10:0] udp_rx_addr;
 
 // FIFO
-    wire fifo_rxc, fifo_txc;
+    wire [11:0] dat_tx_len;
     wire fifo_rxen, fifo_txen;
     wire [7:0] fifo_rxd, fifo_txd;
     wire fifo_empty, fifo_full;
@@ -65,7 +65,10 @@ module top(
         end
         else begin
             case(state)
-                IDLE: state <= WAIT;
+                IDLE: begin
+                    if(fifo_full == 1'b0) state <= WAIT;
+                    else state <= IDLE;
+                end
                 WAIT: begin
                     if(fd_keys) state <= FIRD;
                     else state <= WAIT;
