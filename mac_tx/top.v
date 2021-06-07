@@ -29,7 +29,7 @@ module top(
     wire mac_rxdv, mac_txdv;
     wire [7:0] mac_rxd, mac_txd;
     wire fs_udp_rx;
-    reg fs_udp_tx;
+    wire fs_udp_tx;
     wire fd_udp_rx, fd_udp_tx;
     wire [7:0] udp_rxd, udp_txd;
     wire flag_udp_tx_req, flag_udp_tx_prep;
@@ -47,20 +47,38 @@ module top(
     wire rst;
     wire fs_key, fd_key;
     reg [3:0] reg_led;
+    reg [3:0] state;
+    localparam IDLE = 4'h1, WAIT = 4'h2, UPTX = 4'h3, LAST = 4'h4;
 
     assign rst = ~rst_n;
     assign dat_tx_len = 12'hC;
     assign led[0] = fifo_full;
-    assign led[3:1] = reg_led;
+    assign led[3:1] = ~reg_led;
+
+    assign fs_udp_tx = (state == UPTX);
 
     always@(posedge sysc or posedge rst) begin
         if(rst) begin
-            reg_led[3:1] <= 3'h2;
-            fs_udp_tx <= 1'b0;
+            state <= IDLE;
+            reg_led <= 3'h2;
         end
-        else if(fd_key) fs_udp_tx <= 1'b1;
-        else if(fd_udp_tx) fs_udp_tx <= 1'b0;
-        else fs_udp_tx <= fs_udp_tx;
+        else begin
+            reg_led <= 3'h0;
+            case(state) 
+                IDLE: state <= WAIT;
+                WAIT: begin
+                    if(fd_key) state <= UPTX;
+                    else state <= WAIT;
+                end
+                UPTX: begin
+                    if(fd_udp_tx) state <= LAST;
+                    else state <= UPTX;
+                end
+                LAST: begin
+                    state <= IDLE;
+                end
+            endcase
+        end
     end
 
     eth 
@@ -102,7 +120,7 @@ module top(
         .flag_udp_tx_req(flag_udp_tx_req),
         .udp_txen(udp_txen),
         .flag_udp_tx_prep(flag_udp_tx_prep),
-        .udp_txd(8'h5A),
+        .udp_txd(udp_txd),
         .fs_udp_rx(fs_udp_rx),
         .fd_udp_rx(fd_udp_rx),
         .udp_rxd(udp_rxd),

@@ -1,15 +1,14 @@
 module top(
     input sys_clk,
-    input rst_n,
 
-    input [1:0] key,
+    input [3:0] key,
     output [3:0] lec,
     output [31:0] led
 );
 
     parameter LEN = 12'hC;
     localparam IDLE = 3'h0, FIWR = 3'h1, WAIT = 3'h2, FIRD = 3'h3;
-    localparam LAST = 3'h4, LAT0 = 3'h5, LAT1 = 3'h6;
+    localparam LAST = 3'h4, LAT0 = 3'h5, LAT1 = 3'h6, IDFS = 3'h7;
 
     wire rst;
     wire fs_fw, fs_fr;
@@ -17,14 +16,13 @@ module top(
     wire [95:0] data;
     wire [7:0] fifo_txd, fifo_rxd;
     wire fifo_txen, fifo_rxen;
-    wire fsu, fdu, fsd, fdd;
+    wire fs_keys, fs_keyc, fd_keys, fd_keyc;
     wire [3:0] num;
     wire fifo_full, fifo_empty;
 
     reg [2:0] state;
-    assign rst = ~rst_n;
+    assign rst = ~key[3];
     assign num = 4'h2;
-    assign fs_fw = (state == FIWR);
     assign fs_fr = (state == FIRD);
 
     always @(posedge sys_clk or posedge rst) begin
@@ -34,15 +32,17 @@ module top(
         else begin
             case(state)
                 IDLE: begin
-                    if(~fifo_full) state <= FIWR;
+                    if(fifo_full == 1'b0) state <= WAIT;
                     else state <= IDLE;
                 end
-                FIWR: if(fd_fw) state <= WAIT;
-                WAIT: state <= FIRD;
+                WAIT: begin
+                    if(fd_keys) state <= FIRD;
+                    else state <= WAIT;
+                end
                 FIRD: if(fd_fr) state <= LAST;
                 LAST: state <= LAT0;
                 LAT0: state <= LAT1;
-                LAT1: state <= LAT1;
+                LAT1: state <= IDLE;
                 default: state <= IDLE;
             endcase
         end
@@ -71,8 +71,8 @@ module top(
         .err(),
         .fifo_txd(fifo_txd),
         .fifo_txen(fifo_txen),
-        .fs(fs_fw),
-        .fd(fd_fw),
+        .fs(fs_keys),
+        .fd(fd_keys),
         .data_len(LEN)
     );
 
@@ -98,14 +98,14 @@ module top(
     led
     led_dut(
         .clk(sys_clk),
-        .rst(~rst_n),
+        .rst(rst),
         .num(num),
         .lec(lec),
         .led(led),
-        .fsu(fsu),
-        .fsd(fsd),
-        .fdu(fdu),
-        .fdd(fdd),
+        .fsu(fs_keyc),
+        .fsd(),
+        .fdu(fd_keyc),
+        .fdd(),
 
         .reg00(data[95:88]),
         .reg01(data[87:80]),
@@ -124,35 +124,36 @@ module top(
     key 
     key_dutu(
         .clk(sys_clk),
-        .key(key[1]),
-        .fs(fsu),
-        .fd(fdu)
+        .key(key[0]),
+        .fs(fs_keys),
+        .fd(fd_keys)
     );
 
     key 
-    key_dutd(
+    key_duts(
         .clk(sys_clk),
-        .key(key[0]),
-        .fs(fsd),
-        .fd(fdd)
+        .key(key[1]),
+        .fs(fs_keyc),
+        .fd(fd_keyc)
     );
 
-    ilap
-    ilap_dut(
-        .clk(sys_clk),
-        .probe0(fifo_txd),
-        .probe1(fifo_rxd),
-        .probe2(data),
-        .probe3(state),
-        .probe4(fs_fw),
-        .probe5(fd_fw),
-        .probe6(fs_fr),
-        .probe7(fd_fr),
-        .probe8(fifo_txen),
-        .probe9(fifo_rxen),
-        .probe10(fifo_full),
-        .probe11(fifo_empty)
-    );
+    // ilap
+    // ilap_dut(
+    //     .clk(sys_clk),
+    //     .probe0(fifo_txd),
+    //     .probe1(fifo_rxd),
+    //     .probe2(data),
+    //     .probe3(state),
+    //     .probe4(fs_keys),
+    //     .probe5(fd_keys),
+    //     .probe6(fs_fr),
+    //     .probe7(fd_fr),
+    //     .probe8(fifo_txen),
+    //     .probe9(fifo_rxen),
+    //     .probe10(fifo_full),
+    //     .probe11(fifo_empty)
+    // );
+
 // #endregion
 
 endmodule
