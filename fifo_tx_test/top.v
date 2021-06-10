@@ -10,8 +10,8 @@ module top(
     output rgmii_txctl,
     input [3:0] rgmii_rxd,
     output [3:0] rgmii_txd,
-    output [3:0] lec
-    // output [31:0] led
+    output [3:0] lec,
+    output [31:0] led
 );
 
     wire gmii_rxc, gmii_txc;
@@ -36,6 +36,7 @@ module top(
     wire [15:0] udp_rx_len;
     wire udp_txen;
     wire [10:0] udp_rx_addr;
+    wire [31:0] leds;
 
 // FIFO
     // wire [11:0] dat_tx_len;
@@ -44,8 +45,8 @@ module top(
     wire fifo_empty, fifo_full;
 
     wire rst;
-    wire fs_key; 
-    wire fd_key;
+    wire fs_keyf, fs_keym; 
+    wire fd_keyf, fd_keym;
     // reg [3:0] reg_led;
     reg [3:0] state;
     localparam IDLE = 4'h1, WAIT = 4'h2, UPTX = 4'h3, LAST = 4'h4;
@@ -53,10 +54,15 @@ module top(
     // localparam LAST = 3'h4, LAT0 = 3'h5, LAT1 = 3'h6;
     // wire fs_fw, fs_fr, fd_fw, fd_fr;
     wire [95:0] data;
-    assign fs_udp_tx = (state == UPTX);
 
     assign rst = ~key[3];
     assign dat_tx_len = 12'hC;
+    // assign fs_keym = (state == UPTX);
+    assign led = ~leds;
+    assign lec = ~state;
+    assign leds[21] = key[1];
+    assign leds[20] = key[0];
+    assign leds[12] = key[3];
 
     always@(posedge sysc or posedge rst) begin
         if(rst) begin
@@ -69,11 +75,11 @@ module top(
                     else state <= IDLE;
                 end
                 WAIT: begin
-                    if(fd_key) state <= UPTX;
+                    if(fd_keyf) state <= UPTX;
                     else state <= WAIT;
                 end
                 UPTX: begin
-                    if(fd_udp_tx) state <= LAST;
+                    if(fd_keym) state <= LAST;
                     else state <= UPTX;
                 end
                 LAST: begin
@@ -116,8 +122,8 @@ module top(
         .mac_rxd(mac_rxd),
         .mac_txdv(mac_txdv),
         .mac_txd(mac_txd),
-        .fs_udp_tx(fs_udp_tx),
-        .fd_udp_tx(fd_udp_tx),
+        .fs_udp_tx(fs_keym),
+        .fd_udp_tx(fs_keym),
         .udp_tx_len(dat_tx_len),
         .flag_udp_tx_req(flag_udp_tx_req),
         .udp_txen(udp_txen),
@@ -127,7 +133,8 @@ module top(
         .fd_udp_rx(fd_udp_rx),
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
-        .udp_rx_len(udp_rx_len)
+        .udp_rx_len(udp_rx_len),
+        .state_mac(leds[19:16])
     );
 
     fifod
@@ -140,22 +147,26 @@ module top(
         .rd_clk(gmii_txc),
         .rd_en(fifo_rxen),
         .dout(fifo_rxd),
-        .empty(fifo_empty)
+        .empty(fifo_empty),
+        .rd_data_count(leds[31:22]),
+        .wr_data_count()
+
     );
 
     fifod2mac 
     fifod2mac_dut(
         .clk(gmii_txc),
         .rst(rst),
-        .fs(fs_udp_tx),
-        .fd(fd_udp_tx),
+        .fs(fs_keym),
+        .fd(fd_keym),
         .data_len(dat_tx_len),
         .fifod_rxen(fifo_rxen),
         .fifod_rxd(fifo_rxd),
         .udp_txen(udp_txen),
         .udp_txd(udp_txd),
         .flag_udp_tx_prep(flag_udp_tx_prep),
-        .flag_udp_tx_req(flag_udp_tx_req)
+        .flag_udp_tx_req(flag_udp_tx_req),
+        .state_fifod2mac(leds[11:8])
     );
 
     eth2mac 
@@ -180,18 +191,26 @@ module top(
         .err(),
         .fifo_txd(fifo_txd),
         .fifo_txen(fifo_txen),
-        .fs(fs_key),
-        .fd(fd_key),
+        .fs(fs_keyf),
+        .fd(fd_keyf),
         .data_len(dat_tx_len)
     );
 
 
     key
-    key_duts(
+    key_dutf(
+        .clk(sysc),
+        .key(key[1]),
+        .fs(fs_keyf),
+        .fd(fd_keyf)
+    );
+
+    key
+    key_dutm(
         .clk(sysc),
         .key(key[0]),
-        .fs(fs_key),
-        .fd(fd_key)
+        .fs(fs_keym),
+        .fd(fd_keym)
     );
 
 endmodule
