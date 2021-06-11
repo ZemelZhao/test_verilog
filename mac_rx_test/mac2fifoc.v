@@ -1,4 +1,7 @@
 module mac2fifoc(
+    //TEST
+    output [3:0] so,
+
     input clk, 
     input rst,
 
