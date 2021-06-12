@@ -2,6 +2,7 @@ module fifo_read(
     input clk,
     input rst,
     input err,
+    output [2:0] so,
     input [11:0] FIFO_NUM,
 
     input [7:0] fifo_rxd,
@@ -15,6 +16,7 @@ module fifo_read(
     reg [2:0] state, next_state;
     localparam [2:0] IDLE = 3'h0, PRE0 = 3'h1, PRE1 = 3'h2;
     localparam [2:0] WORK = 3'h3, LAST = 3'h4;
+    assign so = state;
 
     reg [15:0] addr;  
 

@@ -75,6 +75,7 @@ module top(
     wire [3:0] mac2fifoc_so;
 
     reg [3:0] state;
+    wire [3:0] keys;
     wire [31:0] leds;
     localparam IDLE = 4'h8, MCFC = 4'h9, UPRX = 4'hA, FIFR = 4'hB;
     localparam TEST = 4'h5;
@@ -90,8 +91,12 @@ module top(
     assign fd_udp_rx = (state == UPRX);
     assign fs_fr = (state == FIFR);
     assign rst = ~key[3];
+    assign leds[19:16] = keys;
     assign lec = ~state;
     assign led = ~leds;
+    assign leds[7:0] = eth_rx_len[7:0];
+    assign leds[21] = fs_udp_rx;
+    assign leds[20] = fd_udp_rx;
     
 
     always@(posedge sys_clk or posedge rst) begin
@@ -183,7 +188,8 @@ module top(
         .fd_udp_rx(fd_udp_rx),
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
-        .udp_rx_len(udp_rx_len)
+        .udp_rx_len(udp_rx_len),
+        .so(leds[15:12])
     );
 
     fifod
@@ -197,8 +203,8 @@ module top(
         .rd_clk(sys_clk),
         .dout(fifoc_rxd),
         .rd_en(fifoc_rxen),
-        .rd_data_count(leds[15:6]),
-        .wr_data_count(leds[31:22])
+        .rd_data_count(leds[31:22]),
+        .wr_data_count()
     );
 
     mac2fifoc 
@@ -213,7 +219,7 @@ module top(
         .fifoc_txd(fifoc_txd),
         .fifoc_txen(fifoc_txen),
         .dev_rx_len(eth_rx_len),
-        .so(mac2fifoc_so)
+        .so(leds[11:8])
     );
 
     fifo_read

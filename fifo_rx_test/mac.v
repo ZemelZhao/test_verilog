@@ -34,7 +34,7 @@
 // #endregion 
 
 module mac(
-    output [3:0] state_mac,
+    output [3:0] so,
     input gmii_txc,
     input gmii_rxc,
     input rst,     
@@ -94,7 +94,7 @@ wire flag_udp_rxdv;
 reg [3:0] state, next_state;
 assign fs_udp_rx = (state == RECV);
 assign arp_request_req = (state == ARP_REQ);
-assign state_mac = state;
+assign so = state;
 
 
 always @(posedge gmii_txc or posedge rst) begin
