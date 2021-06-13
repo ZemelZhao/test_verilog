@@ -69,10 +69,16 @@ module top(
     wire [95:0] dat; 
     wire rst;
 
+    // TEST
+    wire [3:0] state_top, state_mac, state_m2f;
+    wire [2:0] state_fr;
+    wire [9:0] fifo_dc;
+    assign state_top = state;
+
+    // TEST_END
+
     wire [7:0] fifoc_txd, fifoc_rxd;
     wire fifoc_txen, fifoc_rxen;
-
-    wire [3:0] mac2fifoc_so;
 
     reg [3:0] state;
     wire [3:0] keys;
@@ -91,12 +97,26 @@ module top(
     assign fd_udp_rx = (state == UPRX);
     assign fs_fr = (state == FIFR);
     assign rst = ~key[3];
-    assign leds[19:16] = keys;
-    assign lec = ~state;
-    assign led = ~leds;
-    assign leds[7:0] = eth_rx_len[7:0];
-    assign leds[21] = fs_udp_rx;
-    assign leds[20] = fd_udp_rx;
+    // assign leds[19:16] = key;
+    // assign lec = ~state;
+    // assign led = ~leds;
+    // assign leds[7:0] = eth_rx_len[7:0];
+    // assign leds[21] = fs_udp_rx;
+    // assign leds[20] = fd_udp_rx;
+
+    // always @(posedge sys_clk) begin
+    //     rstate_top <= state_top;
+    //     rstate_mac <= state_mac;
+    //     rstate_m2f <= state_m2f;
+    //     rstate_fr <= state_fr;
+    //     rudp_rx_len <= udp_rx_len;
+    //     reth_rx_len <= eth_rx_len;
+    //     rudp_rxd <= udp_rxd;
+    //     rfifoc_txd <= fifoc_txd;
+    //     rudp_rx_addr <= udp_rx_addr;
+    //     rfifo_dc <= fifo_dc;
+
+    // end
     
 
     always@(posedge sys_clk or posedge rst) begin
@@ -189,7 +209,7 @@ module top(
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
         .udp_rx_len(udp_rx_len),
-        .so(leds[15:12])
+        .so(state_mac)
     );
 
     fifod
@@ -203,7 +223,7 @@ module top(
         .rd_clk(sys_clk),
         .dout(fifoc_rxd),
         .rd_en(fifoc_rxen),
-        .rd_data_count(leds[31:22]),
+        .rd_data_count(fifo_dc),
         .wr_data_count()
     );
 
@@ -219,7 +239,7 @@ module top(
         .fifoc_txd(fifoc_txd),
         .fifoc_txen(fifoc_txen),
         .dev_rx_len(eth_rx_len),
-        .so(leds[11:8])
+        .so(state_m2f)
     );
 
     fifo_read
@@ -232,7 +252,8 @@ module top(
         .fifo_rxen(fifoc_rxen),
         .res(dat),
         .fs(fs_fr),
-        .fd(fd_fr)
+        .fd(fd_fr),
+        .so(state_fr)
     );
 
 // #endregion
@@ -279,6 +300,27 @@ module top(
         .key(key[0]),
         .fs(fsd),
         .fd(fdd)
+    );
+
+    ilap
+    ilap_dut(
+        .clk(sys_clk),
+        .probe0(state_top),
+        .probe1(state_mac),
+        .probe2(state_m2f),
+        .probe3(state_fr),
+        .probe4(udp_rx_len),
+        .probe5(eth_rx_len),
+        .probe6(udp_rxd),
+        .probe7(fifoc_rxd),
+        .probe8(udp_rx_addr),
+        .probe9(adc_rx_len),
+        .probe10(fs_udp_rx),
+        .probe11(fd_udp_rx),
+        .probe12(fs_fr),
+        .probe13(fd_fr),
+        .probe14(fifoc_rxen),
+        .probe15(fd_mac2fifoc)
     );
 
 // #endregion

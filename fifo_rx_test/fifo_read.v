@@ -39,6 +39,7 @@ module fifo_read(
                 if(fs) begin
                     next_state <= PRE0;
                 end
+                else next_state <= IDLE;
             end
             PRE0: begin
                 next_state <= PRE1;
