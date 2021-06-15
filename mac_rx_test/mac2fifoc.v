@@ -15,7 +15,7 @@ module mac2fifoc(
     input [15:0] udp_rx_len,
     
     // FIFOC
-    output fifoc_txd,
+    output [7:0] fifoc_txd,
     output reg fifoc_txen,
     output [11:0] dev_rx_len
 );
