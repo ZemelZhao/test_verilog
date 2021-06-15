@@ -97,6 +97,7 @@ module top(
     assign fd_udp_rx = (state == UPRX);
     assign fs_fr = (state == FIFR);
     assign rst = ~key[3];
+    assign num = 4'h2;
     // assign leds[19:16] = key;
     // assign lec = ~state;
     // assign led = ~leds;
@@ -134,7 +135,7 @@ module top(
                     else state <= MCFC;
                 end
                 UPRX: begin
-                    if(fs_udp_rx == 1'b0) state <= IDLE;
+                    if(fs_udp_rx == 1'b0) state <= FIFR;
                     else state <= UPRX;
                 end
                 FIFR: begin
@@ -260,31 +261,31 @@ module top(
 
 // LED
 // # region
-    // led
-    // led_dut(
-    //     .clk(sys_clk),
-    //     .rst(rst),
-    //     .num(num),
-    //     .lec(),
-    //     .led(led),
-    //     .fsu(fsu),
-    //     .fsd(fsd),
-    //     .fdu(fdu),
-    //     .fdd(fdd),
+    led
+    led_dut(
+        .clk(sys_clk),
+        .rst(rst),
+        .num(num),
+        .lec(lec),
+        .led(led),
+        .fsu(fsu),
+        .fsd(fsd),
+        .fdu(fdu),
+        .fdd(fdd),
 
-    //     .reg00(dat[95:88]),
-    //     .reg01(dat[87:80]),
-    //     .reg02(dat[79:72]),
-    //     .reg03(dat[71:64]),
-    //     .reg04(dat[63:56]),
-    //     .reg05(dat[55:48]),
-    //     .reg06(dat[47:40]),
-    //     .reg07(dat[39:32]),
-    //     .reg08(dat[31:24]),
-    //     .reg09(dat[23:16]),
-    //     .reg0A(dat[15:8]),
-    //     .reg0B(dat[7:0])
-    // );
+        .reg00(dat[95:88]),
+        .reg01(dat[87:80]),
+        .reg02(dat[79:72]),
+        .reg03(dat[71:64]),
+        .reg04(dat[63:56]),
+        .reg05(dat[55:48]),
+        .reg06(dat[47:40]),
+        .reg07(dat[39:32]),
+        .reg08(dat[31:24]),
+        .reg09(dat[23:16]),
+        .reg0A(dat[15:8]),
+        .reg0B(dat[7:0])
+    );
 
     key 
     key_dutu(
@@ -302,26 +303,27 @@ module top(
         .fd(fdd)
     );
 
-    ilap
-    ilap_dut(
-        .clk(sys_clk),
-        .probe0(state_top),
-        .probe1(state_mac),
-        .probe2(state_m2f),
-        .probe3(state_fr),
-        .probe4(udp_rx_len),
-        .probe5(eth_rx_len),
-        .probe6(udp_rxd),
-        .probe7(fifoc_rxd),
-        .probe8(udp_rx_addr),
-        .probe9(adc_rx_len),
-        .probe10(fs_udp_rx),
-        .probe11(fd_udp_rx),
-        .probe12(fs_fr),
-        .probe13(fd_fr),
-        .probe14(fifoc_rxen),
-        .probe15(fd_mac2fifoc)
-    );
+    // ilap
+    // ilap_dut(
+    //     .clk(sys_clk),
+    //     .probe0(state_top),
+    //     .probe1(state_mac),
+    //     .probe2(state_m2f),
+    //     .probe3(state_fr),
+    //     .probe4(udp_rx_len),
+    //     .probe5(eth_rx_len),
+    //     .probe6(udp_rxd),
+    //     .probe7(fifoc_txd),
+    //     .probe8(udp_rx_addr),
+    //     .probe9(adc_rx_len),
+    //     .probe10(fs_udp_rx),
+    //     .probe11(fd_udp_rx),
+    //     .probe12(fs_fr),
+    //     .probe13(fd_fr),
+    //     .probe14(fifoc_rxen),
+    //     .probe15(fd_mac2fifoc),
+    //     .probe16(dat)
+    // );
 
 // #endregion
 
