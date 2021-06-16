@@ -55,7 +55,16 @@ module top(
     wire rst_mac, rst_fifoc, rst_eth2mac;
     wire rst_mac2fifoc, rst_fifoc2cs, rst;
 
-    wire [95:0] dat;
+    wire [7:0] kind_dev;
+    wire [7:0] info_sr;
+    wire [7:0] cmd_filt;
+    wire [7:0] cmd_mix0;
+    wire [7:0] cmd_mix1;
+    wire [7:0] cmd_reg4;
+    wire [7:0] cmd_reg5;
+    wire [7:0] cmd_reg6;
+    wire [7:0] cmd_reg7;
+
     wire [7:0] fifoc_txd, fifoc_rxd;
     wire fifoc_txen, fifoc_rxen;
 
@@ -67,7 +76,7 @@ module top(
 
     assign fs_mac2fifoc = (state == MCFC);
     assign fd_udp_rx = (state == UPRX);
-    assign fs_fr = (state == FIFR);
+    assign fs_fifoc2cs = (state == FIFR);
     assign rst = ~rst_n;
     assign num = 4'h2;
 
@@ -92,7 +101,7 @@ module top(
                     else state <= UPRX;
                 end
                 FIFR: begin
-                    if(fd_fr) state <= IDLE;
+                    if(fd_fifoc2cs) state <= IDLE;
                     else state <= FIFR;
                 end
                 default: state <= IDLE;
@@ -194,18 +203,40 @@ module top(
         .dev_rx_len(eth_rx_len)
     );
 
-    fifo_read
-    fifo_read_dut(
+    // fifo_read
+    // fifo_read_dut(
+    //     .clk(sys_clk),
+    //     .rst(rst_fifoc),
+    //     .err(),
+    //     .FIFO_NUM(eth_rx_len),
+    //     .fifo_rxd(fifoc_rxd),
+    //     .fifo_rxen(fifoc_rxen),
+    //     .res(dat),
+    //     .fs(fs_fr),
+    //     .fd(fd_fr)
+    // );
+
+    fifoc2cs 
+    fifoc2cs_dut (
         .clk(sys_clk),
-        .rst(rst_fifoc),
+        .rst(rst),
         .err(),
-        .FIFO_NUM(eth_rx_len),
-        .fifo_rxd(fifoc_rxd),
-        .fifo_rxen(fifoc_rxen),
-        .res(dat),
-        .fs(fs_fr),
-        .fd(fd_fr)
+        .fs(fs_fifoc2cs),
+        .fd(fd_fifoc2cs),
+        .fifoc_rxen(fifoc_rxen),
+        .fifoc_rxd(fifoc_rxd),
+        .kind_dev(kind_dev),
+        .info_sr(info_sr),
+        .cmd_filt(cmd_filt),
+        .cmd_mix0(cmd_mix0),
+        .cmd_mix1(cmd_mix1),
+        .cmd_reg4(cmd_reg4),
+        .cmd_reg5(cmd_reg5),
+        .cmd_reg6(cmd_reg6),
+        .cmd_reg7(cmd_reg7)
     );
+
+
 
 // #endregion
 
@@ -224,18 +255,18 @@ module top(
         .fdu(fdu),
         .fdd(fdd),
 
-        .reg00(dat[95:88]),
-        .reg01(dat[87:80]),
-        .reg02(dat[79:72]),
-        .reg03(dat[71:64]),
-        .reg04(dat[63:56]),
-        .reg05(dat[55:48]),
-        .reg06(dat[47:40]),
-        .reg07(dat[39:32]),
-        .reg08(dat[31:24]),
-        .reg09(dat[23:16]),
-        .reg0A(dat[15:8]),
-        .reg0B(dat[7:0])
+        .reg00(8'h55),
+        .reg01(8'hAA),
+        .reg02(kind_dev),
+        .reg03(info_sr),
+        .reg04(8'h6B),
+        .reg05(cmd_filt),
+        .reg06(cmd_mix0),
+        .reg07(cmd_mix1),
+        .reg08(cmd_reg4),
+        .reg09(cmd_reg5),
+        .reg0A(cmd_reg6),
+        .reg0B(cmd_reg7)
     );
 
     key 
