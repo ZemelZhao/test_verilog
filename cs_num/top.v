@@ -1,31 +1,47 @@
-module top();
+module top(
+    input sys_clk,
+    input rst_n,
 
-reg clk, fs, rst;
+    output [31:0] led
+);
 
-reg [7:0] cmd_kdev;
+    wire [7:0] cmd_kdev;
+    wire [10:0] adc_rx_len;
+    wire [11:0] eth_tx_len;
+    wire [7:0] data_cnt;
+    wire fs, fd;
+    wire rst;
 
-wire [9:0] adc_rx_len;
-wire [11:0] eth_tx_len;
-wire [7:0] data_cnt;
-wire fd;
+    assign cmd_kdev = 8'h03;
+    assign led[31] = 1'h1;
+    assign led[30:20] = ~adc_rx_len;
+    assign led[19:8] = ~eth_tx_len;
+    assign led[7:0] = ~data_cnt; 
+    assign rst = ~rst_n;
 
 
-always begin
-    clk <= 1'b0;
-    #5;
-    clk <= 1'b1;
-    #5;
-end
+    reg [3:0] state;
+    localparam IDLE = 4'h0, WORK = 4'h1, DONE = 4'h2;
+    assign fs = (state == WORK);
 
-initial begin
-    rst <= 1'b0;
+    always @(posedge sys_clk or posedge rst) begin
+        if(rst) state <= IDLE;
+        else begin
+            case(state)
+                IDLE: state <= WORK;
+                WORK: if(fd == 1'b1) state <= DONE;
+                DONE: state <= DONE;
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+
+
     
-end
-
-
-    cs_num 
-    cs_num_dut (
-        .clk(clk),
+    cs_num
+    cs_num_dut(
+        .clk(sys_clk),
         .rst(rst),
         .cmd_kdev(cmd_kdev),
         .adc_rx_len(adc_rx_len),
@@ -34,7 +50,6 @@ end
         .fs(fs),
         .fd(fd)
     );
-
 
 
 endmodule
