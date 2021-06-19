@@ -8,6 +8,32 @@ module cs_cmd(
     output dev_grp,
     input [2:0] dev_num_ext,
 
+    output rst_all,
+    output rst_dev,
+    input fifoc_full,
+    input fifod_full,
+    input fifoa_full,
+
+    input fs_udp_rx,
+    output fs_udp_tx,
+    output fs_mac2fifoc,
+    output fs_fifoc2cs,
+    output fs_adc_check,
+    output fs_adc_conf,
+    output fs_adc_read,
+    output fs_adc_fifo,
+    output fs_cs_num,
+
+    output fd_udp_rx,
+    input fd_udp_tx,
+    input fd_mac2fifoc,
+    input fd_fifoc2cs,
+    input fd_adc_check,
+    input fd_adc_conf,
+    input fd_adc_read,
+    input fd_adc_fifo,
+    input fd_cs_num,
+
     input [7:0] cmd_kdev,
     input [7:0] cmd_smpr,
     input [7:0] cmd_filt,
@@ -36,31 +62,7 @@ module cs_cmd(
     output [7:0] regap, 
     output [7:0] dev_info,
     output [7:0] dev_kind,
-    output [7:0] dev_smpr,
-
-    output rst_all,
-    output rst_dev,
-
-    input fs_udp_rx,
-    output fs_udp_tx,
-    output fs_mac2fifoc,
-    output fs_fifoc2cs,
-    output fs_adc_check,
-    output fs_adc_conf,
-    output fs_adc_read,
-    output fs_adc_fifo,
-    output fs_cs_num,
-
-
-    output fd_udp_rx,
-    input fd_udp_tx,
-    input fd_mac2fifoc,
-    input fd_fifoc2cs,
-    input fd_adc_check,
-    input fd_adc_conf,
-    input fd_adc_read,
-    input fd_adc_fifo,
-    input fd_cs_num
+    output [7:0] dev_smpr
 );
     wire [3:0] devid;
     wire [2:0] dev_num;
@@ -90,7 +92,7 @@ module cs_cmd(
     localparam INIT_IDLE = 3'h0, INIT_URXS = 3'h1, INIT_UTOF = 3'h2, INIT_FTOC = 3'h3;
     localparam INIT_URXD = 3'h4, INIT_CSNM = 3'h5, INIT_ADCK = 3'h6;
     localparam ADC_IDLE = 3'h0, ADC_CONF = 3'h1, ADC_PREP = 3'h2, ADC_READ = 3'h3;
-    localparam ADC_FIFO = 3'h3;
+    localparam ADC_FIFO = 3'h4;
     localparam MAC_IDLE = 3'h0, MAC_PREP = 3'h1, MAC_SEND = 3'h2;
 
     assign fs_mac2fifoc = (init_state == INIT_UTOF);
@@ -127,12 +129,16 @@ module cs_cmd(
     always @(*) begin // main_state
         case (main_state)
             MAIN_IDLE: begin
-                if(fs_udp_rx) main_next_state <= MAIN_INIT;
+                if(~|{fifoc_full, fifod_full, fifoa_full}) main_next_state <= MAIN_INIT;
                 else main_next_state <= MAIN_IDLE;
             end
             MAIN_INIT: begin
-                if(fd_adc_check) main_next_state <= MAIN_WORK;
+                if(fs_udp_rx) main_next_state <= MAIN_PREP;
                 else main_next_state <= MAIN_INIT;
+            end
+            MAIN_PREP: begin
+                if(fd_adc_check) main_next_state <= MAIN_WORK;
+                else main_next_state <= MAIN_PREP;              
             end
             MAIN_WORK: begin
                 main_next_state <= MAIN_WORK;
@@ -194,7 +200,6 @@ module cs_cmd(
             num_cnt <= 4'h0;
         end
         else num_cnt <= num_cnt;
-        
     end
 
     cs_cmd2reg cs_cmd2reg(

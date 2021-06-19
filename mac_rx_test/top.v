@@ -70,6 +70,8 @@ module top(
 
     wire [7:0] fifoc_txd, fifoc_rxd;
     wire fifoc_txen, fifoc_rxen;
+    wire fifoc_full, fifod_full, fifoa_full;
+    wire fifoc_empty, fifod_empty, fifoa_empty;
 
 // CS 
 // #region
