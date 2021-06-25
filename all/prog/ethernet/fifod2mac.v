@@ -1,5 +1,4 @@
 module fifod2mac(
-    output [3:0] state_fifod2mac,
     input clk,
     input rst,
 
@@ -28,7 +27,6 @@ assign flag_udp_tx_req = (state == MAC_REQ);
 assign fifod_rxen = (state == WORK);
 assign fd = (state == LAST);
 assign udp_txd = fifod_rxd;
-assign state_fifod2mac = state;
 
 
 always @(posedge clk or posedge rst) begin
