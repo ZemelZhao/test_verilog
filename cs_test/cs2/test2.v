@@ -105,9 +105,25 @@ module top(
 // TEST
 // #region
     wire [31:0] led_cont;
-    assign led = ~led_cont;
-    assign lec = ~eth_rx_len[3:0];
+    wire err_fifoc2cs;
+    wire [7:0] t0;
+    // assign led = ~led_cont;
     assign fifoa_full = 1'b0;
+    assign fifod_txd = 8'h0;
+    assign fifod_txen = 1'h0;
+    assign fifod_rxen = 1'b0;
+    assign t0 = fifod_rxd;
+    
+
+    assign lec = ~4'hB;
+    assign led[31:24] = ~udp_rxd;
+    assign led[5] = ~fs_udp_rx;
+    assign led[4] = ~fs_mac2fifoc;
+    assign led[3] = ~fs_fifoc2cs;
+    assign led[2] = ~fd_udp_rx;
+    assign led[1] = ~fd_mac2fifoc;
+    assign led[0] = ~fd_fifoc2cs; 
+    assign led[6] = ~err_fifoc2cs;
 // #endregion
 
 // MAC
@@ -221,7 +237,7 @@ module top(
     fifoc2cs_dut (
         .clk(sys_clk),
         .rst(rst),
-        .err(),
+        .err(err_fifoc2cs),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
         .fifoc_rxen(fifoc_rxen),
@@ -237,20 +253,20 @@ module top(
         .cmd_reg7(cmd_reg7)
     );
 
-    fifod2mac 
-    fifod2mac_dut (
-        .clk(sys_clk),
-        .rst(rst),
-        .fs(fs_fifod2mac),
-        .fd(fd_fifod2mac),
-        .data_len(eth_tx_len),
-        .fifod_rxen(fifod_rxen),
-        .fifod_rxd(fifod_rxd),
-        .udp_txen(udp_txen),
-        .udp_txd(udp_txd),
-        .flag_udp_tx_prep(flag_udp_tx_prep),
-        .flag_udp_tx_req(flag_udp_tx_req)
-    );
+    // fifod2mac 
+    // fifod2mac_dut (
+    //     .clk(sys_clk),
+    //     .rst(rst),
+    //     .fs(fs_fifod2mac),
+    //     .fd(fd_fifod2mac),
+    //     .data_len(eth_tx_len),
+    //     .fifod_rxen(fifod_rxen),
+    //     .fifod_rxd(fifod_rxd),
+    //     .udp_txen(udp_txen),
+    //     .udp_txd(udp_txd),
+    //     .flag_udp_tx_prep(flag_udp_tx_prep),
+    //     .flag_udp_tx_req(flag_udp_tx_req)
+    // );
 
 // #endregion
 
@@ -261,60 +277,20 @@ module top(
         .clk(sys_clk),
         .rst(rst),
 
+        .fs_udp_rx(fs_udp_rx),
+        .fs_mac2fifoc(fs_mac2fifoc),
+        .fs_fifoc2cs(fs_fifoc2cs),
+        .fd_udp_rx(fd_udp_rx),
+        .fd_mac2fifoc(fd_mac2fifoc),
+        .fd_fifoc2cs(fd_fifoc2cs),
+
         .fifoa_full(fifoa_full),
         .fifoc_full(fifoc_full),
-        .fifod_full(fifod_full),
+        .fifod_full(fifod_full)
 
-        .led_cont(led_cont)
+        // .led_cont(led_cont)
     );
 
 // #endregion
-
-
-// LED
-// #region
-    // led
-    // led_dut(
-    //     .clk(sys_clk),
-    //     .rst(rst),
-    //     .num(num),
-    //     .lec(lec),
-    //     .led(led),
-    //     .fsu(fsu),
-    //     .fsd(fsd),
-    //     .fdu(fdu),
-    //     .fdd(fdd),
-
-    //     .reg00(8'h55),
-    //     .reg01(8'hAA),
-    //     .reg02(kind_dev),
-    //     .reg03(info_sr),
-    //     .reg04(8'h6B),
-    //     .reg05(cmd_filt),
-    //     .reg06(cmd_mix0),
-    //     .reg07(cmd_mix1),
-    //     .reg08(cmd_reg4),
-    //     .reg09(cmd_reg5),
-    //     .reg0A(cmd_reg6),
-    //     .reg0B(cmd_reg7)
-    // );
-
-    // key 
-    // key_dutu(
-    //     .clk(sys_clk),
-    //     .key(key[1]),
-    //     .fs(fsu),
-    //     .fd(fdu)
-    // );
-
-    // key 
-    // key_dutd(
-    //     .clk(sys_clk),
-    //     .key(key[0]),
-    //     .fs(fsd),
-    //     .fd(fdd)
-    // );
-// #endregion
-
 
 endmodule
