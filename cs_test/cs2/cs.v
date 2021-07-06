@@ -14,7 +14,10 @@ module cs(
     input fd_mac2fifoc,
     input fd_fifoc2cs,
 
-    output [31:0] led_cont
+    output fs_send,
+    input fs_recv,
+
+    output [3:0] led_cont
 );
 
     wire fs_cs_num, fd_cs_num;
@@ -34,6 +37,9 @@ module cs(
         .fd_udp_rx(fd_udp_rx),
         .fd_mac2fifoc(fd_mac2fifoc),
         .fd_fifoc2cs(fd_fifoc2cs),
+
+        .fs_send(fs_send),
+        .fs_recv(fs_recv),
 
         .led_cont(led_cont)
     );

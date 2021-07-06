@@ -6,6 +6,9 @@ module cs_cmd(
     input fifoc_full,
     input fifod_full,
 
+    output fs_send,
+    input fs_recv,
+
     input fs_udp_rx,
     output fs_mac2fifoc,
     output fs_fifoc2cs,
@@ -17,7 +20,7 @@ module cs_cmd(
     input fd_cs_num,
 
     output rst_all,
-    output [31:0] led_cont
+    output [3:0] led_cont
 );
 
     reg [7:0] main_state, next_main_state;
@@ -34,12 +37,12 @@ module cs_cmd(
 
 
     assign fifo_check = ~|{fifoa_full, fifoc_full, fifod_full};
-    assign fs_mac2fifoc = (int_state == INT_UTOF);
-    assign fs_fifoc2cs = (int_state == INT_FTOC);
-    assign fd_udp_rx = (int_state == INT_URXD);
+    // assign fs_mac2fifoc = (int_state == INT_UTOF);
+    // assign fs_fifoc2cs = (int_state == INT_FTOC);
+    // assign fd_udp_rx = (int_state == INT_URXD);
 
     // TEST
-    assign led_cont[7:0] = main_state;
+    assign led_cont[3:0] = state;
 
 // #region
     // always @(posedge clk or posedge rst_all) begin
@@ -108,47 +111,91 @@ module cs_cmd(
 
 // #endregion
     
-    reg [3:0] state;
+    reg [3:0] state, next_state;
     localparam IDLE = 4'h8, MCFC = 4'h9, UPRX = 4'hA, FIFR = 4'hB;
-    localparam TEST = 4'h3;
+    localparam TEST = 4'h3, HAHA = 4'hF;
+    localparam T0 = 4'h4, T1 = 4'h5, T2 = 4'h6, T3 = 4'h7;
 
     assign fs_mac2fifoc = (state == MCFC);
     assign fd_udp_rx = (state == UPRX);
     assign fs_fifoc2cs = (state == FIFR);
+    assign fs_send = (state == HAHA);
+    // assign fs_send = fifo_check;
 
 
 // #endregion
-    always@(posedge clk or posedge rst) begin
+
+    always @(posedge clk or posedge rst) begin
         if(rst) state <= IDLE;
-        else begin
-            case(state)
-                IDLE: begin
-                    if(fifo_check) begin
-                        state <= TEST;
-                    end
-                    else state <= IDLE;
-                end
-                TEST: begin
-                    if(fs_udp_rx) begin
-                        state <= MCFC;
-                    end
-                    else state <= TEST;
-                end
-                MCFC: begin
-                    if(fd_mac2fifoc) state <= UPRX;
-                    else state <= MCFC;
-                end
-                UPRX: begin
-                    if(fs_udp_rx == 1'b0) state <= FIFR;
-                    else state <= UPRX;
-                end
-                FIFR: begin
-                    if(fd_fifoc2cs) state <= IDLE;
-                    else state <= FIFR;
-                end
-                default: state <= IDLE;
-            endcase
-        end
+        else state <= next_state;
     end
+
+    always @(*) begin
+        case(state)
+            IDLE: begin
+                if(fifo_check) next_state <= TEST;
+                else next_state <= IDLE; 
+            end
+            HAHA: begin
+                if(fs_recv) next_state <= T0;
+                else next_state <= HAHA;
+            end
+            T0: next_state <= T1;
+            T1: next_state <= T2;
+            T2: next_state <= T3;
+            T3: next_state <= IDLE;
+            TEST: begin
+                if(fs_udp_rx) next_state <= MCFC;
+                else next_state <= TEST;
+            end
+            MCFC: begin
+                if(fd_mac2fifoc) next_state <= UPRX;
+                else next_state <= MCFC;
+            end
+            UPRX: begin
+                if(fs_udp_rx == 1'b0) next_state <= FIFR;
+                else next_state <= UPRX;
+            end
+            FIFR: begin
+                if(fd_fifoc2cs) next_state <= IDLE;
+                else next_state <= FIFR; 
+            end
+            default: next_state <= IDLE;
+        endcase
+    end
+
+
+//     always@(posedge clk or posedge rst) begin
+//         if(rst) state <= IDLE;
+//         else begin
+//             case(state)
+//                 IDLE: begin
+//                     if(fifo_check) begin
+//                         state <= TEST;
+//                     end
+//                     else state <= IDLE;
+//                 end
+//                 TEST: begin
+//                     if(fs_udp_rx) begin
+//                         state <= MCFC;
+//                     end
+//                     else state <= TEST;
+//                 end
+//                 MCFC: begin
+//                     if(fd_mac2fifoc) state <= UPRX;
+//                     else state <= MCFC;
+//                 end
+//                 UPRX: begin
+//                     if(fs_udp_rx == 1'b0) state <= FIFR;
+//                     else state <= UPRX;
+//                 end
+//                 FIFR: begin
+//                     if(fd_fifoc2cs) state <= IDLE;
+//                     else state <= FIFR;
+//                 end
+//                 default: state <= IDLE;
+//             endcase
+//         end
+//     end
 
 endmodule

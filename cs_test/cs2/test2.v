@@ -18,6 +18,7 @@ module top(
 );
 
 // MAC SECTION
+    localparam LED_NUM = 8'h65;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -102,28 +103,75 @@ module top(
 
 // #endregion
 
+    reg [3:0] state;
+    wire fs_send, fs_recv;
+    localparam IDLE = 4'hC, MCFC = 4'h9, UPRX = 4'hA, FIFR = 4'hB;
+    localparam TEST = 4'h3, HAHA = 4'hF;
+
+    // assign fs_mac2fifoc = (state == MCFC);
+    // assign fd_udp_rx = (state == UPRX);
+    // assign fs_fifoc2cs = (state == FIFR);
+    assign fs_recv = (state == HAHA);
+    assign rst = ~rst_n;
+    assign num = 4'h2;
+
+    assign fifod_txen = 1'b0;
+    assign fifod_rxen = 1'b0;
+    assign fifod_txd = 8'h0;
+    assign fifoa_full = 1'b0;
+
+    assign lec = ~led_cont;
+
+
+
+// #endregion
+    // always@(posedge sys_clk or posedge rst) begin
+    //     if(rst) state <= IDLE;
+    //     else begin
+    //         case(state)
+    //             IDLE: begin
+    //                 if(fs_send) state <= HAHA;
+    //                 else state <= IDLE;
+    //             end
+    //             HAHA: begin
+    //                 if(fs_send == 1'b0) state <= IDLE;
+    //                 else state <= HAHA;
+    //             end
+    //             TEST: begin
+    //                 if(fs_udp_rx) begin
+    //                     state <= MCFC;
+    //                 end
+    //                 else state <= TEST;
+    //             end
+    //             MCFC: begin
+    //                 if(fd_mac2fifoc) state <= UPRX;
+    //                 else state <= MCFC;
+    //             end
+    //             UPRX: begin
+    //                 if(fs_udp_rx == 1'b0) state <= FIFR;
+    //                 else state <= UPRX;
+    //             end
+    //             FIFR: begin
+    //                 if(fd_fifoc2cs) state <= IDLE;
+    //                 else state <= FIFR;
+    //             end
+    //             default: state <= IDLE;
+    //         endcase
+    //     end
+    // end
+
 // TEST
 // #region
-    wire [31:0] led_cont;
+    wire [3:0] led_cont;
     wire err_fifoc2cs;
-    wire [7:0] t0;
     // assign led = ~led_cont;
     assign fifoa_full = 1'b0;
     assign fifod_txd = 8'h0;
     assign fifod_txen = 1'h0;
     assign fifod_rxen = 1'b0;
-    assign t0 = fifod_rxd;
-    
 
-    assign lec = ~4'hB;
-    assign led[31:24] = ~udp_rxd;
-    assign led[5] = ~fs_udp_rx;
-    assign led[4] = ~fs_mac2fifoc;
-    assign led[3] = ~fs_fifoc2cs;
-    assign led[2] = ~fd_udp_rx;
-    assign led[1] = ~fd_mac2fifoc;
-    assign led[0] = ~fd_fifoc2cs; 
-    assign led[6] = ~err_fifoc2cs;
+
+
 // #endregion
 
 // MAC
@@ -186,6 +234,7 @@ module top(
         .rd_clk(sys_clk),
         .dout(fifoc_rxd),
         .rd_en(fifoc_rxen),
+
         .full(fifoc_full)
     );
 
@@ -240,6 +289,7 @@ module top(
         .err(err_fifoc2cs),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
+        .check_show(led[31:24]),
         .fifoc_rxen(fifoc_rxen),
         .fifoc_rxd(fifoc_rxd),
         .kind_dev(kind_dev),
@@ -284,13 +334,62 @@ module top(
         .fd_mac2fifoc(fd_mac2fifoc),
         .fd_fifoc2cs(fd_fifoc2cs),
 
+        .led_cont(led_cont),
+
         .fifoa_full(fifoa_full),
         .fifoc_full(fifoc_full),
-        .fifod_full(fifod_full)
+        .fifod_full(fifod_full),
+        .fs_send(fs_send),
+        .fs_recv(fs_recv)
 
         // .led_cont(led_cont)
     );
 
+// #endregion
+
+// LED
+// #region
+    led
+    led_dut(
+        .clk(sys_clk),
+        .rst(rst),
+        .num(num),
+        .lec(),
+        .led(),
+        .fsu(fsu),
+        .fsd(fsd),
+        .fdu(fdu),
+        .fdd(fdd),
+
+        .reg00(LED_NUM),
+        .reg01(8'hAA),
+        .reg02(kind_dev),
+        .reg03(info_sr),
+        .reg04(8'h6B),
+        .reg05(cmd_filt),
+        .reg06(cmd_mix0),
+        .reg07(cmd_mix1),
+        .reg08(cmd_reg4),
+        .reg09(cmd_reg5),
+        .reg0A(cmd_reg6),
+        .reg0B(cmd_reg7)
+    );
+
+    key 
+    key_dutu(
+        .clk(sys_clk),
+        .key(key[1]),
+        .fs(fsu),
+        .fd(fdu)
+    );
+
+    key 
+    key_dutd(
+        .clk(sys_clk),
+        .key(key[0]),
+        .fs(fsd),
+        .fd(fdd)
+    );
 // #endregion
 
 endmodule

@@ -18,6 +18,7 @@ module top(
 );
 
 // MAC SECTION
+    localparam LED_NUM = 8'h56;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -70,7 +71,8 @@ module top(
     wire fs_mac2fifoc, fs_fifoc2cs;
     wire fd_mac2fifoc, fd_fifoc2cs;
     wire fs_fr, fd_fr;
-    wire rst_mac, rst_fifoc, rst_eth2mac;
+    wire rst_mac, rst_fifoc, rst_fifod;
+    wire rst_eth2mac;
     wire rst_mac2fifoc, rst_fifoc2cs, rst;
 
     wire [7:0] fifoc_txd, fifoc_rxd;
@@ -80,7 +82,8 @@ module top(
     wire [3:0] num;
 
     reg [3:0] state;
-    wire fifoc_full;
+    wire fifoc_full, fifod_full, fifoa_full;
+    wire fifo_check;
     localparam IDLE = 4'h8, MCFC = 4'h9, UPRX = 4'hA, FIFR = 4'hB;
     localparam TEST = 4'h3;
 
@@ -90,6 +93,16 @@ module top(
     assign rst = ~rst_n;
     assign num = 4'h2;
 
+    wire fifod_txen, fifod_rxen;
+    wire [7:0] fifod_rxd, fifod_txd;
+
+    assign fifod_txen = 1'b0;
+    assign fifod_rxen = 1'b0;
+    assign fifod_txd = 8'h0;
+    assign fifoa_full = 1'b0;
+
+    assign fifo_check = ~|{fifoa_full, fifoc_full, fifod_full};
+
 
 // #endregion
     always@(posedge sys_clk or posedge rst) begin
@@ -97,7 +110,7 @@ module top(
         else begin
             case(state)
                 IDLE: begin
-                    if(~fifoc_full) begin
+                    if(fifo_check) begin
                         state <= TEST;
                     end
                     else state <= IDLE;
@@ -204,6 +217,22 @@ module top(
         .full(fifoc_full)
     );
 
+    fifod
+    fifod_dut(
+        .rst(rst_fifod),
+        
+        .wr_clk(sys_clk),
+        .din(fifod_txd),
+        .wr_en(fifod_txen),
+
+        .rd_clk(gmii_txc),
+        .dout(fifod_rxd),
+        .rd_en(fifod_rxen),
+
+        .full(fifod_full)
+    );
+
+
     mac2fifoc 
     mac2fifoc_dut(
         .clk(gmii_rxc),
@@ -255,80 +284,11 @@ module top(
 
 // #endregion
 
-// CONSOLE
+// CS
 // #region
-    // cs 
-    // cs_dut (
-    //     .clk(clk),
-    //     .rst(rst),
-    //     .spi_mc(spi_mc),
-    //     .fs_adc_ext(fs_adc_ext),
 
-    //     .dev_num_ext(dev_num_ext),
-    //     .dev_info(dev_info),
-    //     .dev_kind(dev_kind),
-    //     .dev_smpr(dev_smpr),
-    //     .eth_rx_len(eth_rx_len),
-    //     .eth_tx_len(eth_tx_len),
-    //     .adc_rx_len(adc_rx_len),
 
-    //     .cmd_kdev(cmd_kdev),
-    //     .cmd_smpr(cmd_smpr),
-    //     .cmd_filt(cmd_filt),
-    //     .cmd_mix0(cmd_mix0),
-    //     .cmd_mix1(cmd_mix1),
-    //     .cmd_reg4(cmd_reg4),
-    //     .cmd_reg5(cmd_reg5),
-    //     .cmd_reg6(cmd_reg6),
-    //     .cmd_reg7(cmd_reg7),
-    //     .adc_reg00(adc_reg00),
-    //     .adc_reg01(adc_reg01),
-    //     .adc_reg02(adc_reg02),
-    //     .adc_reg03(adc_reg03),
-    //     .adc_reg04(adc_reg04),
-    //     .adc_reg05(adc_reg05),
-    //     .adc_reg06(adc_reg06),
-    //     .adc_reg07(adc_reg07),
-    //     .adc_reg08(adc_reg08),
-    //     .adc_reg09(adc_reg09),
-    //     .adc_reg10(adc_reg10),
-    //     .adc_reg11(adc_reg11),
-    //     .adc_reg12(adc_reg12),
-    //     .adc_reg13(adc_reg13),
-    //     .adc_regap(adc_regap),
-
-    //     .fs_udp_rx(fs_udp_rx),
-    //     .fs_udp_tx(fs_udp_tx),
-    //     .fs_fifod2mac(fs_fifod2mac),
-    //     .fs_mac2fifoc(fs_mac2fifoc),
-    //     .fs_fifoc2cs(fs_fifoc2cs),
-    //     .fs_adc_check(fs_adc_check),
-    //     .fs_adc_conf(fs_adc_conf),
-    //     .fs_adc_read(fs_adc_read),
-    //     .fs_adc_fifo(fs_adc_fifo),
-    //     .fd_udp_rx(fd_udp_rx),
-    //     .fd_udp_tx(fd_udp_tx),
-    //     .fd_fifod2mac(fd_fifod2mac),
-    //     .fd_mac2fifoc(fd_mac2fifoc),
-    //     .fd_fifoc2cs(fd_fifoc2cs),
-    //     .fd_adc_check(fd_adc_check),
-    //     .fd_adc_conf(fd_adc_conf),
-    //     .fd_adc_read(fd_adc_read),
-    //     .fd_adc_fifo(fd_adc_fifo),
-
-    //     .rst_mac(rst_mac),
-    //     .rst_adc(rst_adc),
-    //     .rst_fifod(rst_fifod),
-    //     .rst_fifoc(rst_fifoc),
-    //     .rst_eth2mac(rst_eth2mac),
-    //     .rst_fifod2mac(rst_fifod2mac),
-    //     .rst_mac2fifoc(rst_mac2fifoc),
-    //     .rst_adc2fifod(rst_adc2fifod),
-    //     .rst_fifoc2cs(rst_fifoc2cs)
-    // );
-
-// #endregion
-
+//#endregion
 
 // LED
 // #region
@@ -344,7 +304,7 @@ module top(
         .fdu(fdu),
         .fdd(fdd),
 
-        .reg00(8'h55),
+        .reg00(LED_NUM),
         .reg01(8'hAA),
         .reg02(kind_dev),
         .reg03(info_sr),
