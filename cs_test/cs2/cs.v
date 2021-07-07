@@ -17,7 +17,7 @@ module cs(
     output fs_send,
     input fs_recv,
 
-    output [3:0] led_cont
+    output [7:0] so
 );
 
     wire fs_cs_num, fd_cs_num;
@@ -41,7 +41,7 @@ module cs(
         .fs_send(fs_send),
         .fs_recv(fs_recv),
 
-        .led_cont(led_cont)
+        .so(so)
     );
 
 

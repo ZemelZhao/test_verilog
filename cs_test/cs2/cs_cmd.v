@@ -20,7 +20,7 @@ module cs_cmd(
     input fd_cs_num,
 
     output rst_all,
-    output [3:0] led_cont
+    output [7:0] so
 );
 
     reg [7:0] main_state, next_main_state;
@@ -42,7 +42,7 @@ module cs_cmd(
     // assign fd_udp_rx = (int_state == INT_URXD);
 
     // TEST
-    assign led_cont[3:0] = state;
+    assign so[3:0] = ~state;
 
 // #region
     // always @(posedge clk or posedge rst_all) begin
@@ -136,14 +136,6 @@ module cs_cmd(
                 if(fifo_check) next_state <= TEST;
                 else next_state <= IDLE; 
             end
-            HAHA: begin
-                if(fs_recv) next_state <= T0;
-                else next_state <= HAHA;
-            end
-            T0: next_state <= T1;
-            T1: next_state <= T2;
-            T2: next_state <= T3;
-            T3: next_state <= IDLE;
             TEST: begin
                 if(fs_udp_rx) next_state <= MCFC;
                 else next_state <= TEST;
@@ -163,39 +155,5 @@ module cs_cmd(
             default: next_state <= IDLE;
         endcase
     end
-
-
-//     always@(posedge clk or posedge rst) begin
-//         if(rst) state <= IDLE;
-//         else begin
-//             case(state)
-//                 IDLE: begin
-//                     if(fifo_check) begin
-//                         state <= TEST;
-//                     end
-//                     else state <= IDLE;
-//                 end
-//                 TEST: begin
-//                     if(fs_udp_rx) begin
-//                         state <= MCFC;
-//                     end
-//                     else state <= TEST;
-//                 end
-//                 MCFC: begin
-//                     if(fd_mac2fifoc) state <= UPRX;
-//                     else state <= MCFC;
-//                 end
-//                 UPRX: begin
-//                     if(fs_udp_rx == 1'b0) state <= FIFR;
-//                     else state <= UPRX;
-//                 end
-//                 FIFR: begin
-//                     if(fd_fifoc2cs) state <= IDLE;
-//                     else state <= FIFR;
-//                 end
-//                 default: state <= IDLE;
-//             endcase
-//         end
-//     end
 
 endmodule

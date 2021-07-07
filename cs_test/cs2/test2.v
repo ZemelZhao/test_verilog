@@ -18,7 +18,7 @@ module top(
 );
 
 // MAC SECTION
-    localparam LED_NUM = 8'h65;
+    localparam LED_NUM = 8'h66;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -95,22 +95,28 @@ module top(
     wire fifod_txen, fifod_rxen;
 
     wire fsu, fdu, fsd, fdd;
+    wire fifo_check;
+    assign fifo_check = ~|{fifoa_full, fifoc_full, fifod_full};
     wire [3:0] num;
 
     assign rst = ~rst_n;
     assign num = 4'h2;
+    // assign led[7:0] = ~LED_NUM;
 
 
 // #endregion
 
-    reg [3:0] state;
-    wire fs_send, fs_recv;
-    localparam IDLE = 4'hC, MCFC = 4'h9, UPRX = 4'hA, FIFR = 4'hB;
-    localparam TEST = 4'h3, HAHA = 4'hF;
+    reg [7:0] state, next_state;
+    localparam IDLE = 8'h8, MCFC = 8'h9, UPRX = 8'hA, FIFR = 8'hB;
+    localparam TEST = 8'h3, HAHA = 8'hF;
 
-    // assign fs_mac2fifoc = (state == MCFC);
-    // assign fd_udp_rx = (state == UPRX);
-    // assign fs_fifoc2cs = (state == FIFR);
+    assign fs_mac2fifoc = (state == MCFC);
+    assign fd_udp_rx = (state == UPRX);
+    assign fs_fifoc2cs = (state == FIFR);
+
+    wire fs_send, fs_recv;
+    wire [7:0] so_fifoc2cs;
+
     assign fs_recv = (state == HAHA);
     assign rst = ~rst_n;
     assign num = 4'h2;
@@ -122,43 +128,7 @@ module top(
 
     assign lec = ~led_cont;
 
-
-
 // #endregion
-    // always@(posedge sys_clk or posedge rst) begin
-    //     if(rst) state <= IDLE;
-    //     else begin
-    //         case(state)
-    //             IDLE: begin
-    //                 if(fs_send) state <= HAHA;
-    //                 else state <= IDLE;
-    //             end
-    //             HAHA: begin
-    //                 if(fs_send == 1'b0) state <= IDLE;
-    //                 else state <= HAHA;
-    //             end
-    //             TEST: begin
-    //                 if(fs_udp_rx) begin
-    //                     state <= MCFC;
-    //                 end
-    //                 else state <= TEST;
-    //             end
-    //             MCFC: begin
-    //                 if(fd_mac2fifoc) state <= UPRX;
-    //                 else state <= MCFC;
-    //             end
-    //             UPRX: begin
-    //                 if(fs_udp_rx == 1'b0) state <= FIFR;
-    //                 else state <= UPRX;
-    //             end
-    //             FIFR: begin
-    //                 if(fd_fifoc2cs) state <= IDLE;
-    //                 else state <= FIFR;
-    //             end
-    //             default: state <= IDLE;
-    //         endcase
-    //     end
-    // end
 
 // TEST
 // #region
@@ -170,6 +140,44 @@ module top(
     assign fifod_txen = 1'h0;
     assign fifod_rxen = 1'b0;
 
+
+    always @(posedge sys_clk or posedge rst) begin
+        if(rst) state <= IDLE;
+        else state <= next_state;
+    end
+
+    always @(*) begin
+        case(state)
+            IDLE: begin
+                if(fifo_check) next_state <= TEST;
+                else next_state <= IDLE; 
+            end
+            TEST: begin
+                if(fs_udp_rx) next_state <= MCFC;
+                else next_state <= TEST;
+            end
+            MCFC: begin
+                if(fd_mac2fifoc) next_state <= UPRX;
+                else next_state <= MCFC;
+            end
+            UPRX: begin
+                if(fs_udp_rx == 1'b0) next_state <= FIFR;
+                else next_state <= UPRX;
+            end
+            FIFR: begin
+                if(fd_fifoc2cs) next_state <= IDLE;
+                else next_state <= FIFR; 
+            end
+            default: next_state <= IDLE;
+        endcase
+    end
+
+    ilap
+    ilap_dut(
+        .clk(sys_clk),
+        .probe0(state),
+        .probe1(so_fifoc2cs)
+    );
 
 
 // #endregion
@@ -289,7 +297,7 @@ module top(
         .err(err_fifoc2cs),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
-        .check_show(led[31:24]),
+        .so(so_fifoc2cs),
         .fifoc_rxen(fifoc_rxen),
         .fifoc_rxd(fifoc_rxd),
         .kind_dev(kind_dev),
@@ -327,14 +335,14 @@ module top(
         .clk(sys_clk),
         .rst(rst),
 
-        .fs_udp_rx(fs_udp_rx),
-        .fs_mac2fifoc(fs_mac2fifoc),
-        .fs_fifoc2cs(fs_fifoc2cs),
-        .fd_udp_rx(fd_udp_rx),
-        .fd_mac2fifoc(fd_mac2fifoc),
-        .fd_fifoc2cs(fd_fifoc2cs),
+        .fs_udp_rx(),
+        .fs_mac2fifoc(),
+        .fs_fifoc2cs(),
+        .fd_udp_rx(),
+        .fd_mac2fifoc(),
+        .fd_fifoc2cs(),
 
-        .led_cont(led_cont),
+        // .so(led[23:16]),
 
         .fifoa_full(fifoa_full),
         .fifoc_full(fifoc_full),
@@ -354,15 +362,15 @@ module top(
         .clk(sys_clk),
         .rst(rst),
         .num(num),
-        .lec(),
-        .led(),
+        .lec(lec),
+        .led(led),
         .fsu(fsu),
         .fsd(fsd),
         .fdu(fdu),
         .fdd(fdd),
 
-        .reg00(LED_NUM),
-        .reg01(8'hAA),
+        .reg00(),
+        .reg01(),
         .reg02(kind_dev),
         .reg03(info_sr),
         .reg04(8'h6B),

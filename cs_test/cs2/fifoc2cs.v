@@ -6,7 +6,7 @@ module fifoc2cs ( // WRITE_DONE
     input fs,
     output fd,
 
-    output [7:0] check_show,
+    output reg [7:0] so,
 
     output reg fifoc_rxen,
     input [7:0] fifoc_rxd,
@@ -22,18 +22,18 @@ module fifoc2cs ( // WRITE_DONE
     output reg [7:0] cmd_reg7
 );
 
-assign check_show[3:0] = ~state;
+// assign so = ~state;
 
 reg [7:0] check;
-reg [4:0] state, next_state;
-localparam IDLE = 5'h0, PRE0 = 5'h1, PRE1 = 5'h2, HED0 = 5'h3;
-localparam HED1 = 5'h4, CMD0 = 5'h5, CMD1 = 5'h6, CMD2 = 5'h7;
-localparam CMD3 = 5'h8, CMD4 = 5'h9, CMD5 = 5'hA, CMD6 = 5'hB;
-localparam CMD7 = 5'hC, CMD8 = 5'hD, PART = 5'hE, LAST = 5'hF;
-localparam ERR = 5'h18;
+reg [7:0] state, next_state;
+localparam IDLE = 8'h00, PRE0 = 8'h01, PRE1 = 8'h02, HED0 = 8'h03;
+localparam HED1 = 8'h04, CMD0 = 8'h05, CMD1 = 8'h06, CMD2 = 8'h07;
+localparam CMD3 = 8'h08, CMD4 = 8'h09, CMD5 = 8'h0A, CMD6 = 8'h0B;
+localparam CMD7 = 8'h0C, CMD8 = 8'h0D, PART = 8'h0E, LAST = 8'h0F;
+// localparam ERR0 = 5'h18;
+localparam ERR0 = 8'h11, ERR1 = 8'h12, ERR2 = 8'h13;
 
 assign fd = (state == LAST);
-assign err = (state == ERR);
 
 always@(posedge clk or posedge rst)begin // next_state => state
     if(rst)begin
@@ -46,12 +46,21 @@ end
 
 always@(*) begin // state 
     case(state) 
-        IDLE: if(fs) next_state <= PRE0;
-        PRE0: next_state <= PRE1;
-        PRE1: next_state <= HED0;
+        IDLE: begin
+            if(fs) next_state <= PRE0;
+            so <= IDLE;
+        end
+        PRE0: begin
+            next_state <= PRE1;
+            so <= PRE0;
+        end
+        PRE1: begin
+            next_state <= HED0;
+            so <= PRE1;
+        end
         HED0: begin
             if(fifoc_rxd != 8'h55) begin
-                next_state  <= ERR;
+                next_state <= ERR1;
             end
             else begin
                 next_state <= HED1;
@@ -59,31 +68,72 @@ always@(*) begin // state
         end
         HED1: begin
             if(fifoc_rxd != 8'hAA) begin
-                next_state  <= ERR;
+                next_state <= ERR0;
             end
             else begin
                 next_state <= CMD0;
             end
         end
-        CMD0: next_state <= CMD1;
-        CMD1: next_state <= CMD2;
-        CMD2: next_state <= CMD3;
-        CMD3: next_state <= CMD4;
-        CMD4: next_state <= CMD5;
-        CMD5: next_state <= CMD6;
-        CMD6: next_state <= CMD7;
-        CMD7: next_state <= CMD8;
-        CMD8: next_state <= PART;
+        CMD0: begin
+            next_state <= CMD1;
+            so <= CMD0;
+        end
+        CMD1: begin
+            next_state <= CMD2;
+            so <= CMD1;
+        end
+        CMD2: begin
+            next_state <= CMD3;
+            so <= CMD2;
+        end
+        CMD3: begin
+            next_state <= CMD4;
+            so <= CMD3;
+        end
+        CMD4: begin
+            next_state <= CMD5;
+            so <= CMD4;
+        end
+        CMD5: begin
+            next_state <= CMD6;
+            so <= CMD5;
+        end
+        CMD6: begin
+            next_state <= CMD7;
+            so <= CMD6;
+        end
+        CMD7: begin
+            next_state <= CMD8;
+            so <= CMD7;
+        end
+        CMD8: begin
+            next_state <= PART;
+            so <= CMD8;
+        end
         PART: begin
             if(check != fifoc_rxd) begin
-                next_state <= ERR;
+                next_state <= ERR2;
             end
             else begin
                 next_state <= LAST;
             end
         end
-        ERR: next_state <= ERR;
-        LAST: if(fs == 1'b0) next_state <= IDLE;
+        ERR0: begin
+            next_state <= ERR0;
+            so <= ERR0;
+        end
+        ERR1: begin
+            next_state <= ERR1;
+            so <= ERR1;
+        end
+        ERR2: begin
+            next_state <= ERR2;
+            so <= ERR2;
+        end
+        LAST: begin
+            so <= LAST;
+            if(fs == 1'b0) next_state <= IDLE;
+        end
         default: next_state <= IDLE;
     endcase
 end
