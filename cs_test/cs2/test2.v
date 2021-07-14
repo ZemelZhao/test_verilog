@@ -18,7 +18,7 @@ module top(
 );
 
 // MAC SECTION
-    localparam LED_NUM = 8'h66;
+    localparam LED_NUM = 8'h78;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -99,7 +99,7 @@ module top(
     assign fifo_check = ~|{fifoa_full, fifoc_full, fifod_full};
     wire [3:0] num;
 
-    assign rst = ~rst_n;
+    // assign rst = ~rst_n;
     assign num = 4'h2;
     // assign led[7:0] = ~LED_NUM;
 
@@ -118,23 +118,20 @@ module top(
     wire [7:0] so_fifoc2cs;
 
     assign fs_recv = (state == HAHA);
-    assign rst = ~rst_n;
-    assign num = 4'h2;
 
     assign fifod_txen = 1'b0;
     assign fifod_rxen = 1'b0;
     assign fifod_txd = 8'h0;
     assign fifoa_full = 1'b0;
 
-    assign lec = ~led_cont;
+    // assign lec = ~led_cont;
 
 // #endregion
 
 // TEST
 // #region
-    wire [3:0] led_cont;
+    wire [7:0] led_cont;
     wire err_fifoc2cs;
-    // assign led = ~led_cont;
     assign fifoa_full = 1'b0;
     assign fifod_txd = 8'h0;
     assign fifod_txen = 1'h0;
@@ -172,12 +169,12 @@ module top(
         endcase
     end
 
-    ilap
-    ilap_dut(
-        .clk(sys_clk),
-        .probe0(state),
-        .probe1(so_fifoc2cs)
-    );
+    // ilap
+    // ilap_dut(
+    //     .clk(sys_clk),
+    //     .probe0(state),
+    //     .probe1(so_fifoc2cs)
+    // );
 
 
 // #endregion
@@ -233,7 +230,7 @@ module top(
 
     fifoc
     fifoc_dut(
-        .rst(rst_fifoc),
+        .rst(),
 
         .wr_clk(gmii_rxc),
         .din(fifoc_txd),
@@ -248,7 +245,7 @@ module top(
 
     fifod
     fifod_dut(
-        .rst(rst_fifod),
+        .rst(),
         
         .wr_clk(sys_clk),
         .din(fifod_txd),
@@ -263,7 +260,7 @@ module top(
 
     eth2mac
     eth2mac_dut(
-        .rst(rst_eth2mac),
+        .rst(),
         .gmii_txc(gmii_txc),
         .gmii_rxc(gmii_rxc),
         .gmii_rxdv(gmii_rxdv),
@@ -279,7 +276,7 @@ module top(
     mac2fifoc 
     mac2fifoc_dut(
         .clk(gmii_rxc),
-        .rst(rst_mac2fifoc),
+        .rst(),
         .fs(fs_mac2fifoc),
         .fd(fd_mac2fifoc),
         .udp_rxd(udp_rxd),
@@ -292,8 +289,9 @@ module top(
 
     fifoc2cs 
     fifoc2cs_dut (
+        .led_cont(led_cont),
         .clk(sys_clk),
-        .rst(rst),
+        .rst(),
         .err(err_fifoc2cs),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
@@ -333,7 +331,7 @@ module top(
     cs
     cs_dut(
         .clk(sys_clk),
-        .rst(rst),
+        .rst(),
 
         .fs_udp_rx(),
         .fs_mac2fifoc(),
@@ -350,7 +348,6 @@ module top(
         .fs_send(fs_send),
         .fs_recv(fs_recv)
 
-        // .led_cont(led_cont)
     );
 
 // #endregion
@@ -360,17 +357,17 @@ module top(
     led
     led_dut(
         .clk(sys_clk),
-        .rst(rst),
+        .rst(),
         .num(num),
-        .lec(lec),
+        .lec(),
         .led(led),
         .fsu(fsu),
         .fsd(fsd),
         .fdu(fdu),
         .fdd(fdd),
 
-        .reg00(),
-        .reg01(),
+        .reg00(LED_NUM),
+        .reg01(led_cont),
         .reg02(kind_dev),
         .reg03(info_sr),
         .reg04(8'h6B),

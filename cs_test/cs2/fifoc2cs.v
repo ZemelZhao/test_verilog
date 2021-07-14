@@ -10,6 +10,7 @@ module fifoc2cs ( // WRITE_DONE
 
     output reg fifoc_rxen,
     input [7:0] fifoc_rxd,
+    output reg [7:0] led_cont,
 
     output reg [7:0] kind_dev,
     output reg [7:0] info_sr, // SAMPLE_RATE
@@ -31,12 +32,13 @@ localparam HED1 = 8'h04, CMD0 = 8'h05, CMD1 = 8'h06, CMD2 = 8'h07;
 localparam CMD3 = 8'h08, CMD4 = 8'h09, CMD5 = 8'h0A, CMD6 = 8'h0B;
 localparam CMD7 = 8'h0C, CMD8 = 8'h0D, PART = 8'h0E, LAST = 8'h0F;
 // localparam ERR0 = 5'h18;
-localparam ERR0 = 8'h11, ERR1 = 8'h12, ERR2 = 8'h13;
+localparam ERR0 = 8'h14, ERR1 = 8'h15, ERR2 = 8'h16;
 
 assign fd = (state == LAST);
 
 always@(posedge clk or posedge rst)begin // next_state => state
     if(rst)begin
+        // state <= IDLE;
         state <= IDLE;
     end
     else begin
@@ -48,19 +50,16 @@ always@(*) begin // state
     case(state) 
         IDLE: begin
             if(fs) next_state <= PRE0;
-            so <= IDLE;
         end
         PRE0: begin
             next_state <= PRE1;
-            so <= PRE0;
         end
         PRE1: begin
             next_state <= HED0;
-            so <= PRE1;
         end
         HED0: begin
             if(fifoc_rxd != 8'h55) begin
-                next_state <= ERR1;
+                next_state <= ERR0;
             end
             else begin
                 next_state <= HED1;
@@ -68,7 +67,7 @@ always@(*) begin // state
         end
         HED1: begin
             if(fifoc_rxd != 8'hAA) begin
-                next_state <= ERR0;
+                next_state <= ERR1;
             end
             else begin
                 next_state <= CMD0;
@@ -76,39 +75,30 @@ always@(*) begin // state
         end
         CMD0: begin
             next_state <= CMD1;
-            so <= CMD0;
         end
         CMD1: begin
             next_state <= CMD2;
-            so <= CMD1;
         end
         CMD2: begin
             next_state <= CMD3;
-            so <= CMD2;
         end
         CMD3: begin
             next_state <= CMD4;
-            so <= CMD3;
         end
         CMD4: begin
             next_state <= CMD5;
-            so <= CMD4;
         end
         CMD5: begin
             next_state <= CMD6;
-            so <= CMD5;
         end
         CMD6: begin
             next_state <= CMD7;
-            so <= CMD6;
         end
         CMD7: begin
             next_state <= CMD8;
-            so <= CMD7;
         end
         CMD8: begin
             next_state <= PART;
-            so <= CMD8;
         end
         PART: begin
             if(check != fifoc_rxd) begin
@@ -120,18 +110,17 @@ always@(*) begin // state
         end
         ERR0: begin
             next_state <= ERR0;
-            so <= ERR0;
+            led_cont <= ERR0;
         end
         ERR1: begin
             next_state <= ERR1;
-            so <= ERR1;
+            led_cont <= ERR1;
         end
         ERR2: begin
             next_state <= ERR2;
-            so <= ERR2;
+            led_cont <= ERR2;
         end
         LAST: begin
-            so <= LAST;
             if(fs == 1'b0) next_state <= IDLE;
         end
         default: next_state <= IDLE;
