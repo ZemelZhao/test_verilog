@@ -6,7 +6,7 @@ module fifoc2cs ( // WRITE_DONE
     input fs,
     output fd,
 
-    output reg [7:0] so,
+    output [7:0] so,
 
     output reg fifoc_rxen,
     input [7:0] fifoc_rxd,
@@ -23,7 +23,7 @@ module fifoc2cs ( // WRITE_DONE
     output reg [7:0] cmd_reg7
 );
 
-// assign so = ~state;
+assign so = state;
 
 reg [7:0] check;
 reg [7:0] state, next_state;
@@ -50,6 +50,7 @@ always@(*) begin // state
     case(state) 
         IDLE: begin
             if(fs) next_state <= PRE0;
+            else next_state <= IDLE;
         end
         PRE0: begin
             next_state <= PRE1;
@@ -59,7 +60,7 @@ always@(*) begin // state
         end
         HED0: begin
             if(fifoc_rxd != 8'h55) begin
-                next_state <= ERR0;
+                next_state <= HED1;
             end
             else begin
                 next_state <= HED1;
@@ -67,7 +68,7 @@ always@(*) begin // state
         end
         HED1: begin
             if(fifoc_rxd != 8'hAA) begin
-                next_state <= ERR1;
+                next_state <= CMD0;
             end
             else begin
                 next_state <= CMD0;
@@ -122,6 +123,7 @@ always@(*) begin // state
         end
         LAST: begin
             if(fs == 1'b0) next_state <= IDLE;
+            else next_state <= LAST;
         end
         default: next_state <= IDLE;
     endcase

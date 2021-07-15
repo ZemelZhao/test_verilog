@@ -18,7 +18,7 @@ module top(
 
 
 // MAC SECTION
-    localparam LED_NUM = 8'h78;
+    localparam LED_NUM = 8'h0A;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -44,6 +44,96 @@ module top(
     wire [9:0] adc_rx_len;
     wire flag_udp_tx_req, flag_udp_tx_prep;
 
+
+    wire fs_udp_tx, fd_udp_tx;
+    wire fs_udp_rx, fd_udp_rx;
+
+    wire [7:0] fifoc_txd, fifoc_rxd;
+    wire [7:0] fifod_txd, fifod_rxd;
+    wire fifoc_txen, fifoc_rxen;
+    wire fifod_txen, fifod_rxen;
+
+    wire fifoc_full, fifod_full;
+    wire [3:0] num;
+    wire fsu, fsd, fdu, fdd;
+    wire fs_fw, fd_fw;
+    wire [7:0] led_cont, kind_dev, info_sr, cmd_filt;
+    wire [7:0] cmd_mix0, cmd_mix1;
+    wire [7:0] cmd_reg4, cmd_reg5, cmd_reg6, cmd_reg7;
+
+    wire [7:0] so_fifoc2cs;
+    wire rst;
+
+    wire fs_mac2fifoc, fd_mac2fifoc;
+    wire fs_fifoc2cs, fd_fifoc2cs;
+    reg [3:0] fw_cmd;
+
+    localparam WAIT_PAR = 32'd100_000_000;
+    reg [31:0] wait_num;
+
+    reg [7:0] state, next_state;
+
+    localparam IDL0 = 8'h00, IDL1 = 8'h01;
+    localparam WAIT = 8'h02, NAP0 = 8'h03;
+    localparam RMTX = 8'h04, RMRX = 8'h05;
+
+    assign fs_fw = (state == RMTX);
+    assign fs_fifoc2cs = (state == RMRX);
+    assign rst = ~rst_n;
+    assign num = 4'h2;
+
+    assign fifod_txen = 1'b0;
+    assign fifod_rxen = 1'b0;
+
+
+    always @(posedge sys_clk or posedge rst) begin
+        if(rst) state <= IDL0;
+        else state <= next_state;
+    end
+
+    always @(*) begin
+        case(state)
+            IDL0: begin
+                if(~|{fifoc_full, fifod_full}) next_state <= WAIT;
+                else next_state <= IDL0;
+            end
+            IDL1: begin
+                next_state <= WAIT;
+            end
+            WAIT: begin
+                if(wait_num == WAIT_PAR) next_state <= RMTX;
+                else next_state <= WAIT;
+            end
+            RMTX: begin
+                if(fd_fw) next_state <= NAP0;
+                else next_state <= RMTX;
+            end
+            NAP0: begin
+                next_state <= RMRX;
+            end
+            RMRX: begin
+                if(fd_fifoc2cs) next_state <= IDL1;
+                else next_state <= RMRX;
+            end
+        endcase
+    end
+
+    always@(posedge sys_clk or posedge rst) begin
+        if(rst) wait_num <= 32'h0;
+        else if(state == IDL0 || state == IDL1) wait_num <= 32'h0;
+        else if(state == WAIT) wait_num <= wait_num + 1'b1;
+        else wait_num <= wait_num;
+    end
+
+    always @(posedge sys_clk or posedge rst) begin
+        if(rst) fw_cmd <= 4'h0;
+        else if(state == IDL0) fw_cmd <= 4'h0;
+        else if(state == IDL1 && fw_cmd == 4'h5) fw_cmd <= 4'h0;
+        else if(state == IDL1 && fw_cmd != 4'h5) fw_cmd <= fw_cmd + 1'b1;
+        else fw_cmd <= fw_cmd;  
+    end
+    
+
 // MAC
 // # region
     eth 
@@ -64,11 +154,26 @@ module top(
         .gmii_txd(gmii_txd)
     );
 
+    eth2mac
+    eth2mac_dut(
+        .rst(),
+        .gmii_txc(gmii_txc),
+        .gmii_rxc(gmii_rxc),
+        .gmii_rxdv(gmii_rxdv),
+        .gmii_rxd(gmii_rxd),
+        .mac_rxdv(mac_rxdv),
+        .mac_rxd(mac_rxd),
+        .gmii_txen(gmii_txen),
+        .gmii_txd(gmii_txd),
+        .mac_txdv(mac_txdv),
+        .mac_txd(mac_txd)
+    );
+
     mac 
     mac_dut(
         .gmii_txc(gmii_txc),
         .gmii_rxc(gmii_rxc),
-        .rst(rst_mac),
+        .rst(),
         .mac_ttl(MAC_TTL),
         .src_mac_addr(SOURCE_MAC_ADDR),
         .src_ip_addr(SOURCE_IP_ADDR),
@@ -93,11 +198,12 @@ module top(
         .udp_rx_len(udp_rx_len)
     );
 
+
     fifoc
     fifoc_dut(
         .rst(),
 
-        .wr_clk(gmii_rxc),
+        .wr_clk(sys_clk),
         .din(fifoc_txd),
         .wr_en(fifoc_txen),
 
@@ -123,20 +229,7 @@ module top(
         .full(fifod_full)
     );
 
-    eth2mac
-    eth2mac_dut(
-        .rst(),
-        .gmii_txc(gmii_txc),
-        .gmii_rxc(gmii_rxc),
-        .gmii_rxdv(gmii_rxdv),
-        .gmii_rxd(gmii_rxd),
-        .mac_rxdv(mac_rxdv),
-        .mac_rxd(mac_rxd),
-        .gmii_txen(gmii_txen),
-        .gmii_txd(gmii_txd),
-        .mac_txdv(mac_txdv),
-        .mac_txd(mac_txd)
-    );
+
 
     mac2fifoc 
     mac2fifoc_dut(
@@ -147,14 +240,108 @@ module top(
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
         .udp_rx_len(udp_rx_len),
-        .fifoc_txd(fifoc_txd),
-        .fifoc_txen(fifoc_txen),
+        .fifoc_txd(),
+        .fifoc_txen(),
         .dev_rx_len(eth_rx_len)
     );
 
+    wire [11:0] fw_bag_num;
 
 
+    fifo_write
+    fifod_write_dut(
+        .clk(sys_clk),
+        .rst(),
+        .err(),
+        .so(lec),
 
+        .fifo_txd(fifoc_txd),
+        .fifo_txen(fifoc_txen),
+        .fs(fs_fw),
+        .fd(fd_fw),
+        .data_cmd(fw_cmd),
+        .so_bag_num(fw_bag_num)
+    );
 
+    fifoc2cs 
+    fifoc2cs_dut (
+        .led_cont(led_cont),
+        .clk(sys_clk),
+        .rst(),
+        .err(),
+        .fs(fs_fifoc2cs),
+        .fd(fd_fifoc2cs),
+        .so(so_fifoc2cs),
+        .fifoc_rxen(fifoc_rxen),
+        .fifoc_rxd(fifoc_rxd),
+        .kind_dev(kind_dev),
+        .info_sr(info_sr),
+        .cmd_filt(cmd_filt),
+        .cmd_mix0(cmd_mix0),
+        .cmd_mix1(cmd_mix1),
+        .cmd_reg4(cmd_reg4),
+        .cmd_reg5(cmd_reg5),
+        .cmd_reg6(cmd_reg6),
+        .cmd_reg7(cmd_reg7)
+    );
+
+    // ilap
+    // ilap_dut(
+    //     .clk(sys_clk),
+    //     .probe0(state), 
+    //     .probe1(fw_cmd),
+    //     .probe2(fifoc_txd),
+    //     .probe3(fifoc_txen),
+    //     .probe4(fw_bag_num),
+    //     .probe5(fifoc_rxd), 
+    //     .probe6(fifoc_rxen),
+    //     .probe7(so_fifoc2cs),
+    //     .probe8(fs_fw), 
+    //     .probe9(fd_fw), 
+    //     .probe10(fs_fifoc2cs),
+    //     .probe11(fd_fifoc2cs)
+    // );
+
+    led
+    led_dut(
+        .clk(sys_clk),
+        .rst(),
+        .num(num),
+        .lec(),
+        .led(led),
+        .fsu(fsu),
+        .fsd(fsd),
+        .fdu(fdu),
+        .fdd(fdd),
+
+        .reg00(LED_NUM),
+        .reg01(fw_cmd),
+        .reg02(kind_dev),
+        .reg03(info_sr),
+        .reg04(8'h6B),
+        .reg05(cmd_filt),
+        .reg06(cmd_mix0),
+        .reg07(cmd_mix1),
+        .reg08(cmd_reg4),
+        .reg09(cmd_reg5),
+        .reg0A(cmd_reg6),
+        .reg0B(cmd_reg7)
+    );
+
+    key 
+    key_dutu(
+        .clk(sys_clk),
+        .key(key[1]),
+        .fs(fsu),
+        .fd(fdu)
+    );
+
+    key 
+    key_dutd(
+        .clk(sys_clk),
+        .key(key[0]),
+        .fs(fsd),
+        .fd(fdd)
+    );
 
 endmodule
