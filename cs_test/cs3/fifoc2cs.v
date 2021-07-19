@@ -6,11 +6,10 @@ module fifoc2cs ( // WRITE_DONE
     input fs,
     output fd,
 
-    output [7:0] so,
-
     output reg fifoc_rxen,
     input [7:0] fifoc_rxd,
     output reg [7:0] led_cont,
+    input [11:0] data_len,
 
     output reg [7:0] kind_dev,
     output reg [7:0] info_sr, // SAMPLE_RATE
@@ -23,7 +22,6 @@ module fifoc2cs ( // WRITE_DONE
     output reg [7:0] cmd_reg7
 );
 
-assign so = state;
 
 reg [7:0] check;
 reg [7:0] state, next_state;
@@ -60,7 +58,7 @@ always@(*) begin // state
         end
         HED0: begin
             if(fifoc_rxd != 8'h55) begin
-                next_state <= HED1;
+                next_state <= ERR0;
             end
             else begin
                 next_state <= HED1;
@@ -68,7 +66,7 @@ always@(*) begin // state
         end
         HED1: begin
             if(fifoc_rxd != 8'hAA) begin
-                next_state <= CMD0;
+                next_state <= ERR1;
             end
             else begin
                 next_state <= CMD0;
@@ -103,7 +101,7 @@ always@(*) begin // state
         end
         PART: begin
             if(check != fifoc_rxd) begin
-                next_state <= LAST;
+                next_state <= ERR2;
             end
             else begin
                 next_state <= LAST;

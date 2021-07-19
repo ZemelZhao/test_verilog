@@ -18,7 +18,7 @@ module top(
 
 
 // MAC SECTION
-    localparam LED_NUM = 8'h0A;
+    localparam LED_NUM = 8'h11;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -229,8 +229,6 @@ module top(
         .full(fifod_full)
     );
 
-
-
     mac2fifoc 
     mac2fifoc_dut(
         .clk(gmii_rxc),
@@ -245,7 +243,8 @@ module top(
         .dev_rx_len(eth_rx_len)
     );
 
-    wire [11:0] fw_bag_num;
+    wire [11:0] fw_data_len;
+
 
 
     fifo_write
@@ -253,14 +252,12 @@ module top(
         .clk(sys_clk),
         .rst(),
         .err(),
-        .so(lec),
-
         .fifo_txd(fifoc_txd),
         .fifo_txen(fifoc_txen),
         .fs(fs_fw),
         .fd(fd_fw),
         .data_cmd(fw_cmd),
-        .so_bag_num(fw_bag_num)
+        .so_data_len(fw_data_len)
     );
 
     fifoc2cs 
@@ -271,9 +268,10 @@ module top(
         .err(),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
-        .so(so_fifoc2cs),
         .fifoc_rxen(fifoc_rxen),
+        .data_len(fw_data_len),
         .fifoc_rxd(fifoc_rxd),
+
         .kind_dev(kind_dev),
         .info_sr(info_sr),
         .cmd_filt(cmd_filt),
@@ -283,24 +281,10 @@ module top(
         .cmd_reg5(cmd_reg5),
         .cmd_reg6(cmd_reg6),
         .cmd_reg7(cmd_reg7)
+
+
     );
 
-    // ilap
-    // ilap_dut(
-    //     .clk(sys_clk),
-    //     .probe0(state), 
-    //     .probe1(fw_cmd),
-    //     .probe2(fifoc_txd),
-    //     .probe3(fifoc_txen),
-    //     .probe4(fw_bag_num),
-    //     .probe5(fifoc_rxd), 
-    //     .probe6(fifoc_rxen),
-    //     .probe7(so_fifoc2cs),
-    //     .probe8(fs_fw), 
-    //     .probe9(fd_fw), 
-    //     .probe10(fs_fifoc2cs),
-    //     .probe11(fd_fifoc2cs)
-    // );
 
     led
     led_dut(
