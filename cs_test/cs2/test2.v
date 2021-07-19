@@ -18,7 +18,7 @@ module top(
 );
 
 // MAC SECTION
-    localparam LED_NUM = 8'h78;
+    localparam LED_NUM = 8'h13;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -176,6 +176,10 @@ module top(
     //     .probe1(so_fifoc2cs)
     // );
 
+    wire [3:0] mac_state;
+    wire [7:0] fc_state;
+    wire [3:0] mc_state; 
+
 
 // #endregion
 
@@ -225,7 +229,8 @@ module top(
         .fd_udp_rx(fd_udp_rx),
         .udp_rxd(udp_rxd),
         .udp_rx_addr(udp_rx_addr),
-        .udp_rx_len(udp_rx_len)
+        .udp_rx_len(udp_rx_len),
+        .so(mac_state)
     );
 
     fifoc
@@ -284,20 +289,23 @@ module top(
         .udp_rx_len(udp_rx_len),
         .fifoc_txd(fifoc_txd),
         .fifoc_txen(fifoc_txen),
-        .dev_rx_len(eth_rx_len)
+        .dev_rx_len(eth_rx_len),
+        .so(mc_state)
     );
 
-    fifoc2cs 
-    fifoc2cs_dut (
-        .led_cont(led_cont),
+    wire [255:0] fc_res;
+
+    fifoc2cs
+    fifoc2cs_dut(
         .clk(sys_clk),
-        .rst(),
-        .err(err_fifoc2cs),
+        .rst(rst),
+        .err(),
+        .res(fc_res),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
-        .so(so_fifoc2cs),
         .fifoc_rxen(fifoc_rxen),
         .fifoc_rxd(fifoc_rxd),
+        .data_len(eth_rx_len),
         .kind_dev(kind_dev),
         .info_sr(info_sr),
         .cmd_filt(cmd_filt),
@@ -306,8 +314,30 @@ module top(
         .cmd_reg4(cmd_reg4),
         .cmd_reg5(cmd_reg5),
         .cmd_reg6(cmd_reg6),
-        .cmd_reg7(cmd_reg7)
+        .cmd_reg7(cmd_reg7),
+        .so(fc_state)
     );
+
+    ilap
+    ilap_dut(
+        .clk(gmii_rxc),
+        .probe0(fc_res),
+        .probe1(eth_rx_len),
+        .probe2(state),
+        .probe3(fc_state),
+        .probe4(mc_state),
+        .probe5(mac_state),
+        .probe6(fifo_check),
+        .probe7(fs_udp_rx),
+        .probe8(fd_udp_rx),
+        .probe9(fs_mac2fifoc),
+        .probe10(fd_mac2fifoc),
+        .probe11(fs_fifoc2cs),
+        .probe12(fd_fifoc2cs)
+
+    );
+
+
 
     // fifod2mac 
     // fifod2mac_dut (
