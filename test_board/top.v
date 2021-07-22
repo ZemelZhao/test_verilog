@@ -1,10 +1,7 @@
 module top(
-    input clk_p, 
-    input clk_n,
+    input clk,
     output [15:0] led
 );
-
-    wire clk;
 
     assign led = ~led_show;
 
@@ -15,16 +12,10 @@ module top(
     reg [3:0] state;
 
 
-    IBUFGDS clkp(
-        .O(clk),
-        .I(clk_p),
-        .IB(clk_n)
-    );
-
     always@(posedge clk) begin
         case(state)
             WAIT: begin
-                if(cnt >= 32'd125_00_000) state <= CHANGE;
+                if(cnt >= 32'd50_000_000) state <= CHANGE;
                 else state <= WAIT;
             end
             CHANGE: begin

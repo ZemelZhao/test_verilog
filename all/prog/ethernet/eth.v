@@ -8,7 +8,7 @@ module eth(
     input rgmii_rxctl,                     //Control signal for receiving data
     input rgmii_rxc,
     output gmii_txc,
-    output gmii_rxc,
+    input gmii_rxc,
     output gmii_rxdv,
     output [7:0] gmii_rxd,
     input gmii_txen,

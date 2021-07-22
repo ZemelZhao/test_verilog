@@ -27,16 +27,6 @@ set_property PACKAGE_PIN B19 [get_ports led[2]]
 set_property PACKAGE_PIN D18 [get_ports led[1]]
 set_property PACKAGE_PIN C18 [get_ports led[0]]
 
-set_property IOSTANDARD LVDS_25 [get_ports clk_p]
-set_property IOSTANDARD LVDS_25 [get_ports clk_n]
-set_property PACKAGE_PIN A16 [get_ports clk_p]
-set_property PACKAGE_PIN A17 [get_ports clk_n]
-
-set_property SEVERITY {Warning} [get_drc_checks UCIO-1]
-
-create_clock -period 8 [get_ports clk_p]
-create_clock -period 8 [get_ports clk_n]
-
-
-
-
+create_clock -period 20 [get_ports clk]
+set_property IOSTANDARD LVCMOS33 [get_ports clk]
+set_property PACKAGE_PIN P15 [get_ports clk]

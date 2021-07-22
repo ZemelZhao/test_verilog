@@ -55,9 +55,9 @@ set_property PACKAGE_PIN AA21 [get_ports key[0]]
 set_property IOSTANDARD LVCMOS33 [get_ports rst_n]
 set_property PACKAGE_PIN M15 [get_ports rst_n]
 
-create_clock -period 20 [get_ports sys_clk]
-set_property IOSTANDARD LVCMOS33 [get_ports sys_clk]
-set_property PACKAGE_PIN P15 [get_ports sys_clk]
+create_clock -period 20 [get_ports clk]
+set_property IOSTANDARD LVCMOS33 [get_ports clk]
+set_property PACKAGE_PIN P15 [get_ports clk]
 ############## ethernet define#########################
 set_property IOSTANDARD LVCMOS33 [get_ports {rgmii_rxd[*]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {rgmii_txd[*]}]
@@ -88,4 +88,9 @@ set_property PACKAGE_PIN G22 [get_ports rgmii_rxc]
 set_property PACKAGE_PIN D22 [get_ports rgmii_rxctl]
 set_property PACKAGE_PIN F19 [get_ports rgmii_txc]
 set_property PACKAGE_PIN F20 [get_ports rgmii_txctl]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets rgmii_rxc_IBUF]
+
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets clkf_eth_wiz/inst/clk_in1_clkf_eth]
+
+set_false_path -from[get_clocks clk_out1_clkf_eth] -to [get_clocks clk_out1_clkf_sys]
+set_false_path -from[get_clocks clk_out1_clkf_sys] -to [get_clocks clk_out1_clkf_eth]
+

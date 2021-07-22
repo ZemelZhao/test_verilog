@@ -132,7 +132,7 @@ always @(*) begin
         end
         WAIT: begin
             if(fs_udp_tx) next_state <= SEND;
-            if(flag_udp_rxdv) next_state <= RECV;
+            else if(flag_udp_rxdv) next_state <= RECV;
             else next_state <= WAIT;
         end
         SEND: begin
