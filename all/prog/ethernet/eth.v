@@ -6,7 +6,7 @@ module eth(
     output rgmii_txc,                       //Clock for sending data
     input[3:0] rgmii_rxd,                       //recieve data
     input rgmii_rxctl,                     //Control signal for receiving data
-    input rgmii_rxc,
+
     output gmii_txc,
     input gmii_rxc,
     output gmii_rxdv,
@@ -54,7 +54,6 @@ GMII and RGMII data conversion
         .gmii_crs(gmii_crs),
         .gmii_col(gmii_col),
         .gmii_rxd(gmii_rxd),
-        .rgmii_rxc(rgmii_rxc),//add
         .gmii_rx_dv(gmii_rxdv),
         .gmii_rx_er(gmii_rx_er),
         .speed_selection(speed_selection),

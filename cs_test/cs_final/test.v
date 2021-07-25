@@ -18,7 +18,7 @@ module top(
 );
 
 // MAC SECTION
-    localparam LED_NUM = 8'h17;
+    localparam LED_NUM = 8'h19;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -301,8 +301,7 @@ module top(
         .udp_rx_len(udp_rx_len),
         .fifoc_txd(fifoc_txd),
         .fifoc_txen(fifoc_txen),
-        .dev_rx_len(eth_rx_len),
-        .so(mc_state)
+        .dev_rx_len(eth_rx_len)
     );
 
     wire [255:0] fc_res;
@@ -312,7 +311,6 @@ module top(
         .clk(sys_clk),
         .rst(rst),
         .err(),
-        .res(fc_res),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
         .fifoc_rxen(fifoc_rxen),
@@ -326,28 +324,7 @@ module top(
         .cmd_reg4(cmd_reg4),
         .cmd_reg5(cmd_reg5),
         .cmd_reg6(cmd_reg6),
-        .cmd_reg7(cmd_reg7),
-        .so(fc_state)
-    );
-
-    ilap
-    ilap_dut(
-        .clk(gmii_rxc),
-        .probe0(fc_res),
-        .probe1(eth_rx_len),
-        .probe2(state),
-        .probe3(fc_state),
-        .probe4(mc_state),
-        .probe5(mac_state),
-        .probe6(fifo_check),
-        .probe7(fs_udp_rx),
-        .probe8(fd_udp_rx),
-        .probe9(fs_mac2fifoc),
-        .probe10(fd_mac2fifoc),
-        .probe11(fs_fifoc2cs),
-        .probe12(fd_fifoc2cs),
-        .probe13(fifoc_full),
-        .probe14(mac_rxdv)
+        .cmd_reg7(cmd_reg7)
     );
 
 

@@ -91,6 +91,5 @@ set_property PACKAGE_PIN F20 [get_ports rgmii_txctl]
 
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets clkf_eth_wiz/inst/clk_in1_clkf_eth]
 
-set_false_path -from[get_clocks clk_out1_clkf_eth] -to [get_clocks clk_out1_clkf_sys]
-set_false_path -from[get_clocks clk_out1_clkf_sys] -to [get_clocks clk_out1_clkf_eth]
-
+set_false_path -from [get_clocks clk_out1_clkf_eth] -to [get_clocks clk_out1_clkf_sys]
+set_false_path -from [get_clocks clk_out1_clkf_sys] -to [get_clocks clk_out1_clkf_eth]

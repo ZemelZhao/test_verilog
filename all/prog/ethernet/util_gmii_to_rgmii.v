@@ -7,7 +7,6 @@ module util_gmii_to_rgmii (
   rgmii_rd,
   rgmii_rx_ctl,
   gmii_rx_clk,
-  rgmii_rxc,
   gmii_txd,
   gmii_tx_en,
   gmii_tx_er,
@@ -20,7 +19,6 @@ module util_gmii_to_rgmii (
   speed_selection,
   duplex_mode
   );
-  input           rgmii_rxc;//add
   input           reset;
   output  [ 3:0]  rgmii_td;
   output          rgmii_tx_ctl;

@@ -90,16 +90,30 @@ wire mac_send_end;
 wire arp_found;
 wire mac_not_exist;
 wire flag_udp_rxdv;
+reg udp_rxdv_d0, udp_rxdv_d1;
+wire udp_rxdv;
 
 reg [3:0] state, next_state;
 assign fs_udp_rx = (state == RECV);
 assign arp_request_req = (state == ARP_REQ);
 assign so = state;
+assign flag_udp_rxdv = ({udp_rxdv_d0, udp_rxdv_d1} == 2'b10);
 
 
 always @(posedge gmii_txc or posedge rst) begin
     if(rst) state <= IDLE;
     else state <= next_state;
+end
+
+always @(posedge gmii_rxc or posedge rst) begin
+    if(rst) begin
+        udp_rxdv_d0 <= 1'b0;
+        udp_rxdv_d1 <= 1'b0;
+    end
+    else begin
+        udp_rxdv_d0 <= udp_rxdv;
+        udp_rxdv_d1 <= udp_rxdv_d0;
+    end
 end
 
 always @(*) begin
@@ -182,7 +196,7 @@ mac_top mac_top0(
 	.udp_rec_ram_rdata           (udp_rxd),
 	.udp_rec_ram_read_addr       (udp_rx_addr),
 	.udp_rec_data_length         (udp_rx_len),
-	.udp_rec_data_valid          (flag_udp_rxdv),
+	.udp_rec_data_valid          (udp_rxdv),
 
 	.arp_request_req             (arp_request_req),
 	.mac_send_end                (mac_send_end),
