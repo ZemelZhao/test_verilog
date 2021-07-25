@@ -18,7 +18,7 @@ module top(
 );
 
 // MAC SECTION
-    localparam LED_NUM = 8'h19;
+    localparam LED_NUM = 8'h1A;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -259,20 +259,12 @@ module top(
     //     .full(fifod_full)
     // );
 
-    clkf_sys
-    clkf_sys_wiz(
-        .clk_out1(sys_clk),
-        .reset(1'b0),
-        .locked(),
-        .clk_in1(clk)
-    );
-
-    clkf_eth
-    clkf_eth_wiz(
-        .clk_out1(gmii_rxc),
-        .reset(1'b0),
-        .locked(),
-        .clk_in1(rgmii_rxc)
+    cs
+    cs_dut(
+        .osc_clk(clk),
+        .net_clk(rgmii_rxc),
+        .sys_clk(sys_clk),
+        .eth_clk(gmii_rxc)
     );
 
     eth2mac
@@ -347,30 +339,6 @@ module top(
 // #endregion
 
 // CONSOLE
-// #region
-    // cs
-    // cs_dut(
-    //     .clk(sys_clk),
-    //     .rst(),
-
-    //     .fs_udp_rx(),
-    //     .fs_mac2fifoc(),
-    //     .fs_fifoc2cs(),
-    //     .fd_udp_rx(),
-    //     .fd_mac2fifoc(),
-    //     .fd_fifoc2cs(),
-
-    //     // .so(led[23:16]),
-
-    //     .fifoa_full(fifoa_full),
-    //     .fifoc_full(fifoc_full),
-    //     .fifod_full(fifod_full),
-    //     .fs_send(fs_send),
-    //     .fs_recv(fs_recv)
-
-    // );
-
-// #endregion
 
 // LED
 // #region

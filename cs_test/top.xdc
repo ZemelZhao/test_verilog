@@ -89,7 +89,7 @@ set_property PACKAGE_PIN D22 [get_ports rgmii_rxctl]
 set_property PACKAGE_PIN F19 [get_ports rgmii_txc]
 set_property PACKAGE_PIN F20 [get_ports rgmii_txctl]
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets clkf_eth_wiz/inst/clk_in1_clkf_eth]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets cs_dut/cs_clk_dut/clkf_eth_wiz/inst/clk_in1_clkf_eth]
 
 set_false_path -from [get_clocks clk_out1_clkf_eth] -to [get_clocks clk_out1_clkf_sys]
 set_false_path -from [get_clocks clk_out1_clkf_sys] -to [get_clocks clk_out1_clkf_eth]
