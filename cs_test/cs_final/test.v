@@ -18,7 +18,7 @@ module top(
 );
 
 // MAC SECTION
-    localparam LED_NUM = 8'h1A;
+    localparam LED_NUM = 8'h1B;
 // #region
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
     localparam SOURCE_IP_ADDR = 32'hC0_A8_00_02;
@@ -64,9 +64,13 @@ module top(
     wire [7:0] adc_reg08, adc_reg09, adc_reg10, adc_reg11;
     wire [7:0] adc_reg12, adc_reg13, adc_regap;
 
+    wire [3:0] dev_id;
+
 // #endregion
 
 // OTHER SECTION
+
+    wire dev_grp;
 
     wire fs_udp_rx, fd_udp_rx;
     wire fs_mac2fifoc, fd_mac2fifoc;
@@ -88,6 +92,8 @@ module top(
     wire rst_adc2fifod, rst_fifoc2cs;
     wire rst;
 
+    wire err_fifoc2cs;
+
 
     wire [7:0] fifoc_txd, fifoc_rxd;
     wire [7:0] fifod_txd, fifod_rxd;
@@ -95,32 +101,9 @@ module top(
     wire fifod_txen, fifod_rxen;
 
     wire fsu, fdu, fsd, fdd;
-    wire fifo_check;
-    assign fifo_check = ~|{fifoa_full, fifoc_full, fifod_full};
-    wire [3:0] num;
-
-    // assign rst = ~rst_n;
-    assign num = 4'h2;
-    // assign led[7:0] = ~LED_NUM;
 
     wire fifod_txc, fifod_rxc;
     wire fifoc_txc, fifoc_rxc;
-
-
-// #endregion
-
-    reg [7:0] state, next_state;
-    localparam IDLE = 8'h01, MCFC = 8'h02, UPRX = 8'h04, FIFR = 8'h08;
-    localparam TEST = 8'h10, HAHA = 8'h20;
-
-    assign fs_mac2fifoc = (state == MCFC);
-    assign fd_udp_rx = (state == UPRX);
-    assign fs_fifoc2cs = (state == FIFR);
-
-    wire fs_send, fs_recv;
-    wire [7:0] so_fifoc2cs;
-
-    assign fs_recv = (state == HAHA);
 
     assign fifod_txen = 1'b0;
     assign fifod_rxen = 1'b0;
@@ -133,55 +116,11 @@ module top(
 
 // TEST
 // #region
-    wire err_fifoc2cs;
-
-    always @(posedge sys_clk or posedge rst) begin
-        if(rst) state <= IDLE;
-        else state <= next_state;
-    end
-
-    always @(*) begin
-        case(state)
-            IDLE: begin
-                if(fifo_check) next_state <= TEST;
-                else next_state <= IDLE; 
-            end
-            TEST: begin
-                if(fs_udp_rx) next_state <= MCFC;
-                else next_state <= TEST;
-            end
-            MCFC: begin
-                if(fd_mac2fifoc) next_state <= UPRX;
-                else next_state <= MCFC;
-            end
-            UPRX: begin
-                if(fs_udp_rx == 1'b0) next_state <= FIFR;
-                else next_state <= UPRX;
-            end
-            FIFR: begin
-                if(fd_fifoc2cs) next_state <= TEST;
-                else next_state <= FIFR; 
-            end
-            default: next_state <= TEST;
-        endcase
-    end
-
-    // ilap
-    // ilap_dut(
-    //     .clk(sys_clk),
-    //     .probe0(state),
-    //     .probe1(so_fifoc2cs)
-    // );
-
-    wire [3:0] mac_state;
-    wire [7:0] fc_state;
-    wire [3:0] mc_state; 
-
-
+    wire [7:0] mac_state;
 // #endregion
 
 // MAC
-// # region
+// #region
     eth 
     eth_dut(
         .e_mdc(e_mdc),
@@ -259,13 +198,7 @@ module top(
     //     .full(fifod_full)
     // );
 
-    cs
-    cs_dut(
-        .osc_clk(clk),
-        .net_clk(rgmii_rxc),
-        .sys_clk(sys_clk),
-        .eth_clk(gmii_rxc)
-    );
+
 
     eth2mac
     eth2mac_dut(
@@ -296,13 +229,12 @@ module top(
         .dev_rx_len(eth_rx_len)
     );
 
-    wire [255:0] fc_res;
 
     fifoc2cs
     fifoc2cs_dut(
         .clk(sys_clk),
         .rst(rst),
-        .err(),
+        .err(err_fifoc2cs),
         .fs(fs_fifoc2cs),
         .fd(fd_fifoc2cs),
         .fifoc_rxen(fifoc_rxen),
@@ -339,9 +271,66 @@ module top(
 // #endregion
 
 // CONSOLE
+// #region
+    cs
+    cs_dut(
+        .osc_clk(clk),
+        .net_clk(rgmii_rxc),
+        .sys_clk(sys_clk),
+        .eth_clk(gmii_rxc),
+
+        .dev_id(dev_id),
+        .dev_grp(dev_grp),
+
+        .fifoa_full(fifoa_full),
+        .fifoc_full(fifoc_full),
+        .fifod_full(fifod_full),
+
+        .fs_udp_rx(fs_udp_rx),
+        .fd_mac2fifoc(fd_mac2fifoc),
+        .fd_fifoc2cs(fd_fifoc2cs),
+        .fd_udp_rx(fd_udp_rx),
+        .fs_mac2fifoc(fs_mac2fifoc),
+        .fs_fifoc2cs(fs_fifoc2cs),
+
+        .adc_rx_len(adc_rx_len),
+        .eth_tx_len(eth_tx_len),
+
+        .err_fifoc2cs(err_fifoc2cs),
+
+        .kind_dev(kind_dev),
+        .info_sr(info_sr),
+        .cmd_filt(cmd_filt),
+        .cmd_mix0(cmd_mix0),
+        .cmd_mix1(cmd_mix1),
+        .cmd_reg4(cmd_reg4),
+        .cmd_reg5(cmd_reg5),
+        .cmd_reg6(cmd_reg6),
+        .cmd_reg7(cmd_reg7),
+
+        .adc_reg00(adc_reg00),
+        .adc_reg01(adc_reg01),
+        .adc_reg02(adc_reg02),
+        .adc_reg03(adc_reg03),
+        .adc_reg04(adc_reg04),
+        .adc_reg05(adc_reg05),
+        .adc_reg06(adc_reg06),
+        .adc_reg07(adc_reg07),
+        .adc_reg08(adc_reg08),
+        .adc_reg09(adc_reg09),
+        .adc_reg10(adc_reg10),
+        .adc_reg11(adc_reg11),
+        .adc_reg12(adc_reg12),
+        .adc_reg13(adc_reg13),
+        .adc_regap(adc_regap)
+    );
+
+// #endregion
 
 // LED
 // #region
+    wire [3:0] num;
+    assign num = 4'h2;
     led
     led_dut(
         .clk(sys_clk),
@@ -382,6 +371,49 @@ module top(
         .key(key[0]),
         .fs(fsd),
         .fd(fdd)
+    );
+// #endregion
+
+// ILA
+// #region
+    ilap
+    ilap_dut(
+        .clk(sys_clk),
+
+        .probe0(udp_rx_len),
+        .probe1(adc_rx_len),
+        .probe2(eth_tx_len),
+
+        .probe3(kind_dev),
+        .probe4(info_sr),
+        .probe5(cmd_filt),
+        .probe6(cmd_mix0),
+        .probe7(cmd_mix1),
+        .probe8(cmd_reg4),
+        .probe9(cmd_reg5),
+        .probe10(cmd_reg6),
+        .probe11(cmd_reg7),
+
+        .probe12(adc_reg00),
+        .probe13(adc_reg01),
+        .probe14(adc_reg02),
+        .probe15(adc_reg03),
+        .probe16(adc_reg04),
+        .probe17(adc_reg05),
+        .probe18(adc_reg06),
+        .probe19(adc_reg07),
+        .probe20(adc_reg08),
+        .probe21(adc_reg09),
+        .probe22(adc_reg10),
+        .probe23(adc_reg11),
+        .probe24(adc_reg12),
+        .probe25(adc_reg13),
+        .probe26(adc_regap),
+
+        .probe27(err_fifoc2cs),
+
+        .probe28(dev_grp),
+        .probe29(dev_id)
     );
 // #endregion
 
