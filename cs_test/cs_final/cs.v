@@ -23,6 +23,7 @@ module cs(
 
     output [9:0] adc_rx_len,
     output [11:0] eth_tx_len,
+    output [7:0] adc_cnt,
 
     input err_fifoc2cs,
 
@@ -126,6 +127,7 @@ module cs(
 
         .adc_rx_len(adc_rx_len),
         .eth_tx_len(eth_tx_len),
+        .data_cnt(adc_cnt),
 
         .fs(fs_cs_num),
         .fd(fd_cs_num)

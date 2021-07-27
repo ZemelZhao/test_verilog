@@ -1,0 +1,53 @@
+############## NET - IOSTANDARD #######################
+set_property CFGBVS VCCO [current_design]
+set_property CONFIG_VOLTAGE 3.3 [current_design]
+#############SPI Configurate Setting###################
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
+set_property CONFIG_MODE SPIx4 [current_design]
+set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
+#################resetsetting##########################
+
+############## led define#########################
+
+set_property IOSTANDARD LVCMOS33 [get_ports rst_n]
+set_property PACKAGE_PIN M15 [get_ports rst_n]
+
+create_clock -period 20 [get_ports clk]
+set_property IOSTANDARD LVCMOS33 [get_ports clk]
+set_property PACKAGE_PIN P15 [get_ports clk]
+############## ethernet define#########################
+set_property IOSTANDARD LVCMOS33 [get_ports {led[*]}]
+set_property PACKAGE_PIN U20 [get_ports {led[23]}]
+set_property PACKAGE_PIN P17 [get_ports {led[22]}]
+set_property PACKAGE_PIN R17 [get_ports {led[21]}]
+set_property PACKAGE_PIN U19 [get_ports {led[20]}]
+set_property PACKAGE_PIN W22 [get_ports {led[19]}]
+set_property PACKAGE_PIN T22 [get_ports {led[18]}]
+set_property PACKAGE_PIN P20 [get_ports {led[17]}]
+set_property PACKAGE_PIN Y20 [get_ports {led[16]}]
+set_property PACKAGE_PIN T20 [get_ports {led[15]}]
+set_property PACKAGE_PIN Y21 [get_ports {led[14]}]
+set_property PACKAGE_PIN R16 [get_ports {led[13]}]
+set_property PACKAGE_PIN U18 [get_ports {led[12]}]
+set_property PACKAGE_PIN V21 [get_ports {led[11]}]
+set_property PACKAGE_PIN T21 [get_ports {led[10]}]
+set_property PACKAGE_PIN N20 [get_ports {led[9]}]
+set_property PACKAGE_PIN Y22 [get_ports {led[8]}]
+set_property PACKAGE_PIN T19 [get_ports {led[7]}]
+set_property PACKAGE_PIN W21 [get_ports {led[6]}]
+set_property PACKAGE_PIN N15 [get_ports {led[5]}]
+set_property PACKAGE_PIN U17 [get_ports {led[4]}]
+set_property PACKAGE_PIN V19 [get_ports {led[3]}]
+set_property PACKAGE_PIN U22 [get_ports {led[2]}]
+set_property PACKAGE_PIN P22 [get_ports {led[1]}]
+set_property PACKAGE_PIN AB21 [get_ports {led[0]}]
+
+set_property IOSTANDARD LVCMOS33 [get_ports {dk[*]}]
+set_property PACKAGE_PIN V20 [get_ports {dk[7]}]
+set_property PACKAGE_PIN R18 [get_ports {dk[6]}]
+set_property PACKAGE_PIN T17 [get_ports {dk[5]}]
+set_property PACKAGE_PIN V18 [get_ports {dk[4]}]
+set_property PACKAGE_PIN V22 [get_ports {dk[3]}]
+set_property PACKAGE_PIN P21 [get_ports {dk[2]}]
+set_property PACKAGE_PIN AA22 [get_ports {dk[1]}]
+set_property PACKAGE_PIN AB20 [get_ports {dk[0]}]

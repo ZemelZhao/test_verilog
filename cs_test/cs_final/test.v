@@ -39,9 +39,11 @@ module top(
     wire udp_txen;
     wire [7:0] udp_txd;
     wire [7:0] udp_rxd;
+
     wire [11:0] eth_rx_len;
     wire [11:0] eth_tx_len;
     wire [9:0] adc_rx_len;
+    wire [7:0] adc_cnt;
     wire flag_udp_tx_req, flag_udp_tx_prep;
 // #endregion
 
@@ -295,6 +297,7 @@ module top(
 
         .adc_rx_len(adc_rx_len),
         .eth_tx_len(eth_tx_len),
+        .adc_cnt(adc_cnt),
 
         .err_fifoc2cs(err_fifoc2cs),
 
