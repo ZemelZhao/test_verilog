@@ -1,4 +1,4 @@
-module cs_cmd2reg( // TEST_DONE
+module cs_reg( // TEST_DONE
     input [7:0] cmd_filt, // [7:4] UPPER_BW [3:0] LOWER_BW
     input [7:0] cmd_mix0, // [7:4] ADC_OPT  [3:1] DOUT  
     input [7:0] cmd_mix1, // [7:4] ID       [3:2] DIN   [1:0] 01
@@ -21,9 +21,9 @@ module cs_cmd2reg( // TEST_DONE
     output [7:0] reg11,
     output [7:0] reg12,
     output [7:0] reg13,
-
     output [7:0] regap, // Individual Amplifier Power
-    output [3:0] devid,
+
+    output [3:0] dev_id,
     output dev_grp
 
 );
@@ -78,12 +78,12 @@ module cs_cmd2reg( // TEST_DONE
 
 wire [71:0] cache_reg1 = 72'h02_03_03_04_08_08_08_10_20;
 wire [71:0] cache_reg2 = 72'h04_07_10_12_1A_20_28_28_28;
-wire [127:0] cache_reg8 = 128'h0B_11_16_21_03_0D_1B_01_2E_29_1E_06_2A_18_2C_26;
-wire [127:0] cache_reg9 = 128'h00_00_00_00_01_01_01_02_02_03_05_09_0A_0D_11_1A;
-wire [127:0] cache_regA = 128'h08_10_17_25_0D_19_2C_17_1E_24_2B_02_05_07_08_05;
-wire [127:0] cache_regB = 128'h00_00_00_00_01_01_01_02_03_04_06_0B_0D_10_15_1F;
-wire [127:0] cache_regC = 128'h0D_0F_12_19_22_36_3E_05_12_28_14_2A_08_2C_23_38;
-wire [127:0] cache_regD = 128'h00_00_00_00_00_00_00_01_01_01_02_02_03_06_11_36;
+wire [255:0] cache_reg8 = 256'h0B_11_16_21_03_0D_1B_01_2E_29_1E_06_2A_18_2C_26;
+wire [255:0] cache_reg9 = 256'h00_00_00_00_01_01_01_02_02_03_05_09_0A_0D_11_1A;
+wire [255:0] cache_regA = 256'h08_10_17_25_0D_19_2C_17_1E_24_2B_02_05_07_08_05;
+wire [255:0] cache_regB = 256'h00_00_00_00_01_01_01_02_03_04_06_0B_0D_10_15_1F;
+wire [255:0] cache_regC = 256'h0D_0F_12_19_22_36_3E_05_12_28_14_2A_08_2C_23_38;
+wire [255:0] cache_regD = 256'h00_00_00_00_00_00_00_01_01_01_02_02_03_06_11_36;
 
 assign reg00 = 8'b11011110;
 assign reg01 = {2'b00, cache_reg1[8*cmd_mix0[7:4]+5 -: 6]};
@@ -100,7 +100,7 @@ assign reg11 = {cmd_mix0[2], cache_regB[8*cmd_filt[7:4]+6 -: 7]};
 assign reg12 = {cmd_mix0[1], cache_regC[8*cmd_filt[3:0]+6 -: 7]};
 assign reg13 = {cmd_mix0[1], cache_regD[8*cmd_filt[3:0]+6 -: 7]};
 assign regap = 8'b1111_1111;
-assign devid = cmd_mix1[7:4];
+assign dev_id = cmd_mix1[7:4];
 assign dev_grp = cmd_mix1[1];
 
 endmodule

@@ -6,6 +6,7 @@ module mac2fifoc(
     // CONTROL
     input fs,
     output fd,
+    output [3:0] so,
 
     // MAC
     input [7:0] udp_rxd,
@@ -30,6 +31,7 @@ module mac2fifoc(
 
     assign fifoc_txd = udp_rxd;
     assign fd = (state == LAST);
+    assign so = state;
 
     always @(posedge clk or posedge rst) begin
         if(rst) reg_dev_rx_len <= 16'h0;
