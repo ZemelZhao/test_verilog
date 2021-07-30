@@ -1,56 +1,3 @@
-module cs_num(
-    input clk,
-    input rst,
-    input [7:0] cmd_kdev,
-
-    output reg [9:0] adc_rx_len,
-    output reg [11:0] eth_tx_len,
-    output reg [7:0] data_cnt,
-
-	output reg [63:0] intan_cmd, 
-	output reg [63:0] intan_ind,
-	output reg [7:0] intan_lor,
-	output reg [7:0] intan_end,
-
-    input fs,
-    output fd
-);
-
-    reg [7:0] state, next_state;
-    localparam IDLE = 8'h00, PREP = 8'h1, WORK = 8'h2, LAST = 8'h3;
-
-    localparam UDP_LEN = 12'd1472;
-    localparam MAX_NUM = 8'd10;
-
-    assign fd = (state == LAST);
-
-    always @(posedge clk or posedge rst) begin
-        if(rst) state <= IDLE;
-        else state <= next_state;
-    end
-
-    always @(*) begin
-        case(state)
-            IDLE: begin
-                if(fs) next_state <= PREP;
-                else next_state <= IDLE;
-            end
-            PREP: next_state <= WORK;
-            WORK: next_state <= LAST;
-            LAST: begin
-                if(~fs) next_state <= IDLE;
-                else next_state <= LAST;
-            end
-        endcase
-    end
-
-    always @(posedge clk or posedge rst) begin
-        if(rst) begin
-            adc_rx_len <= 10'h000;
-            eth_tx_len <= 12'h000;
-            data_cnt <= 8'h00;
-        end
-        else if(state == WORK) begin
 			case(cmd_kdev)
 				8'h00: begin
 					adc_rx_len <= 10'h006;
@@ -2357,12 +2304,3 @@ module cs_num(
 					intan_end <= 8'h01;
 				end
 			endcase
-        end
-        else begin
-            adc_rx_len <= adc_rx_len;
-            eth_tx_len <= eth_tx_len;
-            data_cnt <= data_cnt;
-        end
-    end
-
-endmodule

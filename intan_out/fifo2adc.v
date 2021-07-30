@@ -39,8 +39,6 @@ module fifo2adc( //
 
     // #### CONTROL SECTION
     // ###### OPTION PART
-    input fs_conf,
-    output fd_conf,
     input fs_fifo,
     output fd_fifo,
 
@@ -55,6 +53,11 @@ module fifo2adc( //
 
     input [63:0] cache_fifoi_rxd,
     output [7:0] fifod_txd,
+
+    input [63:0] intan_cmd,
+    input [63:0] intan_ind,
+    input [7:0] intan_lor,
+    input [7:0] intan_end,
     
     output reg [9:0] data_len
     // #endregion
@@ -68,11 +71,10 @@ module fifo2adc( //
     reg[7:0] state_opt, next_state_opt;
     // ###### LINK
     reg [7:0] state_fifo, next_state_fifo;
-    reg [7:0] cache_fifo_cmd[8:0]; // 记录当前的与INTAN部分FIFO的 0x80 // FIFO_RD_EN
-    reg [8:0] cache_fifo_lor; // 记录当前FIFO读取是否为32通道
-    reg [8:0] cache_fifo_end; // 记录当前是否为读取的最后一个FIFO
-    reg [7:0] cache_fifo_ind[8:0]; // 0x3F // FIFO_IND
-    reg [7:0] cache_fifo_num;
+    wire [7:0] cache_fifo_cmd[8:0]; // 记录当前的与INTAN部分FIFO的 0x80 // FIFO_RD_EN
+    wire [8:0] cache_fifo_lor; // 记录当前FIFO读取是否为32通道
+    wire [8:0] cache_fifo_end; // 记录当前是否为读取的最后一个FIFO
+    wire [7:0] cache_fifo_ind[8:0]; // 0x3F // FIFO_IND
     reg [7:0] fifo_ind;
     reg [7:0] pprev_fifo_ind, prev_fifo_ind;
     reg flag_hord; // HEAD OR DATA
@@ -90,20 +92,39 @@ module fifo2adc( //
 
     // #### 2. WIRE PART
     // #region
-    // ###### LINK
-    wire [7:0] fifo_cmd;
+
     // #endregion
+
+    assign cache_fifo_cmd[8] = 8'h00;
+    assign cache_fifo_cmd[7] = intan_cmd[63:56];
+    assign cache_fifo_cmd[6] = intan_cmd[55:48];
+    assign cache_fifo_cmd[5] = intan_cmd[47:40];
+    assign cache_fifo_cmd[4] = intan_cmd[39:32];
+    assign cache_fifo_cmd[3] = intan_cmd[31:24];
+    assign cache_fifo_cmd[2] = intan_cmd[23:16];
+    assign cache_fifo_cmd[1] = intan_cmd[15:8];
+    assign cache_fifo_cmd[0] = intan_cmd[7:0];
+
+    assign cache_fifo_ind[8] = 8'h00;
+    assign cache_fifo_ind[7] = intan_ind[63:56];
+    assign cache_fifo_ind[6] = intan_ind[55:48];
+    assign cache_fifo_ind[5] = intan_ind[47:40];
+    assign cache_fifo_ind[4] = intan_ind[39:32];
+    assign cache_fifo_ind[3] = intan_ind[31:24];
+    assign cache_fifo_ind[2] = intan_ind[23:16];
+    assign cache_fifo_ind[1] = intan_ind[15:8];
+    assign cache_fifo_ind[0] = intan_ind[7:0];
+
+    assign cache_fifo_lor = intan_lor;
+    assign cache_fifo_end = intan_end;
 
     // #### 3. PARAMETER PART
     // #region
     // ###### STATE MACHINE PAGE
     // MAIN
     localparam MAIN_IDLE = 8'h00;
-
     // OPTION
-    localparam IDLE_OPTION = 8'h10;
-    localparam OPTION0 = 8'h11, OPTION1 = 8'h12, OPTION2 = 8'h13, OPTION3 = 8'h14;
-    localparam OPTION_END = 8'h15, OPTION_DONE = 8'h16;
+
 
     // DATA
     localparam IDLE_READ = 8'h40;
@@ -136,7 +157,6 @@ module fifo2adc( //
     assign fifod_txd = (flag_hord==1'b1) ?head_data :cache_fifoi_rxd[fifo_ind -: 8];
     // assign cache_fifoi_rxen = cache_fifo_cmd[fifo_num];
     assign fd_fifo = (state_fifo == DATA_DONE);
-    assign fd_conf = (state_opt == OPTION_DONE);
 
     // #endregion
 
@@ -145,40 +165,12 @@ module fifo2adc( //
     always @(posedge clk or posedge rst) begin // STATE
         if(rst) begin
             state_fifo <= MAIN_IDLE;
-            state_opt <= MAIN_IDLE;
         end
         else begin
             state_fifo <= next_state_fifo;
-            state_opt <= next_state_opt;
         end
     end
 
-    always @(*) begin // STATE_OPT
-        case(state_opt)
-            MAIN_IDLE: begin
-                if(fs_conf)begin
-                    next_state_opt <= IDLE_OPTION;
-                end
-                else begin
-                    next_state_opt <= MAIN_IDLE;
-                end
-            end
-            IDLE_OPTION: next_state_opt <= OPTION0;
-            OPTION0: next_state_opt <= OPTION1;
-            OPTION1: next_state_opt <= OPTION2;
-            OPTION2: next_state_opt <= OPTION3;
-            OPTION3: next_state_opt <= OPTION_END;
-            OPTION_END: next_state_opt <= OPTION_DONE;
-            OPTION_DONE: begin
-                if(fs_conf == 1'b0) begin
-                    next_state_opt <= MAIN_IDLE;
-                end
-                else begin
-                    next_state_opt <= OPTION_DONE;
-                end
-            end
-        endcase
-    end
     
     always @(posedge clk or posedge rst) begin // cache_fifoi_rxen
         if(rst) begin
@@ -437,200 +429,6 @@ module fifo2adc( //
         end
     end
 
-    always @(posedge clk or posedge rst) begin // option
-        if(rst) begin
-            cache_fifo_cmd[8] <= 8'h00;
-            cache_fifo_cmd[7] <= 8'h00;
-            cache_fifo_cmd[6] <= 8'h00;
-            cache_fifo_cmd[5] <= 8'h00;
-            cache_fifo_cmd[4] <= 8'h00;
-            cache_fifo_cmd[3] <= 8'h00;
-            cache_fifo_cmd[2] <= 8'h00;
-            cache_fifo_cmd[1] <= 8'h00;
-            cache_fifo_cmd[0] <= 8'h00;
-            cache_fifo_ind[8] <= 8'h00;
-            cache_fifo_ind[7] <= 8'h00;
-            cache_fifo_ind[6] <= 8'h00;
-            cache_fifo_ind[5] <= 8'h00;
-            cache_fifo_ind[4] <= 8'h00;
-            cache_fifo_ind[3] <= 8'h00;
-            cache_fifo_ind[2] <= 8'h00;
-            cache_fifo_ind[1] <= 8'h00;
-            cache_fifo_ind[0] <= 8'h00;
-            cache_fifo_lor <= 8'h00;
-            cache_fifo_end <= 8'h00;
-            fifo_num_opt <= 8'h07;
-            data_len <= 10'h0;
-        end
-        case(state_opt) 
-            IDLE_OPTION: begin
-                cache_fifo_cmd[8] <= 8'h00;
-                cache_fifo_cmd[7] <= 8'h00;
-                cache_fifo_cmd[6] <= 8'h00;
-                cache_fifo_cmd[5] <= 8'h00;
-                cache_fifo_cmd[4] <= 8'h00;
-                cache_fifo_cmd[3] <= 8'h00;
-                cache_fifo_cmd[2] <= 8'h00;
-                cache_fifo_cmd[1] <= 8'h00;
-                cache_fifo_cmd[0] <= 8'h00;
-                cache_fifo_ind[8] <= 8'h00;
-                cache_fifo_ind[7] <= 8'h00;
-                cache_fifo_ind[6] <= 8'h00;
-                cache_fifo_ind[5] <= 8'h00;
-                cache_fifo_ind[4] <= 8'h00;
-                cache_fifo_ind[3] <= 8'h00;
-                cache_fifo_ind[2] <= 8'h00;
-                cache_fifo_ind[1] <= 8'h00;
-                cache_fifo_ind[0] <= 8'h00;
-                cache_fifo_lor <= 8'h00;
-                cache_fifo_end <= 8'h00;
-                fifo_num_opt <= 8'h07;
-                data_len <= 10'h0;
-            end
-            OPTION0: begin
-                case(dev_kind[7:6])
-                    2'b00: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h00;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h00;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        cache_fifo_end[fifo_num_opt] <= 1'b0;
-                        data_len <= data_len;
-                    end
-                    2'b01: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h80;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h3F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h20;
-                    end
-                    2'b10: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h80;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h3F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b1;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h40;
-                    end
-                    2'b11: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h80;
-                        cache_fifo_cmd[fifo_num_opt-1] <= 8'h40;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h3F;
-                        cache_fifo_ind[fifo_num_opt-1] <= 8'h37;
-                        cache_fifo_lor[fifo_num_opt -: 2] <= 2'b11;
-                        fifo_num_opt <= fifo_num_opt - 8'h2;
-                        data_len <= data_len + 10'h80;
-                    end
-                endcase
-            end
-            OPTION1: begin
-                case(dev_kind[5:4])
-                    2'b00: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h00;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h00;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        cache_fifo_end[fifo_num_opt] <= 1'b0;
-                        data_len <= data_len;
-                    end
-                    2'b01: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h20;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h2F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h20;
-                    end
-                    2'b10: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h20;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h2F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b1;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h40;
-                    end
-                    2'b11: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h20;
-                        cache_fifo_cmd[fifo_num_opt-1] <= 8'h10;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h2F;
-                        cache_fifo_ind[fifo_num_opt-1] <= 8'h27;
-                        cache_fifo_lor[fifo_num_opt -: 2] <= 2'b11;
-                        fifo_num_opt <= fifo_num_opt - 8'h2;
-                        data_len <= data_len + 10'h80;
-                    end
-                endcase
-            end
-            OPTION2: begin
-                case(dev_kind[3:2])
-                    2'b00: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h00;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h00;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        cache_fifo_end[fifo_num_opt] <= 1'b0;
-                        data_len <= data_len;
-                    end
-                    2'b01: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h08;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h1F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h20;
-                    end
-                    2'b10: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h08;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h1F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b1;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h40;
-                    end
-                    2'b11: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h08;
-                        cache_fifo_cmd[fifo_num_opt-1] <= 8'h04;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h1F;
-                        cache_fifo_ind[fifo_num_opt-1] <= 8'h17;
-                        cache_fifo_lor[fifo_num_opt -: 2] <= 2'b11;
-                        fifo_num_opt <= fifo_num_opt - 8'h2;
-                        data_len <= data_len + 10'h80;
-                    end
-                endcase
-            end
-            OPTION3: begin
-                case(dev_kind[1:0])
-                    2'b00: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h00;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h00;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        fifo_num_opt <= fifo_num_opt + 1'b1;
-                        data_len <= data_len;
-                    end
-                    2'b01: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h02;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h0F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b0;
-                        fifo_num_opt <= fifo_num_opt;
-                        data_len <= data_len + 10'h20;
-                    end
-                    2'b10: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h02;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h0F;
-                        cache_fifo_lor[fifo_num_opt] <= 1'b1;
-                        fifo_num_opt <= fifo_num_opt;
-                        data_len <= data_len + 10'h40;
-                    end
-                    2'b11: begin
-                        cache_fifo_cmd[fifo_num_opt] <= 8'h02;
-                        cache_fifo_cmd[fifo_num_opt-1] <= 8'h01;
-                        cache_fifo_ind[fifo_num_opt] <= 8'h0F;
-                        cache_fifo_ind[fifo_num_opt-1] <= 8'h07;
-                        cache_fifo_lor[fifo_num_opt -: 2] <= 2'b11;
-                        fifo_num_opt <= fifo_num_opt - 8'h1;
-                        data_len <= data_len + 10'h80;
-                    end
-                endcase
-            end
-            OPTION_END: begin
-                data_len <= data_len + 10'h6;
-                cache_fifo_num <= fifo_num_opt;
-                cache_fifo_end[fifo_num_opt] <= 1'b1;
-                fifo_num_opt <= 8'h07;
-            end
-        endcase
-    end
     // #endregion
     // #endregion
 

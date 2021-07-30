@@ -4,30 +4,35 @@ module fifo_write
     input rst,
     input err,
 
+    input fifo_full,
+
     output [7:0] fifo_txd,
     output fifo_txen,
 
     input fs,
     output fd,
     input [11:0] data_len,
-    input [11:0] data_num
+    input [15:0] part
 );
 
 
     wire[7:0] cache_data[127:0];  
     reg [2:0] state, next_state;
 
-    localparam [2:0] IDLE = 3'h0,  WORK = 3'h2, LAST = 3'h3, HEAD = 3'h4;
+    localparam IDLE = 3'h0, PREP = 3'h1;
+    localparam WORK = 3'h2, LAST = 3'h3, HEAD = 3'h4;
 
     reg [11:0] bag_num, fifo_num;
+    wire [7:0] data_num;
     assign fd = (state == LAST);
     assign fifo_txen = (state == WORK);
     assign fifo_txd = cache_data[bag_num];
+    assign data_num = 8'h00;
 
     assign cache_data[0] = 8'h55;
     assign cache_data[1] = 8'hAA;
-    assign cache_data[2] = 8'h02;
-    assign cache_data[3] = 8'h03;
+    assign cache_data[2] = part[15:8];
+    assign cache_data[3] = part[7:0];
     assign cache_data[4] = 8'h04;
     assign cache_data[5] = 8'h05;
     assign cache_data[6] = 8'h06;
@@ -167,11 +172,15 @@ module fifo_write
         case (state)
             IDLE: begin
                 if(fs) begin
-                    next_state <= HEAD;
+                    next_state <= PREP;
                 end
                 else begin
                     next_state <= IDLE;
                 end
+            end
+            PREP: begin
+                if(~fifo_full) next_state <= HEAD;
+                else next_state <= PREP;
             end
             HEAD: begin
                 next_state <= WORK;
@@ -183,9 +192,10 @@ module fifo_write
                 else next_state <= WORK;
             end
             LAST: begin
-                if(fs == 1'b0) begin
+                if(~fs) begin
                     next_state <= IDLE;
                 end
+                else next_state <= LAST;
             end
             default: begin
                 next_state <= IDLE;

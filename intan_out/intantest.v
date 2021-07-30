@@ -5,8 +5,6 @@ module intan (
     output err,
 
     input spi_mc,
-    input fifoi_txc,
-    input fifoi_rxc, 
 
     // #### 2. CONTROL SECTION
     // ###### 1. INTAN CONTROL PART
@@ -27,17 +25,17 @@ module intan (
 
 
 
-reg [7:0] state;
-reg [7:0] next_state;
+    reg [7:0] state;
+    reg [7:0] next_state;
 
-wire [15:0] fifoi_txd;
+    wire [15:0] fifoi_txd;
 
-// FIFO CONTROL
-reg fifoi_txen;
-reg fs_fifo;
-wire fd_fifo;
-// FIFO DATA
-// ERROR
+    // FIFO CONTROL
+    reg fifoi_txen;
+    reg fs_fifo;
+    wire fd_fifo;
+    // FIFO DATA
+    // ERROR
 
 
 
@@ -45,7 +43,7 @@ wire fd_fifo;
     fifoi
     fifoi_dut0(
         .rst(rst),
-        .wr_clk(fifoi_txc),
+        .wr_clk(fifoc_txc0),
         .din(fifoi_txd[15:8]),
         .wr_en(fifoi_txen),
         .rd_clk(fifoi_rxc),
