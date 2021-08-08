@@ -1,4 +1,5 @@
 module intan(
+    input clk,
     input rst,
     output err,
 
@@ -11,14 +12,13 @@ module intan(
     output fd_conf,
     output fd_read,
 
-    input fifoi_txc,
-
     input fifoi_rxc,
     input [1:0] fifoi_rxen,
     input [31:0] intan_id,
     output [15:0] fifoi_rxd,
-    output fifoi_full
-
+    output fifoi_full,
+    output [7:0] so_fw0,
+    output [7:0] so_fw1
 );
 
     wire fd_fw0, fd_fw1;
@@ -63,7 +63,7 @@ module intan(
 
     fifo_write 
     fifo_write_dut1(
-        .clk(fifoi_txc),
+        .clk(clk),
         .rst(),
         .err(),
         .fifo_txd(fifoi_txd1),
@@ -71,13 +71,14 @@ module intan(
         .fs(fs_read),
         .fd(fd_fw1),
         .data_len(fifoi_len1),
-        .fifo_full(),
-        .part(intan_id[31:16])
+        .fifo_full(fifoi_full1),
+        .part(intan_id[31:16]),
+        .so(so_fw1)
     );
 
     fifo_write 
     fifo_write_dut0(
-        .clk(fifoi_txc),
+        .clk(clk),
         .rst(),
         .err(),
         .fifo_txd(fifoi_txd0),
@@ -85,8 +86,9 @@ module intan(
         .fs(fs_read),
         .fd(fd_fw0),
         .data_len(fifoi_len0),
-        .fifo_full(),
-        .part(intan_id[15:0])
+        .fifo_full(fifoi_full0),
+        .part(intan_id[15:0]),
+        .so(so_fw0)
     );
 
 
@@ -95,11 +97,11 @@ module intan(
     fifoi_dut1(
         .rst(),
 
-        .wr_clk(fifoi_txc),
+        .wr_clk(clk),
         .din(fifoi_txd1),
         .wr_en(fifoi_txen1),
 
-        .rd_clk(fifoi_rxc),
+        .rd_clk(clk),
         .dout(fifoi_rxd[15:8]),
         .rd_en(fifoi_rxen[1]),
 
@@ -110,11 +112,11 @@ module intan(
     fifoi_dut0(
         .rst(),
 
-        .wr_clk(fifoi_txc),
-        .din(fifoi_txd1),
-        .wr_en(fifoi_txen1),
+        .wr_clk(clk),
+        .din(fifoi_txd0),
+        .wr_en(fifoi_txen0),
 
-        .rd_clk(fifoi_rxc),
+        .rd_clk(clk),
         .dout(fifoi_rxd[7:0]),
         .rd_en(fifoi_rxen[0]),
 
