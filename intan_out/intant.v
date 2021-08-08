@@ -1,4 +1,5 @@
 module intan(
+    input clk,
     input rst,
     output err,
 
@@ -24,6 +25,11 @@ module intan(
 
 );
 
+    localparam IDLE = 8'h11; 
+    localparam WFCK = 8'h21, FDCK = 8'h12; 
+    localparam WFCF = 8'h41, FDCF = 8'h22;
+    localparam WFRD = 8'h81, FSRD = 8'h82, FDRD = 8'h84;
+
     wire fd_fw0, fd_fw1;
     wire fifoi_full0, fifoi_full1;
     wire fifoi_txen0, fifoi_txen1;
@@ -32,9 +38,58 @@ module intan(
     wire [7:0] fifoi_txd0, fifoi_txd1;
     reg [11:0] fifoi_len0, fifoi_len1;
 
+    reg [7:0] state, next_state;
+    wire fs_read_fifo, fd_read_fifo;
 
     assign fifoi_full = {fifoi_full1, fifoi_full0};
     assign fifoi_empty = {fifoi_empty1, fifoi_empty0};
+    assign fd_check = (state == FDCK);
+    assign fd_conf = (state == FDCF);
+    assign fd_read_fifo = fd_fw0 && fd_fw1;
+    assign fs_read_fifo = (state == FSRD);
+    assign fd_read = (state == FDRD);
+
+    always @(posedge clk or posedge rst) begin
+        if(rst) state <= IDLE;
+        else state <= next_state;
+    end
+
+    always @(*) begin
+        case(state)
+            IDLE: begin
+                next_state <= WFCK;
+            end
+            WFCK: begin
+                if(fs_check) next_state <= FDCK;
+                else next_state <= WFCK;
+            end
+            FDCK: begin
+                if(~fs_check) next_state <= WFCF;
+                else next_state <= FDCK;
+            end
+            WFCF: begin
+                if(fs_conf) next_state <= FDCF;
+                else next_state <= WFCF;
+            end
+            FDCF: begin
+                if(~fs_conf) next_state <= WFRD;
+                else next_state <= FDCF;
+            end
+            WFRD: begin
+                if(fs_read) next_state <= FSRD;
+                else next_state <= WFRD;
+            end
+            FSRD: begin
+                if(fd_read_fifo) next_state <= FDRD;
+                else next_state <= FSRD;
+            end
+            FDRD: begin
+                if(~fs_read) next_state <= WFRD;
+                else next_state <= FDRD;
+            end
+            default: next_state <= IDLE;
+        endcase
+    end
 
 
     always @(*) begin
@@ -62,10 +117,6 @@ module intan(
         endcase
     end
 
-    
-    assign fd_read = fd_fw0 && fd_fw1;
-
-
     fifo_write 
     fifo_write_dut1(
         .clk(fifoi_txc),
@@ -73,7 +124,7 @@ module intan(
         .err(),
         .fifo_txd(fifoi_txd1),
         .fifo_txen(fifoi_txen1),
-        .fs(fs_read),
+        .fs(fs_read_fifo),
         .fd(fd_fw1),
         .data_len(fifoi_len1),
         .fifo_full(),
@@ -88,7 +139,7 @@ module intan(
         .err(),
         .fifo_txd(fifoi_txd0),
         .fifo_txen(fifoi_txen0),
-        .fs(fs_read),
+        .fs(fs_read_fifo),
         .fd(fd_fw0),
         .data_len(fifoi_len0),
         .fifo_full(),

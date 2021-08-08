@@ -3,9 +3,11 @@ module top(
     output [3:0] led
 );
 
-    localparam VERSION = 4'h2;
+    localparam VERSION = 4'h3;
 
     wire fs_read, fd_read;
+    wire fs_check, fd_check;
+    wire fs_conf, fd_conf;
 
     wire sysc, fifo_rxc, fifo_txc, ilac;
 
@@ -20,10 +22,14 @@ module top(
 
     localparam IDLE = 8'h01, FITX = 8'h02, LAST = 8'h10;
     localparam FIRXH = 8'h04, FIRXL = 8'h08;
+    localparam CHECK = 8'h20, CONF = 8'h40, PREP = 8'h80;
 
     assign fifo_rxen = {(state == FIRXH), (state == FIRXL)};
     assign fs_read = (state == FITX);
     assign led = ~VERSION;
+
+    assign fs_check = (state == CHECK);
+    assign fs_conf = (state == CONF);
 
     always @(posedge fifo_rxc) begin
         state <= next_state;
@@ -32,8 +38,19 @@ module top(
     always @(*) begin
         case(state)
             IDLE: begin
+                next_state <= CHECK;
+            end
+            CHECK: begin
+                if(fd_check) next_state <= CONF;
+                else next_state <= CHECK;
+            end
+            CONF: begin
+                if(fd_conf) next_state <= PREP;
+                else next_state <= CONF;
+            end
+            PREP: begin
                 if(~|fifo_full) next_state <= FITX;
-                else next_state <= IDLE;
+                else next_state <= PREP;
             end
             FITX: begin
                 if(fd_read) next_state <= FIRXH;
@@ -48,7 +65,7 @@ module top(
                 else next_state <= FIRXL;
             end
             LAST: begin
-                next_state <= IDLE;
+                next_state <= PREP;
             end
             default: next_state <= IDLE;
         endcase
@@ -57,20 +74,20 @@ module top(
 
     intan
     intan_dut(
+        .clk(sysc),
         .rst(),
         .err(),
         .dev_kind(2'b11),
         
-        .fs_check(),
-        .fs_conf(),
+        .fs_check(fs_check),
+        .fs_conf(fs_conf),
         .fs_read(fs_read),
-        .fd_check(),
-        .fd_conf(),
+        .fd_check(fd_check),
+        .fd_conf(fd_conf),
+        .fd_read(fd_read),
 
         .so_fw0(so_ifw0),
         .so_fw1(so_ifw1),
-
-        .fd_read(fd_read),
 
         .fifoi_txc(fifo_txc),
         .fifoi_rxc(fifo_rxc),
