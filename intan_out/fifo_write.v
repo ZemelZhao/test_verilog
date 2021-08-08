@@ -20,7 +20,7 @@ module fifo_write
     wire[7:0] cache_data[127:0];  
     reg [7:0] state, next_state;
 
-    localparam IDLE = 8'h01, PREP = 8'h02;
+    localparam IDLE = 8'h01, PREP = 8'h02, CHECK = 8'h20;
     localparam WORK = 8'h04, LAST = 8'h08, HEAD = 8'h10;
 
     reg [11:0] bag_num, fifo_num;
@@ -29,7 +29,7 @@ module fifo_write
     assign fifo_txen = (state == WORK);
     assign fifo_txd = cache_data[bag_num];
     assign data_num = 8'h00;
-    assign so = state;
+    assign so = fifo_num[7:0];
 
     assign cache_data[0] = 8'h55;
     assign cache_data[1] = 8'hAA;
@@ -185,7 +185,11 @@ module fifo_write
                 else next_state <= PREP;
             end
             HEAD: begin
-                next_state <= WORK;
+                next_state <= CHECK;
+            end
+            CHECK: begin
+                if(data_len == 1'b0) next_state <= LAST;
+                else next_state <= WORK;
             end
             WORK: begin
                 if(fifo_num == (data_len - 2'h1)) begin

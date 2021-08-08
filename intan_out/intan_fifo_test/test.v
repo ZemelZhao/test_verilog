@@ -1,6 +1,9 @@
 module top(
-    input clk
+    input clk,
+    output [3:0] led
 );
+
+    localparam VERSION = 4'h2;
 
     wire fs_read, fd_read;
 
@@ -8,10 +11,8 @@ module top(
 
     wire [1:0] fifo_rxen;
     wire [15:0] fifo_rxd;
-    wire fifo_full;
-
-    reg [7:0] fifo_rxd0_d0, fifo_rxd0_d1;
-    reg [7:0] fifo_rxd1_d0, fifo_rxd1_d1;
+    wire [1:0] fifo_full;
+    wire [1:0] fifo_empty;
 
     reg [7:0] state, next_state;
 
@@ -22,6 +23,7 @@ module top(
 
     assign fifo_rxen = {(state == FIRXH), (state == FIRXL)};
     assign fs_read = (state == FITX);
+    assign led = ~VERSION;
 
     always @(posedge fifo_rxc) begin
         state <= next_state;
@@ -30,7 +32,7 @@ module top(
     always @(*) begin
         case(state)
             IDLE: begin
-                if(~fifo_full) next_state <= FITX;
+                if(~|fifo_full) next_state <= FITX;
                 else next_state <= IDLE;
             end
             FITX: begin
@@ -38,11 +40,11 @@ module top(
                 else next_state <= FITX;
             end
             FIRXH: begin
-                if(fifo_rxd1_d0 == fifo_rxd1_d1 && fifo_rxd[15:8] == fifo_rxd1_d0) next_state <= FIRXL;
+                if(fifo_empty[1]) next_state <= FIRXL;
                 else next_state <= FIRXH;
             end
             FIRXL: begin
-                if(fifo_rxd0_d0 == fifo_rxd0_d1 && fifo_rxd[7:0] == fifo_rxd0_d0) next_state <= LAST;
+                if(fifo_empty[0]) next_state <= LAST;
                 else next_state <= FIRXL;
             end
             LAST: begin
@@ -52,32 +54,6 @@ module top(
         endcase
     end
 
-     always @(posedge fifo_rxc) begin
-         if(state == FITX) begin
-             fifo_rxd0_d0 <= 8'hE0;
-             fifo_rxd0_d1 <= 8'hE1;
-             fifo_rxd1_d0 <= 8'hEE;
-             fifo_rxd1_d1 <= 8'hEF;
-         end
-         else if(state == FIRXH) begin
-             fifo_rxd0_d0 <= fifo_rxd0_d0;
-             fifo_rxd0_d1 <= fifo_rxd0_d1;
-             fifo_rxd1_d0 <= fifo_rxd[15:8];
-             fifo_rxd1_d1 <= fifo_rxd1_d0;
-         end
-         else if(state == FIRXL) begin
-             fifo_rxd0_d0 <= fifo_rxd[7:0];
-             fifo_rxd0_d1 <= fifo_rxd0_d0;
-             fifo_rxd1_d0 <= fifo_rxd1_d0;
-             fifo_rxd1_d1 <= fifo_rxd1_d1;
-         end
-         else begin
-             fifo_rxd0_d0 <= fifo_rxd0_d0;
-             fifo_rxd0_d1 <= fifo_rxd0_d1;
-             fifo_rxd1_d0 <= fifo_rxd1_d0;
-             fifo_rxd1_d1 <= fifo_rxd1_d1;
-         end
-     end
 
     intan
     intan_dut(
@@ -93,6 +69,7 @@ module top(
 
         .so_fw0(so_ifw0),
         .so_fw1(so_ifw1),
+
         .fd_read(fd_read),
 
         .fifoi_txc(fifo_txc),
@@ -100,7 +77,8 @@ module top(
         .fifoi_rxen(fifo_rxen),
         .intan_id(32'hF0_F1_F2_F3),
         .fifoi_rxd(fifo_rxd),
-        .fifoi_full(fifo_full)
+        .fifoi_full(fifo_full),
+        .fifoi_empty(fifo_empty)
     );
 
     clk_factory
@@ -119,7 +97,8 @@ module top(
         .probe1(fifo_rxd),
         .probe2(fifo_rxen),
         .probe3(so_ifw0),
-        .probe4(so_ifw1)
+        .probe4(so_ifw1),
+        .probe5(fifo_empty)
     );
 
 
