@@ -22,8 +22,8 @@
 // * 
 
 // ## 2. 变量综述
-// * cache_fifoi_rxen 
-// * fifod_txen 
+// * fifoi_grxen 
+// * adc_rxen 
 // *  
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -42,8 +42,8 @@ module fifo2adc( //
     input fs_fifo,
     output fd_fifo,
 
-    output reg fifod_txen, // fifod 的参考写入
-    output reg [7:0] cache_fifoi_rxen, //intan_fifo的读入控制部分
+    output reg adc_rxen, // fifod 的参考写入
+    output reg [7:0] fifoi_grxen, //intan_fifo的读入控制部分
     // ###### DATA PART
 
     // #### DATA_SECTION
@@ -51,15 +51,14 @@ module fifo2adc( //
     input [7:0] dev_info, // 前4位为当前设备编号，后4位为当前数据编号
     input [7:0] dev_smpr,
 
-    input [63:0] cache_fifoi_rxd,
-    output [7:0] fifod_txd,
+    input [63:0] fifoi_grxd,
+    output [7:0] adc_rxd,
 
     input [63:0] intan_cmd,
     input [63:0] intan_ind,
     input [7:0] intan_lor,
-    input [7:0] intan_end,
+    input [7:0] intan_end
     
-    output reg [9:0] data_len
     // #endregion
 );
     
@@ -68,13 +67,12 @@ module fifo2adc( //
     // #### 1. REGISTER PART
     // #region
     // ###### OPTION
-    reg[7:0] state_opt, next_state_opt;
     // ###### LINK
     reg [7:0] state_fifo, next_state_fifo;
-    wire [7:0] cache_fifo_cmd[8:0]; // 记录当前的与INTAN部分FIFO的 0x80 // FIFO_RD_EN
-    wire [8:0] cache_fifo_lor; // 记录当前FIFO读取是否为32通道
-    wire [8:0] cache_fifo_end; // 记录当前是否为读取的最后一个FIFO
-    wire [7:0] cache_fifo_ind[8:0]; // 0x3F // FIFO_IND
+    wire [7:0] fifoi_gcmd[8:0]; // 记录当前的与INTAN部分FIFO的 0x80 // FIFO_RD_EN
+    wire [8:0] fifoi_glor; // 记录当前FIFO读取是否为32通道
+    wire [8:0] fifoi_gend; // 记录当前是否为读取的最后一个FIFO
+    wire [7:0] fifoi_gind[8:0]; // 0x3F // FIFO_IND
     reg [7:0] fifo_ind;
     reg [7:0] pprev_fifo_ind, prev_fifo_ind;
     reg flag_hord; // HEAD OR DATA
@@ -87,7 +85,7 @@ module fifo2adc( //
     reg [7:0] head_data;
     reg [7:0] fifo_num;
     reg [7:0] fifo_num_opt;
-    reg prev_fifod_txen;
+    reg prev_adc_rxen;
     // #endregion
 
     // #### 2. WIRE PART
@@ -95,28 +93,28 @@ module fifo2adc( //
 
     // #endregion
 
-    assign cache_fifo_cmd[8] = 8'h00;
-    assign cache_fifo_cmd[7] = intan_cmd[63:56];
-    assign cache_fifo_cmd[6] = intan_cmd[55:48];
-    assign cache_fifo_cmd[5] = intan_cmd[47:40];
-    assign cache_fifo_cmd[4] = intan_cmd[39:32];
-    assign cache_fifo_cmd[3] = intan_cmd[31:24];
-    assign cache_fifo_cmd[2] = intan_cmd[23:16];
-    assign cache_fifo_cmd[1] = intan_cmd[15:8];
-    assign cache_fifo_cmd[0] = intan_cmd[7:0];
+    assign fifoi_gcmd[8] = 8'h00;
+    assign fifoi_gcmd[7] = intan_cmd[63:56];
+    assign fifoi_gcmd[6] = intan_cmd[55:48];
+    assign fifoi_gcmd[5] = intan_cmd[47:40];
+    assign fifoi_gcmd[4] = intan_cmd[39:32];
+    assign fifoi_gcmd[3] = intan_cmd[31:24];
+    assign fifoi_gcmd[2] = intan_cmd[23:16];
+    assign fifoi_gcmd[1] = intan_cmd[15:8];
+    assign fifoi_gcmd[0] = intan_cmd[7:0];
 
-    assign cache_fifo_ind[8] = 8'h00;
-    assign cache_fifo_ind[7] = intan_ind[63:56];
-    assign cache_fifo_ind[6] = intan_ind[55:48];
-    assign cache_fifo_ind[5] = intan_ind[47:40];
-    assign cache_fifo_ind[4] = intan_ind[39:32];
-    assign cache_fifo_ind[3] = intan_ind[31:24];
-    assign cache_fifo_ind[2] = intan_ind[23:16];
-    assign cache_fifo_ind[1] = intan_ind[15:8];
-    assign cache_fifo_ind[0] = intan_ind[7:0];
+    assign fifoi_gind[8] = 8'h00;
+    assign fifoi_gind[7] = intan_ind[63:56];
+    assign fifoi_gind[6] = intan_ind[55:48];
+    assign fifoi_gind[5] = intan_ind[47:40];
+    assign fifoi_gind[4] = intan_ind[39:32];
+    assign fifoi_gind[3] = intan_ind[31:24];
+    assign fifoi_gind[2] = intan_ind[23:16];
+    assign fifoi_gind[1] = intan_ind[15:8];
+    assign fifoi_gind[0] = intan_ind[7:0];
 
-    assign cache_fifo_lor = intan_lor;
-    assign cache_fifo_end = intan_end;
+    assign fifoi_glor = intan_lor;
+    assign fifoi_gend = intan_end;
 
     // #### 3. PARAMETER PART
     // #region
@@ -154,8 +152,8 @@ module fifo2adc( //
     // #region
     // #### 1. COMBINATIONAL LOGIC PART
     // #region
-    assign fifod_txd = (flag_hord==1'b1) ?head_data :cache_fifoi_rxd[fifo_ind -: 8];
-    // assign cache_fifoi_rxen = cache_fifo_cmd[fifo_num];
+    assign adc_rxd = (flag_hord==1'b1) ?head_data :fifoi_grxd[fifo_ind -: 8];
+    // assign fifoi_grxen = fifoi_gcmd[fifo_num];
     assign fd_fifo = (state_fifo == DATA_DONE);
 
     // #endregion
@@ -172,33 +170,33 @@ module fifo2adc( //
     end
 
     
-    always @(posedge clk or posedge rst) begin // cache_fifoi_rxen
+    always @(posedge clk or posedge rst) begin // fifoi_grxen
         if(rst) begin
-            cache_fifoi_rxen <= 8'h00;
+            fifoi_grxen <= 8'h00;
         end
         else if(state_fifo == DAT31H && (~flag_end)) begin
-            cache_fifoi_rxen <= flag_cmd | nflag_cmd;
+            fifoi_grxen <= flag_cmd | nflag_cmd;
         end
         else if(state_fifo == DAT31H && (flag_end)) begin
-            cache_fifoi_rxen <= flag_cmd;
+            fifoi_grxen <= flag_cmd;
         end
         else if(state_fifo == DAT15H &&(~flag_end) && (~flag_lort)) begin
-            cache_fifoi_rxen <= flag_cmd | nflag_cmd;
+            fifoi_grxen <= flag_cmd | nflag_cmd;
         end
         else if(state_fifo == DAT15H &&(flag_end) && (~flag_lort)) begin
-            cache_fifoi_rxen <= flag_cmd;
+            fifoi_grxen <= flag_cmd;
         end 
         else if(state_fifo == DAT15L &&(flag_end) && (~flag_lort)) begin
-            cache_fifoi_rxen <= 8'h00;
+            fifoi_grxen <= 8'h00;
         end
         else if(state_fifo == DAT31L && (flag_end)) begin
-            cache_fifoi_rxen <= 8'h00;
+            fifoi_grxen <= 8'h00;
         end       
         else if(state_fifo == DATACK) begin
-            cache_fifoi_rxen <= 8'h00;
+            fifoi_grxen <= 8'h00;
         end
         else begin
-            cache_fifoi_rxen <= cache_fifo_cmd[fifo_num];
+            fifoi_grxen <= fifoi_gcmd[fifo_num];
         end
 
     end
@@ -333,26 +331,26 @@ module fifo2adc( //
             head_data <= 8'h00;
         end
         else begin
-            head_data <= head_data + fifod_txd;
+            head_data <= head_data + adc_rxd;
         end
     end
     
-    always @(posedge clk or posedge rst) begin // fifod_txen
+    always @(posedge clk or posedge rst) begin // adc_rxen
         if(rst) begin
-            prev_fifod_txen <= 1'b0;
-            fifod_txen <= 1'b0;
+            prev_adc_rxen <= 1'b0;
+            adc_rxen <= 1'b0;
         end
         else if(state_fifo == HEAD00) begin
-            prev_fifod_txen <= 1'b1;
-            fifod_txen <= prev_fifod_txen;
+            prev_adc_rxen <= 1'b1;
+            adc_rxen <= prev_adc_rxen;
         end
         else if(state_fifo == DATACK) begin
-            prev_fifod_txen <= 1'b0;
-            fifod_txen <= prev_fifod_txen;
+            prev_adc_rxen <= 1'b0;
+            adc_rxen <= prev_adc_rxen;
         end
         else begin
-            prev_fifod_txen <= prev_fifod_txen;
-            fifod_txen <= prev_fifod_txen;
+            prev_adc_rxen <= prev_adc_rxen;
+            adc_rxen <= prev_adc_rxen;
         end
     end
 
@@ -386,11 +384,11 @@ module fifo2adc( //
             flag_ind <= 7'h0;
         end
         else if(state_fifo == DAT00L) begin
-            flag_lort <= cache_fifo_lor[fifo_num];
-            flag_end <= cache_fifo_end[fifo_num];
-            flag_cmd <= cache_fifo_cmd[fifo_num];
-            nflag_cmd <= cache_fifo_cmd[fifo_num-1'b1];
-            flag_ind <= cache_fifo_ind[fifo_num];
+            flag_lort <= fifoi_glor[fifo_num];
+            flag_end <= fifoi_gend[fifo_num];
+            flag_cmd <= fifoi_gcmd[fifo_num];
+            nflag_cmd <= fifoi_gcmd[fifo_num-1'b1];
+            flag_ind <= fifoi_gind[fifo_num];
         end
         else begin
             flag_lort <= flag_lort;
@@ -408,7 +406,7 @@ module fifo2adc( //
             fifo_ind <= 8'h00;
         end
         else begin
-            pprev_fifo_ind <= cache_fifo_ind[fifo_num];
+            pprev_fifo_ind <= fifoi_gind[fifo_num];
             prev_fifo_ind <= pprev_fifo_ind;
             fifo_ind <= prev_fifo_ind;
         end
