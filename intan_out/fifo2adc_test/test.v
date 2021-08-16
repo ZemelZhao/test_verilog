@@ -5,7 +5,9 @@ module test(
     output [7:0] show_state,
     output [7:0] show_adc_rxd,
     output [7:0] show_fifod_rxd,
-    output [7:0] state_adct_intan0
+    output [7:0] sos,
+    output [7:0] sos0,
+    output [63:0] sol
 );
 
     wire sys_clk, fifo_clk;
@@ -45,15 +47,18 @@ module test(
     reg [7:0] state, next_state;
     reg [7:0] adc_num;
 
-    localparam IDLE = 8'h0, CHECK = 8'h1, CONF = 8'h2, PREP = 8'h3;
-    localparam FITX = 8'h4, FIRX = 8'h5, CONT = 8'h6, DTRX = 8'h7;
-    localparam LAST = 8'h8;
+    localparam IDLE = 8'h00, CHECK = 8'h01, CONF = 8'h02, PREP = 8'h03;
+    localparam FITX = 8'h04, FIRX = 8'h05, CONT = 8'h06, DTRX = 8'h07;
+    localparam LAST = 8'h08;
 
     assign fifo_full = {fifoa_full, fifoc_full, fifod_full};
     assign show_state = state;
     assign show_adc_rxd = adc_rxd;
     assign show_fifod_rxd = fifod_rxd;
-    assign dev_kind = 8'hFF;
+
+    assign dev_kind = 8'hF5;
+    assign dev_smpr = 8'hFA;
+    assign dev_info = 8'hC9;
 
     assign sys_clk = clk;
     assign fifo_clk = fclk;
@@ -71,6 +76,8 @@ module test(
     assign fs_read = (state == FITX);
     assign fs_fifo = (state == FIRX);
     assign fs_dtrx = (state == DTRX);
+
+    // assign sos = adc_num;
 
 
     always @(posedge sys_clk or posedge rst) begin
@@ -101,7 +108,7 @@ module test(
             end
             FIRX: begin
                 if(fd_fifo) next_state <= CONT;
-                else next_state <= LAST;
+                else next_state <= FIRX;
             end
             CONT: begin
                 if(adc_num < adc_cnt - 1'b1) next_state <= LAST;
@@ -159,7 +166,9 @@ module test(
         .adc_ind(adc_ind),
         .adc_lor(adc_lor),
         .adc_end(adc_end),
-        .so(state_adct_intan0)
+        .sos0(sos0),
+        .sos(sos),
+        .sol(sol)
     );
 
     cs
@@ -231,10 +240,6 @@ module test(
         .full(fifoc_full),
         .empty(fifoc_empty)
     );
-
-    
-
-
     
 
 endmodule

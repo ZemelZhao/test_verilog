@@ -57,7 +57,10 @@ module fifo2adc( //
     input [63:0] intan_cmd,
     input [63:0] intan_ind,
     input [7:0] intan_lor,
-    input [7:0] intan_end
+    input [7:0] intan_end,
+    output [7:0] sos,
+    output [7:0] sos0,
+    output [63:0] sol
     
     // #endregion
 );
@@ -68,7 +71,7 @@ module fifo2adc( //
     // #region
     // ###### OPTION
     // ###### LINK
-    reg [7:0] state_fifo, next_state_fifo;
+    reg [7:0] state, next_state;
     wire [7:0] fifoi_gcmd[8:0]; // 记录当前的与INTAN部分FIFO的 0x80 // FIFO_RD_EN
     wire [8:0] fifoi_glor; // 记录当前FIFO读取是否为32通道
     wire [8:0] fifoi_gend; // 记录当前是否为读取的最后一个FIFO
@@ -86,6 +89,11 @@ module fifo2adc( //
     reg [7:0] fifo_num;
     reg [7:0] fifo_num_opt;
     reg prev_adc_rxen;
+
+    // TEST
+    assign sos = fifoi_grxen;
+    assign sol = intan_cmd;
+    assign sos0 = state;
     // #endregion
 
     // #### 2. WIRE PART
@@ -154,7 +162,7 @@ module fifo2adc( //
     // #region
     assign adc_rxd = (flag_hord==1'b1) ?head_data :fifoi_grxd[fifo_ind -: 8];
     // assign fifoi_grxen = fifoi_gcmd[fifo_num];
-    assign fd_fifo = (state_fifo == DATA_DONE);
+    assign fd_fifo = (state == DATA_DONE);
 
     // #endregion
 
@@ -162,10 +170,10 @@ module fifo2adc( //
     // #region
     always @(posedge clk or posedge rst) begin // STATE
         if(rst) begin
-            state_fifo <= MAIN_IDLE;
+            state <= MAIN_IDLE;
         end
         else begin
-            state_fifo <= next_state_fifo;
+            state <= next_state;
         end
     end
 
@@ -174,25 +182,25 @@ module fifo2adc( //
         if(rst) begin
             fifoi_grxen <= 8'h00;
         end
-        else if(state_fifo == DAT31H && (~flag_end)) begin
+        else if(state == DAT31H && (~flag_end)) begin
             fifoi_grxen <= flag_cmd | nflag_cmd;
         end
-        else if(state_fifo == DAT31H && (flag_end)) begin
+        else if(state == DAT31H && (flag_end)) begin
             fifoi_grxen <= flag_cmd;
         end
-        else if(state_fifo == DAT15H &&(~flag_end) && (~flag_lort)) begin
+        else if(state == DAT15H &&(~flag_end) && (~flag_lort)) begin
             fifoi_grxen <= flag_cmd | nflag_cmd;
         end
-        else if(state_fifo == DAT15H &&(flag_end) && (~flag_lort)) begin
+        else if(state == DAT15H &&(flag_end) && (~flag_lort)) begin
             fifoi_grxen <= flag_cmd;
         end 
-        else if(state_fifo == DAT15L &&(flag_end) && (~flag_lort)) begin
+        else if(state == DAT15L &&(flag_end) && (~flag_lort)) begin
             fifoi_grxen <= 8'h00;
         end
-        else if(state_fifo == DAT31L && (flag_end)) begin
+        else if(state == DAT31L && (flag_end)) begin
             fifoi_grxen <= 8'h00;
         end       
-        else if(state_fifo == DATACK) begin
+        else if(state == DATACK) begin
             fifoi_grxen <= 8'h00;
         end
         else begin
@@ -202,106 +210,107 @@ module fifo2adc( //
     end
     
     always@(*) begin // STATE_READ
-        case(state_fifo)
+        case(state)
             MAIN_IDLE: begin
                 if(fs_fifo)begin
-                    next_state_fifo <= IDLE_READ;
+                    next_state <= IDLE_READ;
                 end
                 else begin
-                    next_state_fifo <= MAIN_IDLE;
+                    next_state <= MAIN_IDLE;
                 end
             end
-            IDLE_READ: next_state_fifo <= HEAD00;
-            HEAD00: next_state_fifo <= HEAD01;
-            HEAD01: next_state_fifo <= DEVOPT;
-            DEVOPT: next_state_fifo <= DEVSPR;
-            DEVSPR: next_state_fifo <= DEVTYE;
-            DEVTYE: next_state_fifo <= DATA_START;
-            DATA_START: next_state_fifo <= DAT00H;
-            DAT00H: next_state_fifo <= DAT00L;
-            DAT00L: next_state_fifo <= DAT01H;
-            DAT01H: next_state_fifo <= DAT01L;
-            DAT01L: next_state_fifo <= DAT02H;
-            DAT02H: next_state_fifo <= DAT02L;
-            DAT02L: next_state_fifo <= DAT03H;
-            DAT03H: next_state_fifo <= DAT03L;
-            DAT03L: next_state_fifo <= DAT04H;
-            DAT04H: next_state_fifo <= DAT04L;
-            DAT04L: next_state_fifo <= DAT05H;
-            DAT05H: next_state_fifo <= DAT05L;
-            DAT05L: next_state_fifo <= DAT06H;
-            DAT06H: next_state_fifo <= DAT06L;
-            DAT06L: next_state_fifo <= DAT07H;
-            DAT07H: next_state_fifo <= DAT07L;
-            DAT07L: next_state_fifo <= DAT08H;
-            DAT08H: next_state_fifo <= DAT08L;
-            DAT08L: next_state_fifo <= DAT09H;
-            DAT09H: next_state_fifo <= DAT09L;
-            DAT09L: next_state_fifo <= DAT10H;
-            DAT10H: next_state_fifo <= DAT10L;
-            DAT10L: next_state_fifo <= DAT11H;
-            DAT11H: next_state_fifo <= DAT11L;
-            DAT11L: next_state_fifo <= DAT12H;
-            DAT12H: next_state_fifo <= DAT12L;
-            DAT12L: next_state_fifo <= DAT13H;
-            DAT13H: next_state_fifo <= DAT13L;
-            DAT13L: next_state_fifo <= DAT14H;
-            DAT14H: next_state_fifo <= DAT14L;
-            DAT14L: next_state_fifo <= DAT15H;
-            DAT15H: next_state_fifo <= DAT15L;
+            IDLE_READ: next_state <= HEAD00;
+            HEAD00: next_state <= HEAD01;
+            HEAD01: next_state <= DEVOPT;
+            DEVOPT: next_state <= DEVSPR;
+            DEVSPR: next_state <= DEVTYE;
+            DEVTYE: next_state <= DATA_START;
+            DATA_START: next_state <= DAT00H;
+            DAT00H: next_state <= DAT00L;
+            DAT00L: next_state <= DAT01H;
+            DAT01H: next_state <= DAT01L;
+            DAT01L: next_state <= DAT02H;
+            DAT02H: next_state <= DAT02L;
+            DAT02L: next_state <= DAT03H;
+            DAT03H: next_state <= DAT03L;
+            DAT03L: next_state <= DAT04H;
+            DAT04H: next_state <= DAT04L;
+            DAT04L: next_state <= DAT05H;
+            DAT05H: next_state <= DAT05L;
+            DAT05L: next_state <= DAT06H;
+            DAT06H: next_state <= DAT06L;
+            DAT06L: next_state <= DAT07H;
+            DAT07H: next_state <= DAT07L;
+            DAT07L: next_state <= DAT08H;
+            DAT08H: next_state <= DAT08L;
+            DAT08L: next_state <= DAT09H;
+            DAT09H: next_state <= DAT09L;
+            DAT09L: next_state <= DAT10H;
+            DAT10H: next_state <= DAT10L;
+            DAT10L: next_state <= DAT11H;
+            DAT11H: next_state <= DAT11L;
+            DAT11L: next_state <= DAT12H;
+            DAT12H: next_state <= DAT12L;
+            DAT12L: next_state <= DAT13H;
+            DAT13H: next_state <= DAT13L;
+            DAT13L: next_state <= DAT14H;
+            DAT14H: next_state <= DAT14L;
+            DAT14L: next_state <= DAT15H;
+            DAT15H: next_state <= DAT15L;
             DAT15L: begin
-                if(flag_lort) next_state_fifo <= DAT16H;
-                else if(flag_end) next_state_fifo <= DATACK;
-                else next_state_fifo <= DAT00H;
+                if(flag_lort) next_state <= DAT16H;
+                else if(flag_end) next_state <= DATACK;
+                else next_state <= DAT00H;
             end
-            DAT16H: next_state_fifo <= DAT16L;
-            DAT16L: next_state_fifo <= DAT17H;
-            DAT17H: next_state_fifo <= DAT17L;
-            DAT17L: next_state_fifo <= DAT18H;
-            DAT18H: next_state_fifo <= DAT18L;
-            DAT18L: next_state_fifo <= DAT19H;
-            DAT19H: next_state_fifo <= DAT19L;
-            DAT19L: next_state_fifo <= DAT20H;
-            DAT20H: next_state_fifo <= DAT20L;
-            DAT20L: next_state_fifo <= DAT21H;
-            DAT21H: next_state_fifo <= DAT21L;
-            DAT21L: next_state_fifo <= DAT22H;
-            DAT22H: next_state_fifo <= DAT22L;
-            DAT22L: next_state_fifo <= DAT23H;
-            DAT23H: next_state_fifo <= DAT23L;
-            DAT23L: next_state_fifo <= DAT24H;
-            DAT24H: next_state_fifo <= DAT24L;
-            DAT24L: next_state_fifo <= DAT25H;
-            DAT25H: next_state_fifo <= DAT25L;
-            DAT25L: next_state_fifo <= DAT26H;
-            DAT26H: next_state_fifo <= DAT26L;
-            DAT26L: next_state_fifo <= DAT27H;
-            DAT27H: next_state_fifo <= DAT27L;
-            DAT27L: next_state_fifo <= DAT28H;
-            DAT28H: next_state_fifo <= DAT28L;
-            DAT28L: next_state_fifo <= DAT29H;
-            DAT29H: next_state_fifo <= DAT29L;
-            DAT29L: next_state_fifo <= DAT30H;
-            DAT30H: next_state_fifo <= DAT30L;
-            DAT30L: next_state_fifo <= DAT31H;
-            DAT31H: next_state_fifo <= DAT31L;
+            DAT16H: next_state <= DAT16L;
+            DAT16L: next_state <= DAT17H;
+            DAT17H: next_state <= DAT17L;
+            DAT17L: next_state <= DAT18H;
+            DAT18H: next_state <= DAT18L;
+            DAT18L: next_state <= DAT19H;
+            DAT19H: next_state <= DAT19L;
+            DAT19L: next_state <= DAT20H;
+            DAT20H: next_state <= DAT20L;
+            DAT20L: next_state <= DAT21H;
+            DAT21H: next_state <= DAT21L;
+            DAT21L: next_state <= DAT22H;
+            DAT22H: next_state <= DAT22L;
+            DAT22L: next_state <= DAT23H;
+            DAT23H: next_state <= DAT23L;
+            DAT23L: next_state <= DAT24H;
+            DAT24H: next_state <= DAT24L;
+            DAT24L: next_state <= DAT25H;
+            DAT25H: next_state <= DAT25L;
+            DAT25L: next_state <= DAT26H;
+            DAT26H: next_state <= DAT26L;
+            DAT26L: next_state <= DAT27H;
+            DAT27H: next_state <= DAT27L;
+            DAT27L: next_state <= DAT28H;
+            DAT28H: next_state <= DAT28L;
+            DAT28L: next_state <= DAT29H;
+            DAT29H: next_state <= DAT29L;
+            DAT29L: next_state <= DAT30H;
+            DAT30H: next_state <= DAT30L;
+            DAT30L: next_state <= DAT31H;
+            DAT31H: next_state <= DAT31L;
             DAT31L: begin
                 if(flag_end) begin
-                    next_state_fifo <= DATACK;
+                    next_state <= DATACK;
                 end
                 else begin
-                    next_state_fifo <= DAT00H;
+                    next_state <= DAT00H;
                 end
             end
-            DATACK: next_state_fifo <= DATA_DONE;
+            DATACK: next_state <= DATA_DONE;
             DATA_DONE: begin
                 if(fs_fifo == 1'b0) begin
-                    next_state_fifo <= MAIN_IDLE;
+                    next_state <= MAIN_IDLE;
                 end
                 else begin
-                    next_state_fifo <= DATA_DONE;
+                    next_state <= DATA_DONE;
                 end
             end
+            default: next_state <= MAIN_IDLE;
         endcase
     end
 
@@ -309,25 +318,18 @@ module fifo2adc( //
         if(rst) begin
             head_data <= 8'h00;
         end
-        else if(state_fifo == HEAD01) begin
-            head_data <= 8'h55;
-        end
-        else if(state_fifo == DEVOPT) begin
-            head_data <= 8'hAA;
-        end
-        else if(state_fifo == DEVSPR) begin
-            head_data <= dev_info;
-        end
-        else if(state_fifo == DEVTYE) begin
-            head_data <= dev_smpr;
-        end
-        else if(state_fifo == DATA_START) begin
-            head_data <= dev_kind;
-        end
-        else if((state_fifo == DATA_DONE) || (state_fifo == MAIN_IDLE)) begin
+        else if (state == HEAD00) head_data <= 8'h55;
+        else if (state == HEAD01) head_data <= 8'hAA;
+        else if (state == DEVOPT) head_data <= dev_info; 
+        else if (state == DEVSPR) head_data <= dev_smpr;
+        else if (state == DEVTYE) head_data <= dev_kind;
+        else if(state == DATA_START) begin
             head_data <= 8'h00;
         end
-        else if(state_fifo == DAT00H && (fifo_num==8'h07)) begin
+        else if((state == DATA_DONE) || (state == MAIN_IDLE)) begin
+            head_data <= 8'h00;
+        end
+        else if(state == DAT00H && (fifo_num==8'h07)) begin
             head_data <= 8'h00;
         end
         else begin
@@ -340,11 +342,11 @@ module fifo2adc( //
             prev_adc_rxen <= 1'b0;
             adc_rxen <= 1'b0;
         end
-        else if(state_fifo == HEAD00) begin
+        else if(state == HEAD00) begin
             prev_adc_rxen <= 1'b1;
             adc_rxen <= prev_adc_rxen;
         end
-        else if(state_fifo == DATACK) begin
+        else if(state == DATACK) begin
             prev_adc_rxen <= 1'b0;
             adc_rxen <= prev_adc_rxen;
         end
@@ -358,16 +360,16 @@ module fifo2adc( //
         if(rst) begin
             fifo_num <= 8'h08;
         end
-        else if(state_fifo == DEVSPR) begin
+        else if(state == DEVSPR) begin
             fifo_num <= 8'h07;
         end
-        else if(state_fifo == DATACK || (state_fifo == DATA_DONE)) begin
+        else if(state == DATACK || (state == DATA_DONE)) begin
             fifo_num <= 8'h08;
         end
-        else if(state_fifo == DAT30L && (~flag_end)) begin
+        else if(state == DAT30L && (~flag_end)) begin
             fifo_num <= fifo_num - 8'h01;
         end
-        else if(state_fifo == DAT14L && (~flag_end) && ~flag_lort) begin
+        else if(state == DAT14L && (~flag_end) && ~flag_lort) begin
             fifo_num <= fifo_num - 8'h01;
         end
         else begin
@@ -383,7 +385,7 @@ module fifo2adc( //
             nflag_cmd <= 7'h0;
             flag_ind <= 7'h0;
         end
-        else if(state_fifo == DAT00L) begin
+        else if(state == DAT00L) begin
             flag_lort <= fifoi_glor[fifo_num];
             flag_end <= fifoi_gend[fifo_num];
             flag_cmd <= fifoi_gcmd[fifo_num];
@@ -416,10 +418,10 @@ module fifo2adc( //
         if(rst) begin
             flag_hord <= 1'b0;
         end
-        else if(state_fifo == HEAD01 || (state_fifo == DATACK)) begin
+        else if(state == HEAD01 || (state == DATACK)) begin
             flag_hord <= 1'b1;
         end
-        else if(state_fifo == DAT00H || (state_fifo == DATA_DONE)) begin
+        else if(state == DAT00H || (state == DATA_DONE)) begin
             flag_hord <= 1'b0;
         end
         else begin

@@ -29,7 +29,9 @@ module adc(
     input [7:0] adc_lor,
     input [7:0] adc_end,
     
-    output [7:0] so
+    output [7:0] sos,
+    output [7:0] sos0,
+    output [63:0] sol
 );
     wire [3:0] fd_gck;
     wire [3:0] fs_gcf, fd_gcf;
@@ -76,7 +78,10 @@ module adc(
         .intan_cmd(adc_cmd),
         .intan_ind(adc_ind),
         .intan_lor(adc_lor),
-        .intan_end(adc_end)
+        .intan_end(adc_end),
+        .sos(sos),
+        .sos0(sos0),
+        .sol(sol)
 
     );
 
@@ -102,8 +107,7 @@ module adc(
         .fifoi_rxd(fifoi_grxd[63:48]),
         
         .fifoi_full(fifoi_gfull[7:6]),
-        .fifoi_empty(fifoi_gempty[7:6]),
-        .so(so)
+        .fifoi_empty(fifoi_gempty[7:6])
     );
 
     intan
@@ -150,7 +154,7 @@ module adc(
         .fd_read(fd_grd[1]),
 
         .fifoi_rxen(fifoi_grxen[3:2]),
-        .fifoi_rxd(fifoi_grxd[31:15]),
+        .fifoi_rxd(fifoi_grxd[31:16]),
         
         .fifoi_full(fifoi_gfull[3:2]),
         .fifoi_empty(fifoi_gempty[3:2])

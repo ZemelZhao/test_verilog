@@ -27,7 +27,7 @@ module fifo_write
     wire [7:0] data_num;
     assign fd = (state == LAST);
     assign fifo_txen = (state == WORK);
-    assign fifo_txd = cache_data[bag_num];
+    assign fifo_txd = cache_data[fifo_num];
     assign data_num = 8'h00;
     assign so = fifo_num[7:0];
 
@@ -181,8 +181,7 @@ module fifo_write
                 end
             end
             PREP: begin
-                if(~fifo_full) next_state <= HEAD;
-                else next_state <= PREP;
+                next_state <= HEAD;
             end
             HEAD: begin
                 next_state <= CHECK;

@@ -124,6 +124,6 @@ def main(w):
 
 
 if __name__ == '__main__':
-    main(3)
+    main(2)
     print('Done')
 

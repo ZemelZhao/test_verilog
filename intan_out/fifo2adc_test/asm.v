@@ -3,7 +3,8 @@ module asm();
     reg sclk, fclk, rstn;
     wire [7:0] state, adc_rxd, fifod_rxd;
 
-    wire [7:0] state_adct_intan0;
+    wire [7:0] sos, sos0;
+    wire [63:0] sol;
 
     always begin
         sclk <= 1'b1;
@@ -35,7 +36,9 @@ module asm();
         .show_state(state),
         .show_adc_rxd(adc_rxd),
         .show_fifod_rxd(fifod_rxd),
-        .state_adct_intan0(state_adct_intan0)
+        .sos(sos),
+        .sos0(sos0),
+        .sol(sol)
     );
 
 
