@@ -9,7 +9,7 @@ module fifo2adc(
     output reg adc_rxen,
     output [7:0] fifoi_grxen,
 
-    input [7:0] dev_type,
+    input [7:0] dev_kind,
     input [7:0] dev_info,
     input [7:0] dev_smpr,
 
@@ -261,7 +261,7 @@ module fifo2adc(
         else if(state == HD01) hdat <= 8'hAA;
         else if(state == DIFO) hdat <= dev_info;
         else if(state == DSPR) hdat <= dev_smpr;
-        else if(state == DTYE) hdat <= dev_type;
+        else if(state == DTYE) hdat <= dev_kind;
         else if(state == DBGN || state == LAST || state == DONE) hdat <= 8'h00;
         else hdat <= hdat + adc_rxd;
     end

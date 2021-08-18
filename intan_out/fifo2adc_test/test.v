@@ -60,7 +60,7 @@ module test(
     wire fs_fifo, fd_fifo;
     wire fs_dtrx, fd_dtrx;
 
-    wire [7:0] dev_smpr, dev_info, dev_kind;
+    wire [7:0] dev_smpr, dev_info, dev_kind, dev_type;
     wire [63:0] adc_cmd, adc_ind;
     wire [7:0] adc_lrt, adc_end;
 
@@ -83,7 +83,7 @@ module test(
     assign show_adc_rxd = adc_rxd;
     assign show_fifod_rxd = fifod_rxd;
 
-    assign dev_kind = 8'hFF;
+    assign dev_kind = 8'h51;
     assign dev_smpr = 8'hFA;
     assign dev_info = 8'hC9;
 
@@ -185,6 +185,7 @@ module test(
         .dev_smpr(dev_smpr),
         .dev_info(dev_info),
         .dev_kind(dev_kind),
+        .dev_type(dev_type),
 
         .fifoa_full(fifoa_full),
         .fifoa_empty(fifoa_empty),
@@ -229,7 +230,7 @@ module test(
         .sys_clk(),
         .fifo_clk(),
 
-        .kind_dev(dev_kind),
+        .kind_dev(dev_type),
         .adc_rx_len(adc_rx_len),
         .eth_tx_len(eth_tx_len),
         .adc_cnt(adc_cnt),

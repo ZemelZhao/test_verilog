@@ -4,6 +4,7 @@ module intan(
     output err,
 
     input [1:0] dev_kind,
+    output reg [1:0] dev_type,
 
     input fs_check,
     input fs_conf,
@@ -21,8 +22,7 @@ module intan(
     output [1:0] fifoi_full,
     output [1:0] fifoi_empty,
     output [7:0] so_fw0, 
-    output [7:0] so_fw1,
-    output [7:0] so
+    output [7:0] so_fw1
 
 );
 
@@ -49,7 +49,12 @@ module intan(
     assign fd_read_fifo = fd_fw0 && fd_fw1;
     assign fs_read_fifo = (state == FSRD);
     assign fd_read = (state == FDRD);
-    assign so = so_fw0;
+
+
+    reg [15:0] wnum;
+    localparam CFNUM = 16'd400, CKNUM = 16'd100;
+    localparam BGCK = 8'hA0, LTCK = 8'hA1, GNCK = 8'hA2; 
+    localparam BGCF = 8'hB0, LTCF = 8'hB1, GNCF = 8'hB2;
 
     always @(posedge clk or posedge rst) begin
         if(rst) state <= IDLE;
@@ -62,16 +67,36 @@ module intan(
                 next_state <= WFCK;
             end
             WFCK: begin
-                if(fs_check) next_state <= FDCK;
+                if(fs_check) next_state <= BGCK;
                 else next_state <= WFCK;
+            end
+            BGCK: begin
+                next_state <= GNCK;
+            end
+            GNCK: begin
+                if(wnum == CKNUM) next_state <= LTCK;
+                else next_state <= GNCK;
+            end
+            LTCK: begin
+                next_state <= FDCK;
             end
             FDCK: begin
                 if(~fs_check) next_state <= WFCF;
                 else next_state <= FDCK;
             end
             WFCF: begin
-                if(fs_conf) next_state <= FDCF;
+                if(fs_conf) next_state <= BGCF;
                 else next_state <= WFCF;
+            end
+            BGCF: begin
+                next_state <= GNCF;
+            end
+            GNCF: begin
+                if(wnum == CFNUM) next_state <= LTCF;
+                else next_state <= GNCF;
+            end
+            LTCF: begin
+                next_state <= FDCF;
             end
             FDCF: begin
                 if(~fs_conf) next_state <= WFRD;
@@ -95,7 +120,7 @@ module intan(
 
 
     always @(*) begin
-        case(dev_kind)
+        case(dev_type)
             2'b00: begin
                 fifoi_len1 <= 12'h00;
                 fifoi_len0 <= 12'h00;
@@ -117,6 +142,21 @@ module intan(
                 fifoi_len0 <= 12'h0;   
             end
         endcase
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if(rst) wnum <= 16'h0000;
+        else if(state == BGCK || state == BGCF) wnum <= 16'h0000;
+        else if(state == GNCK || state == GNCF) wnum <= wnum + 1'b1;
+        else if(state == LTCK || state == LTCF) wnum <= 16'h0000;
+        else wnum <= wnum;
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if(rst) dev_type <= 2'b00;
+        else if(state == LTCK) dev_type <= dev_kind;
+        else if(state == IDLE) dev_type <= 2'b00;
+        else dev_type <= dev_type;
     end
 
     fifo_write 

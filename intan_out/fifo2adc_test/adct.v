@@ -20,6 +20,7 @@ module adc(
     input [7:0] dev_smpr,
     input [7:0] dev_info,
     input [7:0] dev_kind,
+    output [7:0] dev_type,
 
     output fifoa_full,
     output fifoa_empty,
@@ -94,7 +95,7 @@ module adc(
         .adc_rxen(adc_rxen),
         .fifoi_grxen(fifoi_grxen),
         
-        .dev_kind(dev_kind),
+        .dev_type(dev_type),
         .dev_info(dev_info),
         .dev_smpr(dev_smpr),
 
@@ -144,6 +145,7 @@ module adc(
         .err(),
 
         .dev_kind(dev_kind[7:6]),
+        .dev_type(dev_type[7:6]),
         .intan_id(32'hF0_F1_F2_F3),
 
         .fs_check(fs_check),
@@ -169,6 +171,7 @@ module adc(
         .err(),
 
         .dev_kind(dev_kind[5:4]),
+        .dev_type(dev_type[5:4]),
         .intan_id(32'hF4_F5_F6_F7),
 
         .fs_check(fs_check),
@@ -194,6 +197,7 @@ module adc(
         .err(),
 
         .dev_kind(dev_kind[3:2]),
+        .dev_type(dev_type[3:2]),
         .intan_id(32'hF8_F9_FA_FB),
 
         .fs_check(fs_check),
@@ -219,6 +223,7 @@ module adc(
         .err(),
 
         .dev_kind(dev_kind[1:0]),
+        .dev_type(dev_type[1:0]),
         .intan_id(32'hFC_FD_FE_FF),
 
         .fs_check(fs_check),
