@@ -10,7 +10,7 @@ module cs(
 
     output [63:0] intan_cmd,
     output [63:0] intan_ind,
-    output [7:0] intan_lor,
+    output [7:0] intan_lrt,
     output [7:0] intan_end
 );
 
@@ -25,7 +25,7 @@ module cs(
 
         .intan_cmd(intan_cmd),
         .intan_ind(intan_ind),
-        .intan_lor(intan_lor),
+        .intan_lrt(intan_lrt),
         .intan_end(intan_end)
     );
 

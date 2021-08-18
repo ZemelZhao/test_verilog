@@ -172,8 +172,8 @@ module intan(
         .rst(),
 
         .wr_clk(fifoi_txc),
-        .din(fifoi_txd1),
-        .wr_en(fifoi_txen1),
+        .din(fifoi_txd0),
+        .wr_en(fifoi_txen0),
 
         .rd_clk(fifoi_rxc),
         .dout(fifoi_rxd[7:0]),

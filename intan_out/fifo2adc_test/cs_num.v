@@ -9,7 +9,7 @@ module cs_num(
 
 	output reg [63:0] intan_cmd, 
 	output reg [63:0] intan_ind,
-	output reg [7:0] intan_lor,
+	output reg [7:0] intan_lrt,
 	output reg [7:0] intan_end
 );
 
@@ -22,7 +22,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0000000000000000;
 				intan_ind <= 64'h0000000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h00;
 			end
 			8'h01: begin
@@ -31,7 +31,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0200000000000000;
 				intan_ind <= 64'h0F00000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h80;
 			end
 			8'h02: begin
@@ -40,7 +40,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0200000000000000;
 				intan_ind <= 64'h0F00000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h80;
 			end
 			8'h03: begin
@@ -49,7 +49,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0201000000000000;
 				intan_ind <= 64'h0F07000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h04: begin
@@ -58,7 +58,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0800000000000000;
 				intan_ind <= 64'h1F00000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h80;
 			end
 			8'h05: begin
@@ -67,7 +67,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0802000000000000;
 				intan_ind <= 64'h1F0F000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h40;
 			end
 			8'h06: begin
@@ -76,7 +76,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0802000000000000;
 				intan_ind <= 64'h1F0F000000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h40;
 			end
 			8'h07: begin
@@ -85,7 +85,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h0802010000000000;
 				intan_ind <= 64'h1F0F070000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h08: begin
@@ -94,7 +94,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0800000000000000;
 				intan_ind <= 64'h1F00000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h80;
 			end
 			8'h09: begin
@@ -103,7 +103,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0802000000000000;
 				intan_ind <= 64'h1F0F000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h40;
 			end
 			8'h0A: begin
@@ -112,7 +112,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0802000000000000;
 				intan_ind <= 64'h1F0F000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h0B: begin
@@ -121,7 +121,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h0802010000000000;
 				intan_ind <= 64'h1F0F070000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h0C: begin
@@ -130,7 +130,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h0804000000000000;
 				intan_ind <= 64'h1F17000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h0D: begin
@@ -139,7 +139,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h0804020000000000;
 				intan_ind <= 64'h1F170F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'h0E: begin
@@ -148,7 +148,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h0804020000000000;
 				intan_ind <= 64'h1F170F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h0F: begin
@@ -157,7 +157,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h0804020100000000;
 				intan_ind <= 64'h1F170F0700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h10: begin
@@ -166,7 +166,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2000000000000000;
 				intan_ind <= 64'h2F00000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h80;
 			end
 			8'h11: begin
@@ -175,7 +175,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2002000000000000;
 				intan_ind <= 64'h2F0F000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h40;
 			end
 			8'h12: begin
@@ -184,7 +184,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2002000000000000;
 				intan_ind <= 64'h2F0F000000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h40;
 			end
 			8'h13: begin
@@ -193,7 +193,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2002010000000000;
 				intan_ind <= 64'h2F0F070000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h14: begin
@@ -202,7 +202,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008000000000000;
 				intan_ind <= 64'h2F1F000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h40;
 			end
 			8'h15: begin
@@ -211,7 +211,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h20;
 			end
 			8'h16: begin
@@ -220,7 +220,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'h20;
+				intan_lrt <= 8'h20;
 				intan_end <= 8'h20;
 			end
 			8'h17: begin
@@ -229,7 +229,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2008020100000000;
 				intan_ind <= 64'h2F1F0F0700000000;
-				intan_lor <= 8'h30;
+				intan_lrt <= 8'h30;
 				intan_end <= 8'h10;
 			end
 			8'h18: begin
@@ -238,7 +238,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008000000000000;
 				intan_ind <= 64'h2F1F000000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h40;
 			end
 			8'h19: begin
@@ -247,7 +247,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h20;
 			end
 			8'h1A: begin
@@ -256,7 +256,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h1B: begin
@@ -265,7 +265,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h2008020100000000;
 				intan_ind <= 64'h2F1F0F0700000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h1C: begin
@@ -274,7 +274,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2008040000000000;
 				intan_ind <= 64'h2F1F170000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h1D: begin
@@ -283,7 +283,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2008040200000000;
 				intan_ind <= 64'h2F1F170F00000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h10;
 			end
 			8'h1E: begin
@@ -292,7 +292,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h2008040200000000;
 				intan_ind <= 64'h2F1F170F00000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h1F: begin
@@ -301,7 +301,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2008040201000000;
 				intan_ind <= 64'h2F1F170F07000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h20: begin
@@ -310,7 +310,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2000000000000000;
 				intan_ind <= 64'h2F00000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h80;
 			end
 			8'h21: begin
@@ -319,7 +319,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2002000000000000;
 				intan_ind <= 64'h2F0F000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h40;
 			end
 			8'h22: begin
@@ -328,7 +328,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2002000000000000;
 				intan_ind <= 64'h2F0F000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h23: begin
@@ -337,7 +337,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2002010000000000;
 				intan_ind <= 64'h2F0F070000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h24: begin
@@ -346,7 +346,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008000000000000;
 				intan_ind <= 64'h2F1F000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h40;
 			end
 			8'h25: begin
@@ -355,7 +355,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h20;
 			end
 			8'h26: begin
@@ -364,7 +364,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'hA0;
+				intan_lrt <= 8'hA0;
 				intan_end <= 8'h20;
 			end
 			8'h27: begin
@@ -373,7 +373,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h2008020100000000;
 				intan_ind <= 64'h2F1F0F0700000000;
-				intan_lor <= 8'hB0;
+				intan_lrt <= 8'hB0;
 				intan_end <= 8'h10;
 			end
 			8'h28: begin
@@ -382,7 +382,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2008000000000000;
 				intan_ind <= 64'h2F1F000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h29: begin
@@ -391,7 +391,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'h2A: begin
@@ -400,7 +400,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2008020000000000;
 				intan_ind <= 64'h2F1F0F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h2B: begin
@@ -409,7 +409,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2008020100000000;
 				intan_ind <= 64'h2F1F0F0700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h2C: begin
@@ -418,7 +418,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2008040000000000;
 				intan_ind <= 64'h2F1F170000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h2D: begin
@@ -427,7 +427,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h2008040200000000;
 				intan_ind <= 64'h2F1F170F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'h2E: begin
@@ -436,7 +436,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2008040200000000;
 				intan_ind <= 64'h2F1F170F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h2F: begin
@@ -445,7 +445,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h2008040201000000;
 				intan_ind <= 64'h2F1F170F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'h30: begin
@@ -454,7 +454,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h2010000000000000;
 				intan_ind <= 64'h2F27000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h31: begin
@@ -463,7 +463,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2010020000000000;
 				intan_ind <= 64'h2F270F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'h32: begin
@@ -472,7 +472,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2010020000000000;
 				intan_ind <= 64'h2F270F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h33: begin
@@ -481,7 +481,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2010020100000000;
 				intan_ind <= 64'h2F270F0700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h34: begin
@@ -490,7 +490,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h2010080000000000;
 				intan_ind <= 64'h2F271F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'h35: begin
@@ -499,7 +499,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2010080200000000;
 				intan_ind <= 64'h2F271F0F00000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h10;
 			end
 			8'h36: begin
@@ -508,7 +508,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h2010080200000000;
 				intan_ind <= 64'h2F271F0F00000000;
-				intan_lor <= 8'hD0;
+				intan_lrt <= 8'hD0;
 				intan_end <= 8'h10;
 			end
 			8'h37: begin
@@ -517,7 +517,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2010080201000000;
 				intan_ind <= 64'h2F271F0F07000000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h08;
 			end
 			8'h38: begin
@@ -526,7 +526,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h2010080000000000;
 				intan_ind <= 64'h2F271F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h39: begin
@@ -535,7 +535,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h2010080200000000;
 				intan_ind <= 64'h2F271F0F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'h3A: begin
@@ -544,7 +544,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2010080200000000;
 				intan_ind <= 64'h2F271F0F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h3B: begin
@@ -553,7 +553,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h2010080201000000;
 				intan_ind <= 64'h2F271F0F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'h3C: begin
@@ -562,7 +562,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2010080400000000;
 				intan_ind <= 64'h2F271F1700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h3D: begin
@@ -571,7 +571,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h2010080402000000;
 				intan_ind <= 64'h2F271F170F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'h3E: begin
@@ -580,7 +580,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h2010080402000000;
 				intan_ind <= 64'h2F271F170F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'h3F: begin
@@ -589,7 +589,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h2010080402010000;
 				intan_ind <= 64'h2F271F170F070000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'h40: begin
@@ -598,7 +598,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8000000000000000;
 				intan_ind <= 64'h3F00000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h80;
 			end
 			8'h41: begin
@@ -607,7 +607,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8002000000000000;
 				intan_ind <= 64'h3F0F000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h40;
 			end
 			8'h42: begin
@@ -616,7 +616,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8002000000000000;
 				intan_ind <= 64'h3F0F000000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h40;
 			end
 			8'h43: begin
@@ -625,7 +625,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8002010000000000;
 				intan_ind <= 64'h3F0F070000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h44: begin
@@ -634,7 +634,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008000000000000;
 				intan_ind <= 64'h3F1F000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h40;
 			end
 			8'h45: begin
@@ -643,7 +643,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h20;
 			end
 			8'h46: begin
@@ -652,7 +652,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'h20;
+				intan_lrt <= 8'h20;
 				intan_end <= 8'h20;
 			end
 			8'h47: begin
@@ -661,7 +661,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8008020100000000;
 				intan_ind <= 64'h3F1F0F0700000000;
-				intan_lor <= 8'h30;
+				intan_lrt <= 8'h30;
 				intan_end <= 8'h10;
 			end
 			8'h48: begin
@@ -670,7 +670,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008000000000000;
 				intan_ind <= 64'h3F1F000000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h40;
 			end
 			8'h49: begin
@@ -679,7 +679,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h20;
 			end
 			8'h4A: begin
@@ -688,7 +688,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h4B: begin
@@ -697,7 +697,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8008020100000000;
 				intan_ind <= 64'h3F1F0F0700000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h4C: begin
@@ -706,7 +706,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8008040000000000;
 				intan_ind <= 64'h3F1F170000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h4D: begin
@@ -715,7 +715,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8008040200000000;
 				intan_ind <= 64'h3F1F170F00000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h10;
 			end
 			8'h4E: begin
@@ -724,7 +724,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8008040200000000;
 				intan_ind <= 64'h3F1F170F00000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h4F: begin
@@ -733,7 +733,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8008040201000000;
 				intan_ind <= 64'h3F1F170F07000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h50: begin
@@ -742,7 +742,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020000000000000;
 				intan_ind <= 64'h3F2F000000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h40;
 			end
 			8'h51: begin
@@ -751,7 +751,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h20;
 			end
 			8'h52: begin
@@ -760,7 +760,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'h20;
+				intan_lrt <= 8'h20;
 				intan_end <= 8'h20;
 			end
 			8'h53: begin
@@ -769,7 +769,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020020100000000;
 				intan_ind <= 64'h3F2F0F0700000000;
-				intan_lor <= 8'h30;
+				intan_lrt <= 8'h30;
 				intan_end <= 8'h10;
 			end
 			8'h54: begin
@@ -778,7 +778,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h20;
 			end
 			8'h55: begin
@@ -787,7 +787,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h00;
+				intan_lrt <= 8'h00;
 				intan_end <= 8'h10;
 			end
 			8'h56: begin
@@ -796,7 +796,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h10;
+				intan_lrt <= 8'h10;
 				intan_end <= 8'h10;
 			end
 			8'h57: begin
@@ -805,7 +805,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'h18;
+				intan_lrt <= 8'h18;
 				intan_end <= 8'h08;
 			end
 			8'h58: begin
@@ -814,7 +814,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'h20;
+				intan_lrt <= 8'h20;
 				intan_end <= 8'h20;
 			end
 			8'h59: begin
@@ -823,7 +823,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h20;
+				intan_lrt <= 8'h20;
 				intan_end <= 8'h10;
 			end
 			8'h5A: begin
@@ -832,7 +832,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h30;
+				intan_lrt <= 8'h30;
 				intan_end <= 8'h10;
 			end
 			8'h5B: begin
@@ -841,7 +841,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'h38;
+				intan_lrt <= 8'h38;
 				intan_end <= 8'h08;
 			end
 			8'h5C: begin
@@ -850,7 +850,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080400000000;
 				intan_ind <= 64'h3F2F1F1700000000;
-				intan_lor <= 8'h30;
+				intan_lrt <= 8'h30;
 				intan_end <= 8'h10;
 			end
 			8'h5D: begin
@@ -859,7 +859,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'h30;
+				intan_lrt <= 8'h30;
 				intan_end <= 8'h08;
 			end
 			8'h5E: begin
@@ -868,7 +868,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'h38;
+				intan_lrt <= 8'h38;
 				intan_end <= 8'h08;
 			end
 			8'h5F: begin
@@ -877,7 +877,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020080402010000;
 				intan_ind <= 64'h3F2F1F170F070000;
-				intan_lor <= 8'h3C;
+				intan_lrt <= 8'h3C;
 				intan_end <= 8'h04;
 			end
 			8'h60: begin
@@ -886,7 +886,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020000000000000;
 				intan_ind <= 64'h3F2F000000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h40;
 			end
 			8'h61: begin
@@ -895,7 +895,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h20;
 			end
 			8'h62: begin
@@ -904,7 +904,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h63: begin
@@ -913,7 +913,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020020100000000;
 				intan_ind <= 64'h3F2F0F0700000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h64: begin
@@ -922,7 +922,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h20;
 			end
 			8'h65: begin
@@ -931,7 +931,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h40;
+				intan_lrt <= 8'h40;
 				intan_end <= 8'h10;
 			end
 			8'h66: begin
@@ -940,7 +940,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h50;
+				intan_lrt <= 8'h50;
 				intan_end <= 8'h10;
 			end
 			8'h67: begin
@@ -949,7 +949,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'h58;
+				intan_lrt <= 8'h58;
 				intan_end <= 8'h08;
 			end
 			8'h68: begin
@@ -958,7 +958,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h69: begin
@@ -967,7 +967,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h10;
 			end
 			8'h6A: begin
@@ -976,7 +976,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h6B: begin
@@ -985,7 +985,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h6C: begin
@@ -994,7 +994,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080400000000;
 				intan_ind <= 64'h3F2F1F1700000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h6D: begin
@@ -1003,7 +1003,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h08;
 			end
 			8'h6E: begin
@@ -1012,7 +1012,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h6F: begin
@@ -1021,7 +1021,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020080402010000;
 				intan_ind <= 64'h3F2F1F170F070000;
-				intan_lor <= 8'h7C;
+				intan_lrt <= 8'h7C;
 				intan_end <= 8'h04;
 			end
 			8'h70: begin
@@ -1030,7 +1030,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020100000000000;
 				intan_ind <= 64'h3F2F270000000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h20;
 			end
 			8'h71: begin
@@ -1039,7 +1039,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020100200000000;
 				intan_ind <= 64'h3F2F270F00000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h10;
 			end
 			8'h72: begin
@@ -1048,7 +1048,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020100200000000;
 				intan_ind <= 64'h3F2F270F00000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h73: begin
@@ -1057,7 +1057,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100201000000;
 				intan_ind <= 64'h3F2F270F07000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h74: begin
@@ -1066,7 +1066,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020100800000000;
 				intan_ind <= 64'h3F2F271F00000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h10;
 			end
 			8'h75: begin
@@ -1075,7 +1075,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'h60;
+				intan_lrt <= 8'h60;
 				intan_end <= 8'h08;
 			end
 			8'h76: begin
@@ -1084,7 +1084,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'h68;
+				intan_lrt <= 8'h68;
 				intan_end <= 8'h08;
 			end
 			8'h77: begin
@@ -1093,7 +1093,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100802010000;
 				intan_ind <= 64'h3F2F271F0F070000;
-				intan_lor <= 8'h6C;
+				intan_lrt <= 8'h6C;
 				intan_end <= 8'h04;
 			end
 			8'h78: begin
@@ -1102,7 +1102,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020100800000000;
 				intan_ind <= 64'h3F2F271F00000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h10;
 			end
 			8'h79: begin
@@ -1111,7 +1111,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'h70;
+				intan_lrt <= 8'h70;
 				intan_end <= 8'h08;
 			end
 			8'h7A: begin
@@ -1120,7 +1120,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h7B: begin
@@ -1129,7 +1129,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100802010000;
 				intan_ind <= 64'h3F2F271F0F070000;
-				intan_lor <= 8'h7C;
+				intan_lrt <= 8'h7C;
 				intan_end <= 8'h04;
 			end
 			8'h7C: begin
@@ -1138,7 +1138,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100804000000;
 				intan_ind <= 64'h3F2F271F17000000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h08;
 			end
 			8'h7D: begin
@@ -1147,7 +1147,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100804020000;
 				intan_ind <= 64'h3F2F271F170F0000;
-				intan_lor <= 8'h78;
+				intan_lrt <= 8'h78;
 				intan_end <= 8'h04;
 			end
 			8'h7E: begin
@@ -1156,7 +1156,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100804020000;
 				intan_ind <= 64'h3F2F271F170F0000;
-				intan_lor <= 8'h7C;
+				intan_lrt <= 8'h7C;
 				intan_end <= 8'h04;
 			end
 			8'h7F: begin
@@ -1165,7 +1165,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8020100804020100;
 				intan_ind <= 64'h3F2F271F170F0700;
-				intan_lor <= 8'h7E;
+				intan_lrt <= 8'h7E;
 				intan_end <= 8'h02;
 			end
 			8'h80: begin
@@ -1174,7 +1174,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8000000000000000;
 				intan_ind <= 64'h3F00000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h80;
 			end
 			8'h81: begin
@@ -1183,7 +1183,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8002000000000000;
 				intan_ind <= 64'h3F0F000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h40;
 			end
 			8'h82: begin
@@ -1192,7 +1192,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8002000000000000;
 				intan_ind <= 64'h3F0F000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h83: begin
@@ -1201,7 +1201,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8002010000000000;
 				intan_ind <= 64'h3F0F070000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h84: begin
@@ -1210,7 +1210,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008000000000000;
 				intan_ind <= 64'h3F1F000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h40;
 			end
 			8'h85: begin
@@ -1219,7 +1219,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h20;
 			end
 			8'h86: begin
@@ -1228,7 +1228,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'hA0;
+				intan_lrt <= 8'hA0;
 				intan_end <= 8'h20;
 			end
 			8'h87: begin
@@ -1237,7 +1237,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8008020100000000;
 				intan_ind <= 64'h3F1F0F0700000000;
-				intan_lor <= 8'hB0;
+				intan_lrt <= 8'hB0;
 				intan_end <= 8'h10;
 			end
 			8'h88: begin
@@ -1246,7 +1246,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8008000000000000;
 				intan_ind <= 64'h3F1F000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'h89: begin
@@ -1255,7 +1255,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'h8A: begin
@@ -1264,7 +1264,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8008020000000000;
 				intan_ind <= 64'h3F1F0F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h8B: begin
@@ -1273,7 +1273,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8008020100000000;
 				intan_ind <= 64'h3F1F0F0700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h8C: begin
@@ -1282,7 +1282,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8008040000000000;
 				intan_ind <= 64'h3F1F170000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'h8D: begin
@@ -1291,7 +1291,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8008040200000000;
 				intan_ind <= 64'h3F1F170F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'h8E: begin
@@ -1300,7 +1300,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8008040200000000;
 				intan_ind <= 64'h3F1F170F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'h8F: begin
@@ -1309,7 +1309,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8008040201000000;
 				intan_ind <= 64'h3F1F170F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'h90: begin
@@ -1318,7 +1318,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020000000000000;
 				intan_ind <= 64'h3F2F000000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h40;
 			end
 			8'h91: begin
@@ -1327,7 +1327,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h20;
 			end
 			8'h92: begin
@@ -1336,7 +1336,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'hA0;
+				intan_lrt <= 8'hA0;
 				intan_end <= 8'h20;
 			end
 			8'h93: begin
@@ -1345,7 +1345,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020020100000000;
 				intan_ind <= 64'h3F2F0F0700000000;
-				intan_lor <= 8'hB0;
+				intan_lrt <= 8'hB0;
 				intan_end <= 8'h10;
 			end
 			8'h94: begin
@@ -1354,7 +1354,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h20;
 			end
 			8'h95: begin
@@ -1363,7 +1363,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h80;
+				intan_lrt <= 8'h80;
 				intan_end <= 8'h10;
 			end
 			8'h96: begin
@@ -1372,7 +1372,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'h90;
+				intan_lrt <= 8'h90;
 				intan_end <= 8'h10;
 			end
 			8'h97: begin
@@ -1381,7 +1381,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'h98;
+				intan_lrt <= 8'h98;
 				intan_end <= 8'h08;
 			end
 			8'h98: begin
@@ -1390,7 +1390,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'hA0;
+				intan_lrt <= 8'hA0;
 				intan_end <= 8'h20;
 			end
 			8'h99: begin
@@ -1399,7 +1399,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'hA0;
+				intan_lrt <= 8'hA0;
 				intan_end <= 8'h10;
 			end
 			8'h9A: begin
@@ -1408,7 +1408,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'hB0;
+				intan_lrt <= 8'hB0;
 				intan_end <= 8'h10;
 			end
 			8'h9B: begin
@@ -1417,7 +1417,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'hB8;
+				intan_lrt <= 8'hB8;
 				intan_end <= 8'h08;
 			end
 			8'h9C: begin
@@ -1426,7 +1426,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080400000000;
 				intan_ind <= 64'h3F2F1F1700000000;
-				intan_lor <= 8'hB0;
+				intan_lrt <= 8'hB0;
 				intan_end <= 8'h10;
 			end
 			8'h9D: begin
@@ -1435,7 +1435,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'hB0;
+				intan_lrt <= 8'hB0;
 				intan_end <= 8'h08;
 			end
 			8'h9E: begin
@@ -1444,7 +1444,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'hB8;
+				intan_lrt <= 8'hB8;
 				intan_end <= 8'h08;
 			end
 			8'h9F: begin
@@ -1453,7 +1453,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020080402010000;
 				intan_ind <= 64'h3F2F1F170F070000;
-				intan_lor <= 8'hBC;
+				intan_lrt <= 8'hBC;
 				intan_end <= 8'h04;
 			end
 			8'hA0: begin
@@ -1462,7 +1462,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8020000000000000;
 				intan_ind <= 64'h3F2F000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'hA1: begin
@@ -1471,7 +1471,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'hA2: begin
@@ -1480,7 +1480,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020020000000000;
 				intan_ind <= 64'h3F2F0F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'hA3: begin
@@ -1489,7 +1489,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020020100000000;
 				intan_ind <= 64'h3F2F0F0700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hA4: begin
@@ -1498,7 +1498,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'hA5: begin
@@ -1507,7 +1507,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h10;
 			end
 			8'hA6: begin
@@ -1516,7 +1516,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'hD0;
+				intan_lrt <= 8'hD0;
 				intan_end <= 8'h10;
 			end
 			8'hA7: begin
@@ -1525,7 +1525,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h08;
 			end
 			8'hA8: begin
@@ -1534,7 +1534,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020080000000000;
 				intan_ind <= 64'h3F2F1F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'hA9: begin
@@ -1543,7 +1543,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'hAA: begin
@@ -1552,7 +1552,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080200000000;
 				intan_ind <= 64'h3F2F1F0F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hAB: begin
@@ -1561,7 +1561,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020080201000000;
 				intan_ind <= 64'h3F2F1F0F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hAC: begin
@@ -1570,7 +1570,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080400000000;
 				intan_ind <= 64'h3F2F1F1700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hAD: begin
@@ -1579,7 +1579,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'hAE: begin
@@ -1588,7 +1588,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020080402000000;
 				intan_ind <= 64'h3F2F1F170F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hAF: begin
@@ -1597,7 +1597,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8020080402010000;
 				intan_ind <= 64'h3F2F1F170F070000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hB0: begin
@@ -1606,7 +1606,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8020100000000000;
 				intan_ind <= 64'h3F2F270000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'hB1: begin
@@ -1615,7 +1615,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020100200000000;
 				intan_ind <= 64'h3F2F270F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'hB2: begin
@@ -1624,7 +1624,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100200000000;
 				intan_ind <= 64'h3F2F270F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hB3: begin
@@ -1633,7 +1633,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100201000000;
 				intan_ind <= 64'h3F2F270F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hB4: begin
@@ -1642,7 +1642,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8020100800000000;
 				intan_ind <= 64'h3F2F271F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'hB5: begin
@@ -1651,7 +1651,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h08;
 			end
 			8'hB6: begin
@@ -1660,7 +1660,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'hE8;
+				intan_lrt <= 8'hE8;
 				intan_end <= 8'h08;
 			end
 			8'hB7: begin
@@ -1669,7 +1669,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100802010000;
 				intan_ind <= 64'h3F2F271F0F070000;
-				intan_lor <= 8'hEC;
+				intan_lrt <= 8'hEC;
 				intan_end <= 8'h04;
 			end
 			8'hB8: begin
@@ -1678,7 +1678,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100800000000;
 				intan_ind <= 64'h3F2F271F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hB9: begin
@@ -1687,7 +1687,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'hBA: begin
@@ -1696,7 +1696,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100802000000;
 				intan_ind <= 64'h3F2F271F0F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hBB: begin
@@ -1705,7 +1705,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8020100802010000;
 				intan_ind <= 64'h3F2F271F0F070000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hBC: begin
@@ -1714,7 +1714,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100804000000;
 				intan_ind <= 64'h3F2F271F17000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hBD: begin
@@ -1723,7 +1723,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8020100804020000;
 				intan_ind <= 64'h3F2F271F170F0000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h04;
 			end
 			8'hBE: begin
@@ -1732,7 +1732,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8020100804020000;
 				intan_ind <= 64'h3F2F271F170F0000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hBF: begin
@@ -1741,7 +1741,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8020100804020100;
 				intan_ind <= 64'h3F2F271F170F0700;
-				intan_lor <= 8'hFE;
+				intan_lrt <= 8'hFE;
 				intan_end <= 8'h02;
 			end
 			8'hC0: begin
@@ -1750,7 +1750,7 @@ module cs_num(
 				data_cnt <= 8'h0A;
 				intan_cmd <= 64'h8040000000000000;
 				intan_ind <= 64'h3F37000000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h40;
 			end
 			8'hC1: begin
@@ -1759,7 +1759,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8040020000000000;
 				intan_ind <= 64'h3F370F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'hC2: begin
@@ -1768,7 +1768,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8040020000000000;
 				intan_ind <= 64'h3F370F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'hC3: begin
@@ -1777,7 +1777,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040020100000000;
 				intan_ind <= 64'h3F370F0700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hC4: begin
@@ -1786,7 +1786,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8040080000000000;
 				intan_ind <= 64'h3F371F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'hC5: begin
@@ -1795,7 +1795,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8040080200000000;
 				intan_ind <= 64'h3F371F0F00000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h10;
 			end
 			8'hC6: begin
@@ -1804,7 +1804,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040080200000000;
 				intan_ind <= 64'h3F371F0F00000000;
-				intan_lor <= 8'hD0;
+				intan_lrt <= 8'hD0;
 				intan_end <= 8'h10;
 			end
 			8'hC7: begin
@@ -1813,7 +1813,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040080201000000;
 				intan_ind <= 64'h3F371F0F07000000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h08;
 			end
 			8'hC8: begin
@@ -1822,7 +1822,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8040080000000000;
 				intan_ind <= 64'h3F371F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'hC9: begin
@@ -1831,7 +1831,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040080200000000;
 				intan_ind <= 64'h3F371F0F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'hCA: begin
@@ -1840,7 +1840,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040080200000000;
 				intan_ind <= 64'h3F371F0F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hCB: begin
@@ -1849,7 +1849,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040080201000000;
 				intan_ind <= 64'h3F371F0F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hCC: begin
@@ -1858,7 +1858,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040080400000000;
 				intan_ind <= 64'h3F371F1700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hCD: begin
@@ -1867,7 +1867,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040080402000000;
 				intan_ind <= 64'h3F371F170F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'hCE: begin
@@ -1876,7 +1876,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040080402000000;
 				intan_ind <= 64'h3F371F170F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hCF: begin
@@ -1885,7 +1885,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040080402010000;
 				intan_ind <= 64'h3F371F170F070000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hD0: begin
@@ -1894,7 +1894,7 @@ module cs_num(
 				data_cnt <= 8'h08;
 				intan_cmd <= 64'h8040200000000000;
 				intan_ind <= 64'h3F372F0000000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h20;
 			end
 			8'hD1: begin
@@ -1903,7 +1903,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8040200200000000;
 				intan_ind <= 64'h3F372F0F00000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h10;
 			end
 			8'hD2: begin
@@ -1912,7 +1912,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040200200000000;
 				intan_ind <= 64'h3F372F0F00000000;
-				intan_lor <= 8'hD0;
+				intan_lrt <= 8'hD0;
 				intan_end <= 8'h10;
 			end
 			8'hD3: begin
@@ -1921,7 +1921,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200201000000;
 				intan_ind <= 64'h3F372F0F07000000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h08;
 			end
 			8'hD4: begin
@@ -1930,7 +1930,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8040200800000000;
 				intan_ind <= 64'h3F372F1F00000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h10;
 			end
 			8'hD5: begin
@@ -1939,7 +1939,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hC0;
+				intan_lrt <= 8'hC0;
 				intan_end <= 8'h08;
 			end
 			8'hD6: begin
@@ -1948,7 +1948,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hC8;
+				intan_lrt <= 8'hC8;
 				intan_end <= 8'h08;
 			end
 			8'hD7: begin
@@ -1957,7 +1957,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200802010000;
 				intan_ind <= 64'h3F372F1F0F070000;
-				intan_lor <= 8'hCC;
+				intan_lrt <= 8'hCC;
 				intan_end <= 8'h04;
 			end
 			8'hD8: begin
@@ -1966,7 +1966,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040200800000000;
 				intan_ind <= 64'h3F372F1F00000000;
-				intan_lor <= 8'hD0;
+				intan_lrt <= 8'hD0;
 				intan_end <= 8'h10;
 			end
 			8'hD9: begin
@@ -1975,7 +1975,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hD0;
+				intan_lrt <= 8'hD0;
 				intan_end <= 8'h08;
 			end
 			8'hDA: begin
@@ -1984,7 +1984,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h08;
 			end
 			8'hDB: begin
@@ -1993,7 +1993,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200802010000;
 				intan_ind <= 64'h3F372F1F0F070000;
-				intan_lor <= 8'hDC;
+				intan_lrt <= 8'hDC;
 				intan_end <= 8'h04;
 			end
 			8'hDC: begin
@@ -2002,7 +2002,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200804000000;
 				intan_ind <= 64'h3F372F1F17000000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h08;
 			end
 			8'hDD: begin
@@ -2011,7 +2011,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200804020000;
 				intan_ind <= 64'h3F372F1F170F0000;
-				intan_lor <= 8'hD8;
+				intan_lrt <= 8'hD8;
 				intan_end <= 8'h04;
 			end
 			8'hDE: begin
@@ -2020,7 +2020,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200804020000;
 				intan_ind <= 64'h3F372F1F170F0000;
-				intan_lor <= 8'hDC;
+				intan_lrt <= 8'hDC;
 				intan_end <= 8'h04;
 			end
 			8'hDF: begin
@@ -2029,7 +2029,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040200804020100;
 				intan_ind <= 64'h3F372F1F170F0700;
-				intan_lor <= 8'hDE;
+				intan_lrt <= 8'hDE;
 				intan_end <= 8'h02;
 			end
 			8'hE0: begin
@@ -2038,7 +2038,7 @@ module cs_num(
 				data_cnt <= 8'h07;
 				intan_cmd <= 64'h8040200000000000;
 				intan_ind <= 64'h3F372F0000000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h20;
 			end
 			8'hE1: begin
@@ -2047,7 +2047,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040200200000000;
 				intan_ind <= 64'h3F372F0F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'hE2: begin
@@ -2056,7 +2056,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200200000000;
 				intan_ind <= 64'h3F372F0F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hE3: begin
@@ -2065,7 +2065,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200201000000;
 				intan_ind <= 64'h3F372F0F07000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hE4: begin
@@ -2074,7 +2074,7 @@ module cs_num(
 				data_cnt <= 8'h06;
 				intan_cmd <= 64'h8040200800000000;
 				intan_ind <= 64'h3F372F1F00000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h10;
 			end
 			8'hE5: begin
@@ -2083,7 +2083,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hE0;
+				intan_lrt <= 8'hE0;
 				intan_end <= 8'h08;
 			end
 			8'hE6: begin
@@ -2092,7 +2092,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hE8;
+				intan_lrt <= 8'hE8;
 				intan_end <= 8'h08;
 			end
 			8'hE7: begin
@@ -2101,7 +2101,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200802010000;
 				intan_ind <= 64'h3F372F1F0F070000;
-				intan_lor <= 8'hEC;
+				intan_lrt <= 8'hEC;
 				intan_end <= 8'h04;
 			end
 			8'hE8: begin
@@ -2110,7 +2110,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200800000000;
 				intan_ind <= 64'h3F372F1F00000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hE9: begin
@@ -2119,7 +2119,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'hEA: begin
@@ -2128,7 +2128,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200802000000;
 				intan_ind <= 64'h3F372F1F0F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hEB: begin
@@ -2137,7 +2137,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040200802010000;
 				intan_ind <= 64'h3F372F1F0F070000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hEC: begin
@@ -2146,7 +2146,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200804000000;
 				intan_ind <= 64'h3F372F1F17000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hED: begin
@@ -2155,7 +2155,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040200804020000;
 				intan_ind <= 64'h3F372F1F170F0000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h04;
 			end
 			8'hEE: begin
@@ -2164,7 +2164,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040200804020000;
 				intan_ind <= 64'h3F372F1F170F0000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hEF: begin
@@ -2173,7 +2173,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040200804020100;
 				intan_ind <= 64'h3F372F1F170F0700;
-				intan_lor <= 8'hFE;
+				intan_lrt <= 8'hFE;
 				intan_end <= 8'h02;
 			end
 			8'hF0: begin
@@ -2182,7 +2182,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040201000000000;
 				intan_ind <= 64'h3F372F2700000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h10;
 			end
 			8'hF1: begin
@@ -2191,7 +2191,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040201002000000;
 				intan_ind <= 64'h3F372F270F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'hF2: begin
@@ -2200,7 +2200,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040201002000000;
 				intan_ind <= 64'h3F372F270F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hF3: begin
@@ -2209,7 +2209,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201002010000;
 				intan_ind <= 64'h3F372F270F070000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hF4: begin
@@ -2218,7 +2218,7 @@ module cs_num(
 				data_cnt <= 8'h05;
 				intan_cmd <= 64'h8040201008000000;
 				intan_ind <= 64'h3F372F271F000000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h08;
 			end
 			8'hF5: begin
@@ -2227,7 +2227,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040201008020000;
 				intan_ind <= 64'h3F372F271F0F0000;
-				intan_lor <= 8'hF0;
+				intan_lrt <= 8'hF0;
 				intan_end <= 8'h04;
 			end
 			8'hF6: begin
@@ -2236,7 +2236,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040201008020000;
 				intan_ind <= 64'h3F372F271F0F0000;
-				intan_lor <= 8'hF4;
+				intan_lrt <= 8'hF4;
 				intan_end <= 8'h04;
 			end
 			8'hF7: begin
@@ -2245,7 +2245,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201008020100;
 				intan_ind <= 64'h3F372F271F0F0700;
-				intan_lor <= 8'hF6;
+				intan_lrt <= 8'hF6;
 				intan_end <= 8'h02;
 			end
 			8'hF8: begin
@@ -2254,7 +2254,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040201008000000;
 				intan_ind <= 64'h3F372F271F000000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h08;
 			end
 			8'hF9: begin
@@ -2263,7 +2263,7 @@ module cs_num(
 				data_cnt <= 8'h04;
 				intan_cmd <= 64'h8040201008020000;
 				intan_ind <= 64'h3F372F271F0F0000;
-				intan_lor <= 8'hF8;
+				intan_lrt <= 8'hF8;
 				intan_end <= 8'h04;
 			end
 			8'hFA: begin
@@ -2272,7 +2272,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201008020000;
 				intan_ind <= 64'h3F372F271F0F0000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hFB: begin
@@ -2281,7 +2281,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201008020100;
 				intan_ind <= 64'h3F372F271F0F0700;
-				intan_lor <= 8'hFE;
+				intan_lrt <= 8'hFE;
 				intan_end <= 8'h02;
 			end
 			8'hFC: begin
@@ -2290,7 +2290,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201008040000;
 				intan_ind <= 64'h3F372F271F170000;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h04;
 			end
 			8'hFD: begin
@@ -2299,7 +2299,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201008040200;
 				intan_ind <= 64'h3F372F271F170F00;
-				intan_lor <= 8'hFC;
+				intan_lrt <= 8'hFC;
 				intan_end <= 8'h02;
 			end
 			8'hFE: begin
@@ -2308,7 +2308,7 @@ module cs_num(
 				data_cnt <= 8'h03;
 				intan_cmd <= 64'h8040201008040200;
 				intan_ind <= 64'h3F372F271F170F00;
-				intan_lor <= 8'hFE;
+				intan_lrt <= 8'hFE;
 				intan_end <= 8'h02;
 			end
 			8'hFF: begin
@@ -2317,7 +2317,7 @@ module cs_num(
 				data_cnt <= 8'h02;
 				intan_cmd <= 64'h8040201008040201;
 				intan_ind <= 64'h3F372F271F170F07;
-				intan_lor <= 8'hFF;
+				intan_lrt <= 8'hFF;
 				intan_end <= 8'h01;
 			end
 		endcase

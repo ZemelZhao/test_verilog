@@ -43,7 +43,7 @@ module fifo2adc( //
     output fd_fifo,
 
     output reg adc_rxen, // fifod 的参考写入
-    output reg [7:0] fifoi_grxen, //intan_fifo的读入控制部分
+    output  [7:0] fifoi_grxen, //intan_fifo的读入控制部分
     // ###### DATA PART
 
     // #### DATA_SECTION
@@ -93,7 +93,7 @@ module fifo2adc( //
     // TEST
     assign sos = fifoi_grxen;
     assign sol = intan_cmd;
-    assign sos0 = state;
+    assign sos0 = fifo_ind;
     // #endregion
 
     // #### 2. WIRE PART
@@ -161,7 +161,7 @@ module fifo2adc( //
     // #### 1. COMBINATIONAL LOGIC PART
     // #region
     assign adc_rxd = (flag_hord==1'b1) ?head_data :fifoi_grxd[fifo_ind -: 8];
-    // assign fifoi_grxen = fifoi_gcmd[fifo_num];
+    assign fifoi_grxen = 8'h00;
     assign fd_fifo = (state == DATA_DONE);
 
     // #endregion
@@ -178,36 +178,36 @@ module fifo2adc( //
     end
 
     
-    always @(posedge clk or posedge rst) begin // fifoi_grxen
-        if(rst) begin
-            fifoi_grxen <= 8'h00;
-        end
-        else if(state == DAT31H && (~flag_end)) begin
-            fifoi_grxen <= flag_cmd | nflag_cmd;
-        end
-        else if(state == DAT31H && (flag_end)) begin
-            fifoi_grxen <= flag_cmd;
-        end
-        else if(state == DAT15H &&(~flag_end) && (~flag_lort)) begin
-            fifoi_grxen <= flag_cmd | nflag_cmd;
-        end
-        else if(state == DAT15H &&(flag_end) && (~flag_lort)) begin
-            fifoi_grxen <= flag_cmd;
-        end 
-        else if(state == DAT15L &&(flag_end) && (~flag_lort)) begin
-            fifoi_grxen <= 8'h00;
-        end
-        else if(state == DAT31L && (flag_end)) begin
-            fifoi_grxen <= 8'h00;
-        end       
-        else if(state == DATACK) begin
-            fifoi_grxen <= 8'h00;
-        end
-        else begin
-            fifoi_grxen <= fifoi_gcmd[fifo_num];
-        end
+    // always @(posedge clk or posedge rst) begin // fifoi_grxen
+    //     if(rst) begin
+    //         fifoi_grxen <= 8'h00;
+    //     end
+    //     else if(state == DAT31H && (~flag_end)) begin
+    //         fifoi_grxen <= flag_cmd | nflag_cmd;
+    //     end
+    //     else if(state == DAT31H && (flag_end)) begin
+    //         fifoi_grxen <= flag_cmd;
+    //     end
+    //     else if(state == DAT15L &&(~flag_end) && (~flag_lort)) begin
+    //         fifoi_grxen <= flag_cmd | nflag_cmd;
+    //     end
+    //     else if(state == DAT15H &&(flag_end) && (~flag_lort)) begin
+    //         fifoi_grxen <= flag_cmd;
+    //     end 
+    //     else if(state == DAT15L &&(flag_end) && (~flag_lort)) begin
+    //         fifoi_grxen <= 8'h00;
+    //     end
+    //     else if(state == DAT31L && (flag_end)) begin
+    //         fifoi_grxen <= 8'h00;
+    //     end       
+    //     else if(state == DATACK) begin
+    //         fifoi_grxen <= 8'h00;
+    //     end
+    //     else begin
+    //         fifoi_grxen <= flag_cmd;
+    //     end
 
-    end
+    // end
     
     always@(*) begin // STATE_READ
         case(state)
@@ -318,13 +318,20 @@ module fifo2adc( //
         if(rst) begin
             head_data <= 8'h00;
         end
-        else if (state == HEAD00) head_data <= 8'h55;
-        else if (state == HEAD01) head_data <= 8'hAA;
-        else if (state == DEVOPT) head_data <= dev_info; 
-        else if (state == DEVSPR) head_data <= dev_smpr;
-        else if (state == DEVTYE) head_data <= dev_kind;
+        else if(state == HEAD01) begin
+            head_data <= 8'h55;
+        end
+        else if(state == DEVOPT) begin
+            head_data <= 8'hAA;
+        end
+        else if(state == DEVSPR) begin
+            head_data <= dev_info;
+        end
+        else if(state == DEVTYE) begin
+            head_data <= dev_smpr;
+        end
         else if(state == DATA_START) begin
-            head_data <= 8'h00;
+            head_data <= dev_kind;
         end
         else if((state == DATA_DONE) || (state == MAIN_IDLE)) begin
             head_data <= 8'h00;
@@ -360,7 +367,7 @@ module fifo2adc( //
         if(rst) begin
             fifo_num <= 8'h08;
         end
-        else if(state == DEVSPR) begin
+        else if(state == DEVTYE) begin
             fifo_num <= 8'h07;
         end
         else if(state == DATACK || (state == DATA_DONE)) begin
@@ -383,33 +390,28 @@ module fifo2adc( //
             flag_end <= 1'b0;
             flag_cmd <= 7'h0;
             nflag_cmd <= 7'h0;
-            flag_ind <= 7'h0;
         end
         else if(state == DAT00L) begin
             flag_lort <= fifoi_glor[fifo_num];
             flag_end <= fifoi_gend[fifo_num];
             flag_cmd <= fifoi_gcmd[fifo_num];
             nflag_cmd <= fifoi_gcmd[fifo_num-1'b1];
-            flag_ind <= fifoi_gind[fifo_num];
         end
         else begin
             flag_lort <= flag_lort;
             flag_end <= flag_end;
             flag_cmd <= flag_cmd;
             nflag_cmd <= nflag_cmd;
-            flag_ind <= flag_ind;
         end
     end
 
     always @(posedge clk or posedge rst) begin // fifo_ind
         if(rst) begin
-            pprev_fifo_ind <= 8'h00;
             prev_fifo_ind <= 8'h00;
             fifo_ind <= 8'h00;
         end
         else begin
-            pprev_fifo_ind <= fifoi_gind[fifo_num];
-            prev_fifo_ind <= pprev_fifo_ind;
+            prev_fifo_ind <= fifoi_gind[fifo_num];
             fifo_ind <= prev_fifo_ind;
         end
     end

@@ -5,9 +5,36 @@ module test(
     output [7:0] show_state,
     output [7:0] show_adc_rxd,
     output [7:0] show_fifod_rxd,
-    output [7:0] sos,
+
+    output [63:0] sol0,
+    output [63:0] sol1,
+    output [63:0] sol2,
+    output [63:0] sol3,
+    output [63:0] sol4,
+    output [63:0] sol5,
+    output [63:0] sol6,
+    output [63:0] sol7,
+    output [63:0] sol8,
+    
     output [7:0] sos0,
-    output [63:0] sol
+    output [7:0] sos1,
+    output [7:0] sos2,
+    output [7:0] sos3,
+    output [7:0] sos4,
+    output [7:0] sos5,
+    output [7:0] sos6,
+    output [7:0] sos7,
+    output [7:0] sos8,
+
+    output sob0,
+    output sob1,
+    output sob2,
+    output sob3,
+    output sob4,
+    output sob5,
+    output sob6,
+    output sob7,
+    output sob8
 );
 
     wire sys_clk, fifo_clk;
@@ -35,7 +62,7 @@ module test(
 
     wire [7:0] dev_smpr, dev_info, dev_kind;
     wire [63:0] adc_cmd, adc_ind;
-    wire [7:0] adc_lor, adc_end;
+    wire [7:0] adc_lrt, adc_end;
 
     wire [9:0] adc_rx_len;
     wire [11:0] eth_tx_len;
@@ -56,7 +83,7 @@ module test(
     assign show_adc_rxd = adc_rxd;
     assign show_fifod_rxd = fifod_rxd;
 
-    assign dev_kind = 8'hF5;
+    assign dev_kind = 8'hFF;
     assign dev_smpr = 8'hFA;
     assign dev_info = 8'hC9;
 
@@ -164,11 +191,36 @@ module test(
 
         .adc_cmd(adc_cmd),
         .adc_ind(adc_ind),
-        .adc_lor(adc_lor),
+        .adc_lrt(adc_lrt),
         .adc_end(adc_end),
+
+        .sol0(sol0),
+        .sol1(sol1),
+        .sol2(sol2),
+        .sol3(sol3),
+        .sol4(sol4),
+        .sol5(sol5),
+        .sol6(sol6),
+        .sol7(sol7),
+        .sol8(sol8),
         .sos0(sos0),
-        .sos(sos),
-        .sol(sol)
+        .sos1(sos1),
+        .sos2(sos2),
+        .sos3(sos3),
+        .sos4(sos4),
+        .sos5(sos5),
+        .sos6(sos6),
+        .sos7(sos7),
+        .sos8(sos8),
+        .sob0(sob0),
+        .sob1(sob1),
+        .sob2(sob2),
+        .sob3(sob3),
+        .sob4(sob4),
+        .sob5(sob5),
+        .sob6(sob6),
+        .sob7(sob7),
+        .sob8(sob8)
     );
 
     cs
@@ -184,7 +236,7 @@ module test(
 
         .intan_cmd(adc_cmd),
         .intan_ind(adc_ind),
-        .intan_lor(adc_lor),
+        .intan_lrt(adc_lrt),
         .intan_end(adc_end)
     );
 
