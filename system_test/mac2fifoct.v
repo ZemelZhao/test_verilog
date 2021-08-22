@@ -6,12 +6,13 @@ module mac2fifoc(
     // CONTROL
     input fs,
     output fd,
-    output [10:0] so,
+    output [7:0] so,
 
     // MAC
     input [7:0] udp_rxd,
-    output reg [10:0] udp_rx_addr,
+    output reg udp_rxen,
     input [15:0] udp_rx_len,
+    output reg [10:0] udp_rx_addr,
     
     // FIFOC
     output [7:0] fifoc_txd,
@@ -31,7 +32,7 @@ module mac2fifoc(
 
     assign fifoc_txd = udp_rxd;
     assign fd = (state == LAST);
-    assign so = udp_rx_addr;
+    assign so = state;
 
     always @(posedge clk or posedge rst) begin
         if(rst) reg_dev_rx_len <= 16'h0;
@@ -73,6 +74,13 @@ module mac2fifoc(
         else if(state == WORK) fifoc_txen <= 1'b1;
         else fifoc_txen <= 1'b0;
     end
+
+    always @(posedge clk or posedge rst) begin
+        if(rst) udp_rxen <= 1'b0;
+        else if(state == WORK) udp_rxen <= 1'b1;
+        else udp_rxen <= 1'b0;
+    end
+
 
 
 

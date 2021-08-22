@@ -49,7 +49,7 @@ always @(*) begin
             else next_state <= WORK;
         end
         LAST: begin
-            if(fs == 1'b0) next_state <= IDLE;
+            if(~fs) next_state <= IDLE;
             else next_state <= LAST;
         end
     endcase

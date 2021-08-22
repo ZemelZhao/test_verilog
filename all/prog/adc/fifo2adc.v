@@ -1,5 +1,5 @@
 module fifo2adc(
-    input clk,
+    input clk, // a clock
     input rst,
     output err,
 
@@ -19,57 +19,9 @@ module fifo2adc(
     input [63:0] intan_cmd,
     input [63:0] intan_ind,
     input [7:0] intan_lrt,
-    input [7:0] intan_end,
+    input [7:0] intan_end
 
-    output [63:0] sol0,
-    output [63:0] sol1,
-    output [63:0] sol2,
-    output [63:0] sol3,
-    output [63:0] sol4,
-    output [63:0] sol5,
-    output [63:0] sol6,
-    output [63:0] sol7,
-    output [63:0] sol8,
-    
-    output [7:0] sos0,
-    output [7:0] sos1,
-    output [7:0] sos2,
-    output [7:0] sos3,
-    output [7:0] sos4,
-    output [7:0] sos5,
-    output [7:0] sos6,
-    output [7:0] sos7,
-    output [7:0] sos8,
-
-    output sob0,
-    output sob1,
-    output sob2,
-    output sob3,
-    output sob4,
-    output sob5,
-    output sob6,
-    output sob7,
-    output sob8
 );
-    assign sol0 = intan_cmd;
-    assign sol1 = intan_ind;
-    assign sol2 = fifoi_grxd;
-    
-    assign sos0 = state;
-    assign sos1 = intan_lrt;
-    assign sos2 = intan_end;
-    assign sos3 = flag_num;
-    assign sos4 = hdat;
-    assign sos5 = flag_cmd;
-    assign sos6 = flag_ind;
-
-    assign sob0 = flag_lrt;
-    assign sob1 = flag_end;
-    assign sob2 = adc_rxen;
-    assign sob3 = flag_hrd;
-    assign sob4 = fs_fifo;
-    assign sob5 = fd_fifo;
-
 
     localparam IDLE = 8'h00;
     localparam HD00 = 8'h10, HD01 = 8'h11, DIFO = 8'h12;
