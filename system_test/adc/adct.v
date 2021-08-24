@@ -82,6 +82,7 @@ module adc(
 
     assign fifoa_full = |fifoi_gfull;
     assign fifoa_empty = &fifoi_gempty;
+    // assign sos0 = {4'h0, fd_gcf};
 
     fifo2adc
     fifo2adc_dut(
@@ -105,35 +106,35 @@ module adc(
         .intan_cmd(adc_cmd),
         .intan_ind(adc_ind),
         .intan_lrt(adc_lrt),
-        .intan_end(adc_end),
+        .intan_end(adc_end)
 
-        .sol0(sol0),
-        .sol1(sol1),
-        .sol2(sol2),
-        .sol3(sol3),
-        .sol4(sol4),
-        .sol5(sol5),
-        .sol6(sol6),
-        .sol7(sol7),
-        .sol8(sol8),
-        .sos0(sos0),
-        .sos1(sos1),
-        .sos2(sos2),
-        .sos3(sos3),
-        .sos4(sos4),
-        .sos5(sos5),
-        .sos6(sos6),
-        .sos7(sos7),
-        .sos8(sos8),
-        .sob0(sob0),
-        .sob1(sob1),
-        .sob2(sob2),
-        .sob3(sob3),
-        .sob4(sob4),
-        .sob5(sob5),
-        .sob6(sob6),
-        .sob7(sob7),
-        .sob8(sob8)
+        // .sol0(sol0),
+        // .sol1(sol1),
+        // .sol2(sol2),
+        // .sol3(sol3),
+        // .sol4(sol4),
+        // .sol5(sol5),
+        // .sol6(sol6),
+        // .sol7(sol7),
+        // .sol8(sol8),
+        // .sos0(sos0),
+        // .sos1(sos1),
+        // .sos2(sos2),
+        // .sos3(sos3),
+        // .sos4(sos4),
+        // .sos5(sos5),
+        // .sos6(sos6),
+        // .sos7(sos7),
+        // .sos8(sos8),
+        // .sob0(sob0),
+        // .sob1(sob1),
+        // .sob2(sob2),
+        // .sob3(sob3),
+        // .sob4(sob4),
+        // .sob5(sob5),
+        // .sob6(sob6),
+        // .sob7(sob7),
+        // .sob8(sob8)
     );
 
     intan
@@ -159,7 +160,8 @@ module adc(
         .fifoi_rxd(fifoi_grxd[63:48]),
         
         .fifoi_full(fifoi_gfull[7:6]),
-        .fifoi_empty(fifoi_gempty[7:6])
+        .fifoi_empty(fifoi_gempty[7:6]),
+        .sos0(sos0)
     );
 
     intan

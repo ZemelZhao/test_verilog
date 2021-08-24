@@ -77,17 +77,35 @@ module test(
     wire flag_udp_tx_req, flag_udp_tx_prep;
 
 // FIFO
+    wire fifoa_txc, fifoa_rxc;
+    wire fifoc_txc, fifoc_rxc;
+    wire fifod_txc, fifod_rxc;
+
     wire fifoc_txen, fifoc_rxen;
+    wire fifod_txen, fifod_rxen;
+    wire adc_rxen;
+
     wire [7:0] fifoc_txd, fifoc_rxd;
-    wire fifoc_full;
+    wire [7:0] fifod_txd, fifod_rxd;
+    wire [7:0] adc_rxd;
 
+    wire fifoc_full, fifoa_full, fifod_full;
+    wire fifo_full;
 
+// MODE
     wire fs_udp_tx, fd_udp_tx;
     wire fs_udp_rx, fd_udp_rx;
     wire fs_mac2fifoc, fd_mac2fifoc;
     wire fs_fifoc2cs, fd_fifoc2cs;
+    wire fs_fifod2mac, fd_fifod2mac;
+
+    wire fs_check, fd_check;
+    wire fs_conf, fd_conf;
+    wire fs_read, fd_read;
+    wire fs_fifo, fd_fifo;
 
 
+// PARAMETER
     wire [7:0] kind_dev;
     wire [7:0] info_sr;
     wire [7:0] cmd_filt;
@@ -98,29 +116,116 @@ module test(
     wire [7:0] cmd_reg6;
     wire [7:0] cmd_reg7;
 
+    reg [7:0] adc_num;
+
+    wire [7:0] dev_smpr;
+    wire [7:0] dev_info;
+    wire [7:0] dev_kind;
+    wire [7:0] dev_type;
+
+    wire [63:0] adc_cmd;
+    wire [63:0] adc_ind;
+    wire [7:0] adc_lrt;
+    wire [7:0] adc_end;
+
     // TEST
     wire cmd_make, cmd_done;
     localparam ETH_CMD = 96'h55_AA_FF_14_86_84_33_44_55_66_3D_8C;
-    localparam IDLE = 8'h00, MC2F = 8'h02, F2CS = 8'h03, LAST = 8'h04;
-    localparam MCRX = 8'h10, MCRY = 8'h11, MCRZ = 8'h12;
+    assign dev_kind = 8'hFF;
+    assign dev_smpr = 8'hFA;
+    assign dev_info = 8'h14;
 
 
-    assign sos0 = kind_dev;
-    assign sos1 = info_sr;
-    assign sos2 = cmd_filt;
-    assign sos3 = cmd_mix0;
-    assign sos4 = cmd_mix1;
-    assign sos5 = cmd_reg4;
-    assign sos6 = cmd_reg5;
-    assign sos7 = cmd_reg6;
-    assign sos8 = cmd_reg7;
-    assign sos9 = state;
-    assign cmd_make = (state == MCRX);
-    assign fd_udp_rx = (state == MCRZ);
-    assign fs_mac2fifoc = (state == MC2F);
-    assign fs_fifoc2cs = (state == F2CS);
 
-    reg [7:0] state, next_state;
+    // ALL  
+    wire [7:0] adc_cnt;
+    reg[7:0] state, next_state;
+    assign fifo_full = |{fifoa_full, fifoc_full, fifod_full};
+
+// #region 
+    // localparam IDLE = 8'h00, MC2F = 8'h02, F2CS = 8'h03, LAST = 8'h04;
+    // localparam MCRX = 8'h10, MCRY = 8'h11, MCRZ = 8'h12;
+    // assign sos0 = kind_dev;
+    // assign sos1 = info_sr;
+    // assign sos2 = cmd_filt;
+    // assign sos3 = cmd_mix0;
+    // assign sos4 = cmd_mix1;
+    // assign sos5 = cmd_reg4;
+    // assign sos6 = cmd_reg5;
+    // assign sos7 = cmd_reg6;
+    // assign sos8 = cmd_reg7;
+    // assign sos9 = state;
+    // assign cmd_make = (state == MCRX);
+    // assign fd_udp_rx = (state == MCRZ);
+    // assign fs_mac2fifoc = (state == MC2F);
+    // assign fs_fifoc2cs = (state == F2CS);
+
+    // reg [7:0] state, next_state;
+
+    // always @(posedge sys_clk or posedge rst) begin
+    //     if(rst) state <= IDLE;
+    //     else state <= next_state;
+    // end
+
+    // always @(*) begin
+    //     case(state)
+    //         IDLE: begin
+    //             next_state <= MCRX;
+    //         end
+    //         MCRX: begin
+    //             if(cmd_done) next_state <= MCRY;
+    //             else next_state <= MCRX;
+    //         end
+    //         MCRY: begin
+    //             if(fs_udp_rx) next_state <= MC2F;
+    //             else next_state <= MCRY;
+    //         end
+    //         MC2F: begin
+    //             if(fd_mac2fifoc) next_state <= F2CS;
+    //             else next_state <= MC2F;
+    //         end
+    //         F2CS: begin
+    //             if(fd_fifoc2cs) next_state <= LAST;
+    //             else next_state <= F2CS;
+    //         end
+    //         MCRZ: begin
+    //             if(~fs_udp_rx) next_state <= LAST;
+    //             else next_state <= MCRZ;
+    //         end
+    //         LAST: begin
+    //             next_state <= LAST;
+    //         end
+    //         default: next_state <= IDLE;
+    //     endcase
+    // end
+
+// #endregion
+
+// #region
+    assign fs_check = (state == CHECK);
+    assign fs_conf = (state == CONF);
+    assign fs_read = (state == FITX);
+    assign fs_fifo = (state == FIRX);
+    assign fs_fifod2mac = (state == DTRX);
+    
+    assign fs_udp_tx = fs_fifod2mac;
+    assign fd_udp_tx = fd_fifod2mac;
+
+    assign fifoa_txc = fifo_clk;
+    assign fifoa_rxc = fifo_clk;
+    assign fifoc_txc = gmii_rxc;
+    assign fifoc_rxc = fifo_clk;
+    assign fifod_txc = fifo_clk;
+    assign fifod_rxc = gmii_txc;
+
+    assign sos0 = fifod_txd;
+    assign sos1 = fifod_rxd;
+    assign sos2 = state;
+    assign sol0 = eth_tx_len;
+
+    localparam IDLE = 8'h00, CHECK = 8'h01, CONF = 8'h02, PREP = 8'h03;
+    localparam FITX = 8'h04, FIRX = 8'h05, CONT = 8'h06, DTRX = 8'h07;
+    localparam LAST = 8'h08;
 
     always @(posedge sys_clk or posedge rst) begin
         if(rst) state <= IDLE;
@@ -130,37 +235,50 @@ module test(
     always @(*) begin
         case(state)
             IDLE: begin
-                next_state <= MCRX;
+                next_state <= CHECK;
             end
-            MCRX: begin
-                if(cmd_done) next_state <= MCRY;
-                else next_state <= MCRX;
+            CHECK: begin
+                if(fd_check) next_state <= CONF;
+                else next_state <= CHECK;
             end
-            MCRY: begin
-                if(fs_udp_rx) next_state <= MC2F;
-                else next_state <= MCRY;
+            CONF: begin
+                if(fd_conf) next_state <= PREP;
+                else next_state <= CONF;
             end
-            MC2F: begin
-                if(fd_mac2fifoc) next_state <= F2CS;
-                else next_state <= MC2F;
+            PREP: begin
+                if(~fifo_full) next_state <= FITX;
+                else next_state <= PREP;
             end
-            F2CS: begin
-                if(fd_fifoc2cs) next_state <= LAST;
-                else next_state <= F2CS;
+            FITX: begin
+                if(fd_read) next_state <= FIRX;
+                else next_state <= FITX;
             end
-            MCRZ: begin
-                if(~fs_udp_rx) next_state <= LAST;
-                else next_state <= MCRZ;
+            FIRX: begin
+                if(fd_fifo) next_state <= CONT;
+                else next_state <= FIRX;
+            end
+            CONT: begin
+                if(adc_num < adc_cnt - 1'b1) next_state <= LAST;
+                else next_state <= DTRX;
+            end
+            DTRX: begin
+                if(fd_fifod2mac) next_state <= LAST;
+                else next_state <= DTRX;
             end
             LAST: begin
-                next_state <= LAST;
+                next_state <= PREP;
             end
             default: next_state <= IDLE;
         endcase
     end
 
-
-
+    always @(posedge sys_clk or posedge rst) begin
+        if(rst) adc_num <= 8'h0;
+        else if(state == CONT) adc_num <= adc_num + 1'b1;
+        else if(state == DTRX) adc_num <= 8'h0;
+        else adc_num <= adc_num;
+    end
+// #endregion
 
     mac
     mac_dut(
@@ -193,40 +311,72 @@ module test(
 
         .cmd_make(cmd_make),
         .cmd_done(cmd_done),
-        .cmd_rx(ETH_CMD),
-        .sos(sosA),
-        .sob(sob0)
+        .cmd_rx(ETH_CMD)
+    );
+
+    adc
+    adc_dut(
+        .sys_clk(sys_clk),
+        .fifoa_txc(fifoa_txc),
+        .fifoa_rxc(fifoa_rxc),
+
+        .rst(),
+        .spi_mc(),
+
+        .adc_rxen(adc_rxen),
+        .adc_rxd(adc_rxd),
+
+        .fs_check(fs_check),
+        .fd_check(fd_check),
+        .fs_conf(fs_conf),
+        .fd_conf(fd_conf),
+        .fs_read(fs_read),
+        .fd_read(fd_read),
+        .fs_fifo(fs_fifo),
+        .fd_fifo(fd_fifo),
+
+        .dev_smpr(dev_smpr),
+        .dev_info(dev_info),
+        .dev_kind(dev_kind),
+        .dev_type(dev_type),
+
+        .fifoa_full(fifoa_full),
+
+        .adc_cmd(adc_cmd),
+        .adc_ind(adc_ind),
+        .adc_lrt(adc_lrt),
+        .adc_end(adc_end)
     );
 
     fifoc
     fifoc_dut(
         .rst(rst),
 
-        .wr_clk(gmii_rxc),
+        .wr_clk(fifoc_txc),
         .din(fifoc_txd),
         .wr_en(fifoc_txen),
 
-        .rd_clk(fifo_clk),
+        .rd_clk(fifoc_rxc),
         .dout(fifoc_rxd),
         .rd_en(fifoc_rxen),
 
         .full(fifoc_full)
     );
 
-    // fifod
-    // fifod_dut(
-    //     .rst(),
+    fifod
+    fifod_dut(
+        .rst(),
         
-    //     .wr_clk(sys_clk),
-    //     .din(fifod_txd),
-    //     .wr_en(fifod_txen),
+        .wr_clk(fifod_txc),
+        .din(fifod_txd),
+        .wr_en(fifod_txen),
 
-    //     .rd_clk(gmii_txc),
-    //     .dout(fifod_rxd),
-    //     .rd_en(fifod_rxen),
+        .rd_clk(fifod_rxc),
+        .dout(fifod_rxd),
+        .rd_en(fifod_rxen),
 
-    //     .full(fifod_full)
-    // );
+        .full(fifod_full)
+    );
 
     
 
@@ -243,8 +393,7 @@ module test(
         .udp_rx_len(udp_rx_len),
         .fifoc_txd(fifoc_txd),
         .fifoc_txen(fifoc_txen),
-        .dev_rx_len(eth_rx_len),
-        .so(sosB)
+        .dev_rx_len(eth_rx_len)
     );
 
     fifoc2cs
@@ -265,25 +414,49 @@ module test(
         .cmd_reg4(cmd_reg4),
         .cmd_reg5(cmd_reg5),
         .cmd_reg6(cmd_reg6),
-        .cmd_reg7(cmd_reg7),
-        .so(sosC)
+        .cmd_reg7(cmd_reg7)
     );
 
-    // fifod2mac 
-    // fifod2mac_dut (
-    //     .clk(sys_clk),
-    //     .rst(rst),
-    //     .fs(fs_fifod2mac),
-    //     .fd(fd_fifod2mac),
-    //     .data_len(eth_tx_len),
-    //     .fifod_rxen(fifod_rxen),
-    //     .fifod_rxd(fifod_rxd),
-    //     .udp_txen(udp_txen),
-    //     .udp_txd(udp_txd),
-    //     .flag_udp_tx_prep(flag_udp_tx_prep),
-    //     .flag_udp_tx_req(flag_udp_tx_req)
-    // );
+    adc2fifod
+    adc2fifod_dut(
+        .fifod_txd(fifod_txd),
+        .fifod_txen(fifod_txen),
+        .adc_rxen(adc_rxen),
+        .adc_rxd(adc_rxd)
+    );
 
+
+    fifod2mac 
+    fifod2mac_dut(
+        .clk(fifod_rxc),
+        .rst(rst),
+        .fs(fs_fifod2mac),
+        .fd(fd_fifod2mac),
+        .data_len(eth_tx_len),
+        .fifod_rxen(fifod_rxen),
+        .fifod_rxd(fifod_rxd),
+        .udp_txen(udp_txen),
+        .udp_txd(udp_txd),
+        .flag_udp_tx_prep(flag_udp_tx_prep),
+        .flag_udp_tx_req(flag_udp_tx_req)
+    );
+
+    cs
+    cs_dut(
+        .osc_clk(sys_clk),
+        .sys_clk(),
+        .fifo_clk(),
+
+        .kind_dev(dev_type),
+        .adc_rx_len(adc_rx_len),
+        .eth_tx_len(eth_tx_len),
+        .adc_cnt(adc_cnt),
+
+        .intan_cmd(adc_cmd),
+        .intan_ind(adc_ind),
+        .intan_lrt(adc_lrt),
+        .intan_end(adc_end)
+    );
 
 
 endmodule
