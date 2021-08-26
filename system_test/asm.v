@@ -1,6 +1,6 @@
 module asm();
 
-    reg gmii_txc, gmii_rxc, sys_clk, fifo_clk;
+    reg gmii_txc, gmii_rxc, sys_clk, fifo_clk, adc_rxc;
     reg rst;
     wire [63:0] sol0, sol1, sol2, sol3, sol4, sol5, sol6, sol7;
     wire [63:0] sol8, sol9, solA, solB, solC, solD, solE, solF;
@@ -8,7 +8,36 @@ module asm();
     wire [7:0] sos8, sos9, sosA, sosB, sosC, sosD, sosE, sosF;
     wire sob0, sob1, sob2, sob3, sob4, sob5, sob6, sob7;
     wire sob8, sob9, sobA, sobB, sobC, sobD, sobE, sobF;
+    wire cmd_make, cmd_done;
 
+    reg [7:0] state, next_state;
+    localparam IDLE = 8'h00, WAIT = 8'h01, WORK = 8'h02, CMD = 8'h03;
+    assign cmd_make = (state == CMD);
+
+    always @(posedge sys_clk) begin
+        state <= next_state;
+    end
+
+    always @(*) begin
+        case(state)
+            IDLE: begin
+                if(rst) next_state <= WAIT;
+                else next_state <= IDLE;
+            end
+            WAIT: begin
+                if(~rst) next_state <= WORK;
+                else next_state <= WAIT;
+            end
+            WORK: begin
+                next_state <= CMD;
+            end
+            CMD: begin
+                if(cmd_done) next_state <= IDLE;
+                else next_state <= CMD;
+            end
+            default: next_state <= IDLE;
+        endcase
+    end
 
     always begin
         gmii_txc <= 1'b0;
@@ -37,6 +66,13 @@ module asm();
         fifo_clk <= 1'b1;
         #10;
     end
+    
+    always begin
+        adc_rxc <= 1'b0;
+        #80000;
+        adc_rxc <= 1'b1; 
+        #20000;
+    end
 
     initial begin
         rst <= 1'b0;
@@ -52,6 +88,9 @@ module asm();
         .gmii_rxc(gmii_rxc),
         .sys_clk(sys_clk),
         .fifo_clk(fifo_clk),
+        .adc_rxc(adc_rxc),
+        .cmd_make(cmd_make),
+        .cmd_done(cmd_done),
         .rst(rst),
         .sol0(sol0),
         .sol1(sol1),

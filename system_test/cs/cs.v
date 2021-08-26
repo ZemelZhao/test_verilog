@@ -7,11 +7,31 @@ module cs(
     output gmii_rxc,
     output gmii_txc,
     output spi_mclk,
+    output fifoa_txc,
+    output fifoa_rxc,
+    output fifoc_txc,
+    output fifoc_rxc,
+    output fifod_txc,
+    output fifod_rxc,
 
     // RST
-    input sys_rst,
-    output all_rst,
-    output run_rst,
+    input rst_sys,
+    output rst_mac,
+    output rst_adc,
+    output rst_fifoc,
+    output rst_fifod,
+    output rst_mac2fifoc,
+    output rst_fifoc2cs,
+    output rst_adc2fifod,
+    output rst_fifod2mac,
+
+    // TEST
+    input adc_rxc,
+    output [7:0] sos0,
+    output [7:0] sos1,
+    output [7:0] sos2,
+    output [7:0] sos3,
+    input [3:0] dev_com,
 
     // ERR
 
@@ -47,20 +67,21 @@ module cs(
 
     // FLAG
     input fs_udp_rx,
-    output fs_udp_tx,
-    output fs_fifod2mac,
     output fs_mac2fifoc,
     output fs_fifoc2cs,
+    output fd_udp_rx,
+    input fd_mac2fifoc,
+    input fd_fifoc2cs,
+
+    output fs_udp_tx,
+    output fs_fifod2mac,
+    input fd_udp_tx,
+    input fd_fifod2mac,
+
     output fs_adc_check,
     output fs_adc_conf,
     output fs_adc_read,
     output fs_adc_fifo,
-
-    output fd_udp_rx,
-    input fd_udp_tx,
-    input fd_fifod2mac,
-    input fd_mac2fifoc,
-    input fd_fifoc2cs,
     input fd_adc_check,
     input fd_adc_conf,
     input fd_adc_read,
@@ -69,15 +90,15 @@ module cs(
     // NUM
     input [7:0] info_sr,
     input [7:0] kind_dev,
+    output [7:0] dev_info,
 
     output [9:0] adc_rx_len,
     output [11:0] eth_tx_len,
 
     output [63:0] intan_cmd, 
     output [63:0] intan_ind,
-    output [7:0] intan_lor,
+    output [7:0] intan_lrt,
     output [7:0] intan_end
-
 );
 
     // RUN PARAMETER
@@ -88,8 +109,16 @@ module cs(
     wire [7:0] adc_cnt;
 
     // CLOCK
-    wire adc_rxc;
     wire fs_adc;
+
+    // RST
+    wire rst_all;
+    wire rst_run;
+    wire rst_cs_com;
+
+    // 
+    assign dev_info = {dev_id, dat_id};
+    assign sys_clk = osc_clk;
 
 
     cs_reg 
@@ -128,14 +157,14 @@ module cs(
         .data_cnt(adc_cnt),
         .intan_cmd(intan_cmd),
         .intan_ind(intan_ind),
-        .intan_lor(intan_lor),
+        .intan_lrt(intan_lrt),
         .intan_end(intan_end)
     );
 
     cs_com
     cs_com_dut(
         .sys_clk(sys_clk),
-        .rst(run_rst),
+        .rst(rst_cs_com),
         .adc_rxc(adc_rxc),
         .com0(dev_com[3:2]),
         .com1(dev_com[1:0]),
@@ -145,9 +174,60 @@ module cs(
         .dat_id(dat_id)
     );
 
+    cs_cmd
+    cs_cmd_dut(
+        .sys_clk(sys_clk),
+        .rst_sys(rst_sys),
+        .rst_all(rst_all),
+        .rst_run(rst_run),
 
-    
+        .fifoa_full(fifoa_full),
+        .fifoc_full(fifoc_full),
+        .fifod_full(fifod_full),
 
+        .fs_adc(fs_adc),
+        .adc_cnt(adc_cnt),
+        .sos0(sos0),
+        .sos1(sos1),
+        .sos2(sos2),
+        .sos3(sos3),
 
+        .fs_udp_rx(fs_udp_rx),
+        .fs_mac2fifoc(fs_mac2fifoc),
+        .fs_fifoc2cs(fs_fifoc2cs),
+        .fd_udp_rx(fd_udp_rx),
+        .fd_mac2fifoc(fd_mac2fifoc),
+        .fd_fifoc2cs(fd_fifoc2cs),
+
+        .fs_udp_tx(fs_udp_tx),
+        .fs_fifod2mac(fs_fifod2mac),
+        .fd_udp_tx(fd_udp_tx),
+        .fd_fifod2mac(fd_mac2fifoc),
+
+        .fs_adc_check(fs_adc_check),
+        .fs_adc_conf(fs_adc_conf),
+        .fs_adc_read(fs_adc_read),
+        .fs_adc_fifo(fs_adc_fifo),
+        .fd_adc_check(fd_adc_check),
+        .fd_adc_conf(fd_adc_conf),
+        .fd_adc_read(fd_adc_read),
+        .fd_adc_fifo(fd_adc_fifo)
+    );
+
+    cs_rst
+    cs_rst_dut(
+        .rst_all(rst_all),
+        .rst_run(rst_run),
+
+        .rst_cs_com(rst_cs_com),
+        .rst_mac(rst_mac),
+        .rst_adc(rst_adc),
+        .rst_fifoc(rst_fifoc),
+        .rst_fifod(rst_fifod),
+        .rst_mac2fifoc(rst_mac2fifoc),
+        .rst_fifoc2cs(rst_fifoc2cs),
+        .rst_adc2fifod(rst_adc2fifod),
+        .rst_fifod2mac(rst_fifod2mac)
+    );
 
 endmodule

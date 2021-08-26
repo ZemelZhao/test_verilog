@@ -1,8 +1,14 @@
 module test(
+    // TEST
     input gmii_txc, 
     input gmii_rxc,
     input sys_clk,
     input fifo_clk,
+    input adc_rxc,
+
+    input cmd_make,
+    output cmd_done,
+
     input rst,
 
     output [63:0] sol0,
@@ -54,6 +60,11 @@ module test(
     output sobE,
     output sobF   
 );
+// RESET
+    wire rst_mac, rst_adc;
+    wire rst_fifoc, rst_fifod;
+    wire rst_mac2fifoc, rst_fifod2mac;
+    wire rst_fifoc2cs;
 
 // MAC
     localparam SOURCE_MAC_ADDR = 48'h00_0A_35_01_FE_C0;
@@ -90,7 +101,6 @@ module test(
     wire [7:0] adc_rxd;
 
     wire fifoc_full, fifoa_full, fifod_full;
-    wire fifo_full;
 
 // MODE
     wire fs_udp_tx, fd_udp_tx;
@@ -99,11 +109,27 @@ module test(
     wire fs_fifoc2cs, fd_fifoc2cs;
     wire fs_fifod2mac, fd_fifod2mac;
 
-    wire fs_check, fd_check;
-    wire fs_conf, fd_conf;
-    wire fs_read, fd_read;
-    wire fs_fifo, fd_fifo;
+    wire fs_adc_check, fd_adc_check;
+    wire fs_adc_conf, fd_adc_conf;
+    wire fs_adc_read, fd_adc_read;
+    wire fs_adc_fifo, fd_adc_fifo;
 
+// ADC
+    wire [7:0] adc_reg00;
+    wire [7:0] adc_reg01;
+    wire [7:0] adc_reg02;
+    wire [7:0] adc_reg03;
+    wire [7:0] adc_reg04;
+    wire [7:0] adc_reg05;
+    wire [7:0] adc_reg06;
+    wire [7:0] adc_reg07;
+    wire [7:0] adc_reg08;
+    wire [7:0] adc_reg09;
+    wire [7:0] adc_reg10;
+    wire [7:0] adc_reg11;
+    wire [7:0] adc_reg12;
+    wire [7:0] adc_reg13;
+    wire [7:0] adc_regap;
 
 // PARAMETER
     wire [7:0] kind_dev;
@@ -116,7 +142,6 @@ module test(
     wire [7:0] cmd_reg6;
     wire [7:0] cmd_reg7;
 
-    reg [7:0] adc_num;
 
     wire [7:0] dev_smpr;
     wire [7:0] dev_info;
@@ -129,18 +154,28 @@ module test(
     wire [7:0] adc_end;
 
     // TEST
-    wire cmd_make, cmd_done;
     localparam ETH_CMD = 96'h55_AA_FF_14_86_84_33_44_55_66_3D_8C;
     assign dev_kind = 8'hFF;
     assign dev_smpr = 8'hFA;
-    assign dev_info = 8'h14;
 
+    wire [7:0] cs_sos0;
+    wire [7:0] cs_sos1;
+    wire [7:0] cs_sos2;
+    wire [7:0] cs_sos3;
 
+    assign sos0 = cs_sos0;
+    assign sos1 = cs_sos1;
+    assign sos2 = cs_sos2;
+    assign sos3 = cs_sos3;
 
     // ALL  
-    wire [7:0] adc_cnt;
-    reg[7:0] state, next_state;
-    assign fifo_full = |{fifoa_full, fifoc_full, fifod_full};
+    assign fifoa_txc = fifo_clk;
+    assign fifoa_rxc = fifo_clk;
+    assign fifoc_txc = gmii_rxc;
+    assign fifoc_rxc = fifo_clk;
+    assign fifod_txc = fifo_clk;
+    assign fifod_rxc = gmii_txc;
+
 
 // #region 
     // localparam IDLE = 8'h00, MC2F = 8'h02, F2CS = 8'h03, LAST = 8'h04;
@@ -202,82 +237,82 @@ module test(
 // #endregion
 
 // #region
-    assign fs_check = (state == CHECK);
-    assign fs_conf = (state == CONF);
-    assign fs_read = (state == FITX);
-    assign fs_fifo = (state == FIRX);
-    assign fs_fifod2mac = (state == DTRX);
+    // assign fs_adc_check = (state == CHECK);
+    // assign fs_adc_conf = (state == CONF);
+    // assign fs_adc_read = (state == FITX);
+    // assign fs_adc_fifo = (state == FIRX);
+    // assign fs_fifod2mac = (state == DTRX);
     
-    assign fs_udp_tx = fs_fifod2mac;
-    assign fd_udp_tx = fd_fifod2mac;
+    // assign fs_udp_tx = fs_fifod2mac;
+    // assign fd_udp_tx = fd_fifod2mac;
 
-    assign fifoa_txc = fifo_clk;
-    assign fifoa_rxc = fifo_clk;
-    assign fifoc_txc = gmii_rxc;
-    assign fifoc_rxc = fifo_clk;
-    assign fifod_txc = fifo_clk;
-    assign fifod_rxc = gmii_txc;
+    // assign fifoa_txc = fifo_clk;
+    // assign fifoa_rxc = fifo_clk;
+    // assign fifoc_txc = gmii_rxc;
+    // assign fifoc_rxc = fifo_clk;
+    // assign fifod_txc = fifo_clk;
+    // assign fifod_rxc = gmii_txc;
 
-    assign sos0 = fifod_txd;
-    assign sos1 = fifod_rxd;
-    assign sos2 = state;
-    assign sol0 = eth_tx_len;
+    // assign sos0 = fifod_txd;
+    // assign sos1 = fifod_rxd;
+    // assign sos2 = state;
+    // assign sol0 = eth_tx_len;
 
-    localparam IDLE = 8'h00, CHECK = 8'h01, CONF = 8'h02, PREP = 8'h03;
-    localparam FITX = 8'h04, FIRX = 8'h05, CONT = 8'h06, DTRX = 8'h07;
-    localparam LAST = 8'h08;
+    // localparam IDLE = 8'h00, CHECK = 8'h01, CONF = 8'h02, PREP = 8'h03;
+    // localparam FITX = 8'h04, FIRX = 8'h05, CONT = 8'h06, DTRX = 8'h07;
+    // localparam LAST = 8'h08;
 
-    always @(posedge sys_clk or posedge rst) begin
-        if(rst) state <= IDLE;
-        else state <= next_state;
-    end
+    // always @(posedge sys_clk or posedge rst) begin
+    //     if(rst) state <= IDLE;
+    //     else state <= next_state;
+    // end
 
-    always @(*) begin
-        case(state)
-            IDLE: begin
-                next_state <= CHECK;
-            end
-            CHECK: begin
-                if(fd_check) next_state <= CONF;
-                else next_state <= CHECK;
-            end
-            CONF: begin
-                if(fd_conf) next_state <= PREP;
-                else next_state <= CONF;
-            end
-            PREP: begin
-                if(~fifo_full) next_state <= FITX;
-                else next_state <= PREP;
-            end
-            FITX: begin
-                if(fd_read) next_state <= FIRX;
-                else next_state <= FITX;
-            end
-            FIRX: begin
-                if(fd_fifo) next_state <= CONT;
-                else next_state <= FIRX;
-            end
-            CONT: begin
-                if(adc_num < adc_cnt - 1'b1) next_state <= LAST;
-                else next_state <= DTRX;
-            end
-            DTRX: begin
-                if(fd_fifod2mac) next_state <= LAST;
-                else next_state <= DTRX;
-            end
-            LAST: begin
-                next_state <= PREP;
-            end
-            default: next_state <= IDLE;
-        endcase
-    end
+    // always @(*) begin
+    //     case(state)
+    //         IDLE: begin
+    //             next_state <= CHECK;
+    //         end
+    //         CHECK: begin
+    //             if(fd_check) next_state <= CONF;
+    //             else next_state <= CHECK;
+    //         end
+    //         CONF: begin
+    //             if(fd_conf) next_state <= PREP;
+    //             else next_state <= CONF;
+    //         end
+    //         PREP: begin
+    //             if(~fifo_full) next_state <= FITX;
+    //             else next_state <= PREP;
+    //         end
+    //         FITX: begin
+    //             if(fd_read) next_state <= FIRX;
+    //             else next_state <= FITX;
+    //         end
+    //         FIRX: begin
+    //             if(fd_fifo) next_state <= CONT;
+    //             else next_state <= FIRX;
+    //         end
+    //         CONT: begin
+    //             if(adc_num < adc_cnt - 1'b1) next_state <= LAST;
+    //             else next_state <= DTRX;
+    //         end
+    //         DTRX: begin
+    //             if(fd_fifod2mac) next_state <= LAST;
+    //             else next_state <= DTRX;
+    //         end
+    //         LAST: begin
+    //             next_state <= PREP;
+    //         end
+    //         default: next_state <= IDLE;
+    //     endcase
+    // end
 
-    always @(posedge sys_clk or posedge rst) begin
-        if(rst) adc_num <= 8'h0;
-        else if(state == CONT) adc_num <= adc_num + 1'b1;
-        else if(state == DTRX) adc_num <= 8'h0;
-        else adc_num <= adc_num;
-    end
+    // always @(posedge sys_clk or posedge rst) begin
+    //     if(rst) adc_num <= 8'h0;
+    //     else if(state == CONT) adc_num <= adc_num + 1'b1;
+    //     else if(state == DTRX) adc_num <= 8'h0;
+    //     else adc_num <= adc_num;
+    // end
 // #endregion
 
     mac
@@ -320,20 +355,20 @@ module test(
         .fifoa_txc(fifoa_txc),
         .fifoa_rxc(fifoa_rxc),
 
-        .rst(),
+        .rst(rst_adc),
         .spi_mc(),
 
         .adc_rxen(adc_rxen),
         .adc_rxd(adc_rxd),
 
-        .fs_check(fs_check),
-        .fd_check(fd_check),
-        .fs_conf(fs_conf),
-        .fd_conf(fd_conf),
-        .fs_read(fs_read),
-        .fd_read(fd_read),
-        .fs_fifo(fs_fifo),
-        .fd_fifo(fd_fifo),
+        .fs_check(fs_adc_check),
+        .fd_check(fd_adc_check),
+        .fs_conf(fs_adc_conf),
+        .fd_conf(fd_adc_conf),
+        .fs_read(fs_adc_read),
+        .fd_read(fd_adc_read),
+        .fs_fifo(fs_adc_fifo),
+        .fd_fifo(fd_adc_fifo),
 
         .dev_smpr(dev_smpr),
         .dev_info(dev_info),
@@ -398,7 +433,7 @@ module test(
 
     fifoc2cs
     fifoc2cs_dut(
-        .clk(fifo_clk),
+        .clk(fifoc_rxc),
         .rst(rst),
         .err(),
         .fs(fs_fifoc2cs),
@@ -443,14 +478,101 @@ module test(
 
     cs
     cs_dut(
+        // CLK
         .osc_clk(sys_clk),
+        .eth_clk(),
         .sys_clk(),
-        .fifo_clk(),
+        .gmii_rxc(),
+        .gmii_txc(),
+        .spi_mclk(),
 
+        .fifoa_txc(),
+        .fifoa_rxc(),
+        .fifoc_txc(),
+        .fifoc_rxc(),
+        .fifod_txc(),
+        .fifod_rxc(),
+
+        // RST
+        .rst_sys(rst),
+        .rst_mac(rst_mac),
+        .rst_adc(rst_adc),
+        .rst_fifoc(rst_fifoc),
+        .rst_fifod(rst_fifod),
+        .rst_mac2fifoc(rst_mac2fifoc),
+        .rst_fifoc2cs(rst_fifoc2cs),
+        .rst_adc2fifod(),
+        .rst_fifod2mac(rst_fifod2mac),
+
+        // TEST
+        .adc_rxc(adc_rxc),
+        .sos0(cs_sos0),
+        .sos1(cs_sos1),
+        .sos2(cs_sos2),
+        .sos3(cs_sos3),
+
+        // ERR
+
+        // ADC_CMD
+        .cmd_filt(cmd_filt),
+        .cmd_mix0(cmd_mix0),
+        .cmd_mix1(cmd_mix1),
+        .cmd_reg4(cmd_reg4),
+        .cmd_reg5(cmd_reg5),
+        .cmd_reg6(cmd_reg6),
+        .cmd_reg7(cmd_reg7),
+
+        .adc_reg00(adc_reg00),
+        .adc_reg01(adc_reg01),
+        .adc_reg02(adc_reg02),
+        .adc_reg03(adc_reg03),
+        .adc_reg04(adc_reg04),
+        .adc_reg05(adc_reg05),
+        .adc_reg06(adc_reg06),
+        .adc_reg07(adc_reg07),
+        .adc_reg08(adc_reg08),
+        .adc_reg09(adc_reg09),
+        .adc_reg10(adc_reg10),
+        .adc_reg11(adc_reg11),
+        .adc_reg12(adc_reg12),
+        .adc_reg13(adc_reg13),
+        .adc_regap(adc_regap),
+
+        // FIFO
+        .fifoa_full(fifoa_full),
+        .fifoc_full(fifoc_full),
+        .fifod_full(fifod_full),
+
+        // FLAG
+        // FLAG_CMD
+        .fs_udp_rx(fs_udp_rx),
+        .fd_udp_rx(fd_udp_rx),
+        .fs_mac2fifoc(fs_mac2fifoc),
+        .fd_mac2fifoc(fd_mac2fifoc),
+        .fs_fifoc2cs(fs_fifoc2cs),
+        .fd_fifoc2cs(fd_fifoc2cs),
+
+        // FLAG_DATA
+        .fs_udp_tx(fs_udp_tx),
+        .fd_udp_tx(fd_udp_tx),
+        .fs_fifod2mac(fs_fifod2mac),
+        .fd_fifod2mac(fd_fifod2mac),
+
+        // FLAG_ADC
+        .fs_adc_check(fs_adc_check),
+        .fd_adc_check(fd_adc_check),
+        .fs_adc_conf(fs_adc_conf),
+        .fd_adc_conf(fd_adc_conf),
+        .fs_adc_read(fs_adc_read),
+        .fd_adc_read(fd_adc_read),
+        .fs_adc_fifo(fs_adc_fifo),
+        .fd_adc_fifo(fd_adc_fifo),
+
+        // NUM
         .kind_dev(dev_type),
+        .dev_info(dev_info),
         .adc_rx_len(adc_rx_len),
         .eth_tx_len(eth_tx_len),
-        .adc_cnt(adc_cnt),
 
         .intan_cmd(adc_cmd),
         .intan_ind(adc_ind),
