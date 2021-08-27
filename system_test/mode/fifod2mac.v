@@ -13,20 +13,24 @@ module fifod2mac(
     output [7:0] udp_txd,
 
     input flag_udp_tx_prep,
-    output flag_udp_tx_req
+    output flag_udp_tx_req,
+    
+    output [7:0] sos0
 );
 
 
-    localparam IDLE = 4'h0, MAC_REQ = 4'h1, WORK = 4'h2, LAST = 4'h3;
+    localparam IDLE = 8'h0, MAC_REQ = 8'h1, WORK = 8'h2, LAST = 8'h3;
 
     reg [11:0] tx_len;
 
-    reg [3:0] state, next_state;
+    reg [7:0] state, next_state;
 
     assign flag_udp_tx_req = (state == MAC_REQ);
     assign fifod_rxen = (state == WORK);
     assign fd = (state == LAST);
     assign udp_txd = fifod_rxd;
+
+    assign sos0 = state;
 
 
     always @(posedge clk or posedge rst) begin

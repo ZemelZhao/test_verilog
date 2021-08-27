@@ -75,7 +75,7 @@ module cs(
 
     output fs_udp_tx,
     output fs_fifod2mac,
-    input fd_udp_tx,
+    output fd_udp_tx,
     input fd_fifod2mac,
 
     output fs_adc_check,
@@ -202,7 +202,7 @@ module cs(
         .fs_udp_tx(fs_udp_tx),
         .fs_fifod2mac(fs_fifod2mac),
         .fd_udp_tx(fd_udp_tx),
-        .fd_fifod2mac(fd_mac2fifoc),
+        .fd_fifod2mac(fd_fifod2mac),
 
         .fs_adc_check(fs_adc_check),
         .fs_adc_conf(fs_adc_conf),

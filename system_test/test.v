@@ -155,7 +155,7 @@ module test(
 
     // TEST
     localparam ETH_CMD = 96'h55_AA_FF_14_86_84_33_44_55_66_3D_8C;
-    assign dev_kind = 8'hFF;
+    assign dev_kind = 8'h55;
     assign dev_smpr = 8'hFA;
 
     wire [7:0] cs_sos0;
@@ -163,10 +163,26 @@ module test(
     wire [7:0] cs_sos2;
     wire [7:0] cs_sos3;
 
+    wire [7:0] fifod2mac_sos0;
+
     assign sos0 = cs_sos0;
     assign sos1 = cs_sos1;
     assign sos2 = cs_sos2;
     assign sos3 = cs_sos3;
+    assign sos4 = fifoc_txd;
+    assign sos5 = fifoc_rxd;
+    assign sos6 = fifod_txd;
+    assign sos7 = fifod_rxd;
+    assign sos8 = fifod2mac_sos0;
+
+    assign sob0 = fifoc_txen;
+    assign sob1 = fifoc_rxen;
+    assign sob2 = fifod_txen;
+    assign sob3 = fifod_rxen;
+    assign sob4 = fs_udp_tx;
+    assign sob5 = fd_udp_tx;
+    assign sos6 = fs_fifod2mac;
+    assign sob7 = fd_fifod2mac;
 
     // ALL  
     assign fifoa_txc = fifo_clk;
@@ -473,7 +489,8 @@ module test(
         .udp_txen(udp_txen),
         .udp_txd(udp_txd),
         .flag_udp_tx_prep(flag_udp_tx_prep),
-        .flag_udp_tx_req(flag_udp_tx_req)
+        .flag_udp_tx_req(flag_udp_tx_req),
+        .sos0(fifod2mac_sos0)
     );
 
     cs

@@ -69,9 +69,9 @@ module asm();
     
     always begin
         adc_rxc <= 1'b0;
-        #80000;
+        #24000;
         adc_rxc <= 1'b1; 
-        #20000;
+        #6000;
     end
 
     initial begin
