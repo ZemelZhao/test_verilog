@@ -155,7 +155,7 @@ module test(
 
     // TEST
     localparam ETH_CMD = 96'h55_AA_FF_14_86_84_33_44_55_66_3D_8C;
-    assign dev_kind = 8'h55;
+    assign dev_kind = 8'hFF;
     assign dev_smpr = 8'hFA;
 
     wire [7:0] cs_sos0;
@@ -181,7 +181,7 @@ module test(
     assign sob3 = fifod_rxen;
     assign sob4 = fs_udp_tx;
     assign sob5 = fd_udp_tx;
-    assign sos6 = fs_fifod2mac;
+    assign sob6 = fs_fifod2mac;
     assign sob7 = fd_fifod2mac;
 
     // ALL  

@@ -49,7 +49,7 @@ module cs_cmd(
     localparam ADC_IDLE = 8'h00, ADC_WAIT = 8'h01, ADC_READ = 8'h02, ADC_FIFO = 8'h03;
     localparam ADC_LAST = 8'h04;
 
-    localparam ETH_IDLE = 8'h00, ETH_CKGN = 8'h01, ETH_CKDN = 8'h02, ETH_NMCK = 8'h03;
+    localparam ETH_IDLE = 8'h00, ETH_WAIT = 8'h01, ETH_CAL0 = 8'h02, ETH_CAL1 = 8'h03;
     localparam ETH_SEND = 8'h04;
 
     localparam CMD_NUM = 8'h04;
@@ -60,7 +60,6 @@ module cs_cmd(
     // CMD
     wire fs_init, fd_init;
     wire fs_work, fd_work;
-    wire fs_eth_check, fd_eth_check;
 
     reg [7:0] main_state, next_main_state;
     reg [7:0] init_state, next_init_state;
@@ -82,8 +81,6 @@ module cs_cmd(
     assign fs_init = (main_state == MAIN_INIT);
     assign fs_work = (main_state == MAIN_WORK);
     assign fd_init = (init_state == INIT_LAST);
-    assign fs_eth_check = (adc_state == ADC_LAST);
-    assign fd_eth_check = (eth_state == ETH_CKDN);
     
     assign fs_mac2fifoc = (init_state == INIT_UTOF);
     assign fs_fifoc2cs = (init_state == INIT_FTOC);
@@ -205,8 +202,7 @@ module cs_cmd(
                 else next_adc_state <= ADC_FIFO;
             end
             ADC_LAST: begin
-                if(fd_eth_check) next_adc_state <= ADC_WAIT;
-                else next_adc_state <= ADC_LAST;
+                next_adc_state <= ADC_WAIT;
             end
             default: next_adc_state <= ADC_IDLE;
         endcase
@@ -215,23 +211,21 @@ module cs_cmd(
     always @(*) begin
         case(eth_state)
             ETH_IDLE: begin
-                if(fs_work) next_eth_state <= ETH_CKGN;
+                if(fs_work) next_eth_state <= ETH_WAIT;
                 else next_eth_state <= ETH_IDLE;
             end
-            ETH_CKGN: begin
-                if(fs_eth_check) next_eth_state <= ETH_CKDN;
-                else next_eth_state <= ETH_CKGN;
+            ETH_WAIT: begin
+                if(adc_num < adc_cnt) next_eth_state <= ETH_CAL1;
+                else next_eth_state <= ETH_CAL0;
             end
-            ETH_CKDN: begin
-                if(~fs_eth_check) next_eth_state <= ETH_NMCK;
-                else next_eth_state <= ETH_CKDN;
+            ETH_CAL0: begin
+                next_eth_state <= ETH_SEND;
             end
-            ETH_NMCK: begin
-                if(adc_num < adc_cnt - 1'b1) next_eth_state <= ETH_CKGN;
-                else next_eth_state <= ETH_SEND;
+            ETH_CAL1: begin
+                next_eth_state <= ETH_WAIT;
             end
             ETH_SEND: begin
-                if(fd_fifod2mac) next_eth_state <= ETH_CKGN;
+                if(fd_fifod2mac) next_eth_state <= ETH_WAIT;
                 else next_eth_state <= ETH_SEND; 
             end
             default: next_eth_state <= ETH_IDLE;
@@ -245,8 +239,8 @@ module cs_cmd(
 
     always @(posedge sys_clk or posedge rst_run) begin
         if(rst_run) adc_num <= 8'h00;
-        else if(eth_state == ETH_NMCK) adc_num <= adc_num + 1'b1;
-        else if(eth_state == ETH_SEND) adc_num <= 8'h00;
+        else if(adc_state == ADC_LAST) adc_num <= adc_num + 1'b1;
+        else if(eth_state == ETH_CAL0) adc_num <= adc_num - adc_cnt;
         else adc_num <= adc_num;
     end
 
