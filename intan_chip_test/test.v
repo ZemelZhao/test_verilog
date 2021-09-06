@@ -1,17 +1,27 @@
 module test(
-    input clk,
-    output [15:0] led
+    input clkp,
+    input clkn,
+    output led
 );
+    wire clk;
+
     assign led = ~led_show;
 
-    reg [16:0] led_show;
+    reg led_show;
 
-    localparam CNT = 32'd50_000_000;
+    localparam CNT = 32'd200_000_000;
     reg [31:0] num_cnt;
     reg [7:0] state, next_state;
     localparam ID00 = 8'h00, IW00 = 8'h01;
     localparam ID01 = 8'h02, IW01 = 8'h03;
     localparam IDLE = 8'h10;
+
+    IBUFDS
+    clk_ibufds(
+        .O(clk),
+        .I(clkp),
+        .IB(clkn)
+    );
 
 
     always @(posedge clk) begin
@@ -42,8 +52,8 @@ module test(
     end
 
     always @(posedge clk) begin
-        if(state == ID00) led_show <= 16'h55AA;
-        else if(state == ID01) led_show <= 16'h789A;
+        if(state == ID00) led_show <= 1'b1;
+        else if(state == ID01) led_show <= 1'b0;
         else led_show <= led_show;
     end
 

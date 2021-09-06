@@ -34,6 +34,17 @@ module eth(
         .speed_o            (),                  //link speed
         .speed_override_i   (2'b11)              //11: autonegoation
     );
+
+    // smi_config  
+    // smi_config_inst(
+    // .clk(sys_clk),
+    // .rst_n(1'b0),         
+    // .mdc(e_mdc),
+    // .mdio(e_mdio),
+    // .speed(speed),
+    // .link(link),
+    // .led()    
+    // );    
 	
 /*************************************************************************
 GMII and RGMII data conversion

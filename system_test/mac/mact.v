@@ -53,7 +53,8 @@ module mac(
     wire [7:0] fifoe_txd, fifoe_rxd;
     wire fifoe_full;
 
-    reg [7:0] state, next_state;
+    (* MARK_DEBUG="true" *) reg [7:0] state;
+    reg [7:0] next_state;
     reg [15:0] wnum;
 
     wire fs_ramw, fd_ramw;
