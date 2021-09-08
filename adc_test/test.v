@@ -38,15 +38,22 @@ module test(
     (* MARK_DEBUG="true" *) wire [15:0] chip_rxd1;
 
     (* MARK_DEBUG="true" *) reg [7:0] state; 
+
+    localparam NUM = 32'd50_000_000;
+
+    reg [31:0] num;
+    reg judge;
+
     reg [7:0] next_state;
     wire fd_spi, fd_prd;
     wire spi_mc;
     wire fs;
 
     localparam IDLE = 8'h00, PREP = 8'h01, START = 8'h02, WAIT = 8'h03;
+    localparam PRE0 = 8'h04, PRE1 = 8'h05;
 
 
-    assign chip_txd = {CMD_READ, REG41, RET_READ};
+    assign chip_txd = judge ?{CMD_WRITE, REG03, 8'h01} :{CMD_WRITE, REG03, 8'h00};
 
     assign led_data = ~chip_rxd0;
     assign fs = (state == START);
@@ -68,6 +75,13 @@ module test(
                 next_state <= PREP;
             end
             PREP: begin
+                if(judge) next_state <= PRE0;
+                else next_state <= PRE1;
+            end
+            PRE0: begin
+                next_state <= START;
+            end
+            PRE1: begin
                 next_state <= START;
             end
             START: begin
@@ -79,6 +93,21 @@ module test(
                 else next_state <= WAIT;
             end
         endcase
+    end
+
+    always @(posedge clk) begin
+        if (state == IDLE) begin
+            num <= 32'h0;
+            judge <= 1'b1;
+        end
+        else if(num <= NUM) begin
+            num <= num + 1'b1;
+            judge <= judge;
+        end
+        else begin
+            num <= 32'h0;
+            judge <= ~judge;
+        end
     end
 
 
