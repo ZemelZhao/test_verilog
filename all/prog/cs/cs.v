@@ -31,14 +31,16 @@ module cs(
 
     // ERR
 
-    // ADC REG
-    input [7:0] cmd_filt,
-    input [7:0] cmd_mix0,
-    input [7:0] cmd_mix1,
-    input [7:0] cmd_reg4,
-    input [7:0] cmd_reg5,
-    input [7:0] cmd_reg6,
-    input [7:0] cmd_reg7,
+    // ETH CMD
+    input [7:0] eth_cmd0,
+    input [7:0] eth_cmd1,
+    input [7:0] eth_cmd2,
+    input [7:0] eth_cmd3,
+    input [7:0] eth_cmd4,
+    input [7:0] eth_cmd5,
+    input [7:0] eth_cmd6,
+    input [7:0] eth_cmd7,
+    input [7:0] eth_cmd8,
 
     output [7:0] adc_reg00,
     output [7:0] adc_reg01,
@@ -84,8 +86,6 @@ module cs(
     input fd_adc_fifo,
 
     // NUM
-    input [7:0] info_sr,
-    input [7:0] kind_dev,
     output [7:0] dev_info,
 
     output [9:0] adc_rx_len,
@@ -103,6 +103,13 @@ module cs(
     wire [3:0] dat_id;
     wire dev_grp;
     wire [7:0] adc_cnt;
+
+    // ADC_REG
+    wire [7:0] kind_dev;
+    wire [7:0] info_sr;
+    wire [7:0] cmd_filt;
+    wire [7:0] cmd_mix0, cmd_mix1, cmd_mix2;
+    wire [7:0] cmd_zck0, cmd_zck1, cmd_zck2;
 
     // CLOCK
     wire fs_adc;
@@ -122,10 +129,10 @@ module cs(
         .cmd_filt(cmd_filt),
         .cmd_mix0(cmd_mix0),
         .cmd_mix1(cmd_mix1),
-        .cmd_reg4(cmd_reg4),
-        .cmd_reg5(cmd_reg5),
-        .cmd_reg6(cmd_reg6),
-        .cmd_reg7(cmd_reg7),
+        .cmd_mix2(cmd_mix2),
+        .cmd_zck0(cmd_zck0),
+        .cmd_zck1(cmd_zck1),
+        .cmd_zck2(cmd_zck2),
         .reg00(adc_reg00),
         .reg01(adc_reg01),
         .reg02(adc_reg02),
@@ -221,5 +228,31 @@ module cs(
         .rst_adc2fifod(rst_adc2fifod),
         .rst_fifod2mac(rst_fifod2mac)
     );
+
+    cs_ecmd 
+    cs_ecmd_dut(
+        .eth_cmd0(eth_cmd0),
+        .eth_cmd1(eth_cmd1),
+        .eth_cmd2(eth_cmd2),
+        .eth_cmd3(eth_cmd3),
+        .eth_cmd4(eth_cmd4),
+        .eth_cmd5(eth_cmd5),
+        .eth_cmd6(eth_cmd6),
+        .eth_cmd7(eth_cmd7),
+        .eth_cmd8(eth_cmd8),
+        .dev_kind(kind_dev),
+        .info_sr(info_sr),
+        .cmd_filt(cmd_filt),
+        .cmd_mix0(cmd_mix0),
+        .cmd_mix1(cmd_mix1),
+        .cmd_mix2(cmd_mix2),
+        .cmd_zck0(cmd_zck0),
+        .cmd_zck1(cmd_zck1),
+        .cmd_zck2(cmd_zck2)
+    );
+
+
+
+
 
 endmodule

@@ -1,7 +1,7 @@
 module cs_reg( // TEST_DONE
     input [7:0] cmd_filt, // [7:4] UPPER_BW [3:0] LOWER_BW
-    input [7:0] cmd_mix0, // [7:4] ADC_OPT  [3:1] DOUT  
-    input [7:0] cmd_mix1, // [7:4] ID       [3:2] DIN   [1:0] 01
+    input [7:0] cmd_mix0, // [7:4] ADC_OPT  [3:1] off_chip  
+    input [7:0] cmd_mix1, // [7:4] ID       [3:2] aux_en   [1:0] 01
     input [7:0] cmd_reg4,
     input [7:0] cmd_reg5,
     input [7:0] cmd_reg6,

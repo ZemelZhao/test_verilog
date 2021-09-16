@@ -9,16 +9,16 @@ module fifoc2cs ( // WRITE_DONE
     output fifoc_rxen,
     input [7:0] fifoc_rxd,
     input [11:0] data_len,
-    output reg [7:0] kind_dev,
+    output reg [7:0] eth_cmd0,
 
-    output reg [7:0] info_sr, // SAMPLE_RATE
-    output reg [7:0] cmd_filt,
-    output reg [7:0] cmd_mix0,
-    output reg [7:0] cmd_mix1,
-    output reg [7:0] cmd_reg4,
-    output reg [7:0] cmd_reg5,
-    output reg [7:0] cmd_reg6,
-    output reg [7:0] cmd_reg7
+    output reg [7:0] eth_cmd1, // SAMPLE_RATE
+    output reg [7:0] eth_cmd2,
+    output reg [7:0] eth_cmd3,
+    output reg [7:0] eth_cmd4,
+    output reg [7:0] eth_cmd5,
+    output reg [7:0] eth_cmd6,
+    output reg [7:0] eth_cmd7,
+    output reg [7:0] eth_cmd8
 );
 
     parameter NUM_LEN = 4'hC;
@@ -116,30 +116,30 @@ module fifoc2cs ( // WRITE_DONE
     
     always @(posedge clk or posedge rst) begin
         if(rst) begin
-            {kind_dev, info_sr, cmd_filt, 
-             cmd_mix0, cmd_reg4, cmd_reg5, 
-             cmd_reg6, cmd_reg7, cmd_mix1} <= 72'h000000_000000_000000;
+            {eth_cmd0, eth_cmd1, eth_cmd2, 
+             eth_cmd3, eth_cmd4, eth_cmd5, 
+             eth_cmd6, eth_cmd7, eth_cmd8} <= 72'h000000_000000_000000;
         end
         else if(state == EVAC && judge == 2'b11) begin
-            {kind_dev, info_sr, cmd_filt, 
-             cmd_mix0, cmd_reg4, cmd_reg5, 
-             cmd_reg6, cmd_reg7, cmd_mix1} <= cache[16:87];
+            {eth_cmd0, eth_cmd1, eth_cmd2, 
+             eth_cmd3, eth_cmd4, eth_cmd5, 
+             eth_cmd6, eth_cmd7, eth_cmd8} <= cache[16:87];
         end
         else if(state == EVAC && judge != 2'b11) begin
-            {kind_dev, info_sr, cmd_filt, 
-             cmd_mix0, cmd_reg4, cmd_reg5, 
-             cmd_reg6, cmd_reg7, cmd_mix1} <= 72'hFFFFFF_FFFFFF_FFFFFF;
+            {eth_cmd0, eth_cmd1, eth_cmd2, 
+             eth_cmd3, eth_cmd4, eth_cmd5, 
+             eth_cmd6, eth_cmd7, eth_cmd8} <= 72'hFFFFFF_FFFFFF_FFFFFF;
         end
         else begin
-            kind_dev <= kind_dev;
-            info_sr <= info_sr;
-            cmd_filt <= cmd_filt;
-            cmd_mix0 <= cmd_mix0;
-            cmd_mix1 <= cmd_mix1;
-            cmd_reg4 <= cmd_reg4;
-            cmd_reg5 <= cmd_reg5;
-            cmd_reg6 <= cmd_reg6;
-            cmd_reg7 <= cmd_reg7;
+            eth_cmd0 <= eth_cmd0;
+            eth_cmd1 <= eth_cmd1;
+            eth_cmd2 <= eth_cmd2;
+            eth_cmd3 <= eth_cmd3;
+            eth_cmd4 <= eth_cmd4;
+            eth_cmd5 <= eth_cmd5;
+            eth_cmd6 <= eth_cmd6;
+            eth_cmd7 <= eth_cmd7;
+            eth_cmd8 <= eth_cmd8;
         end
     end
 
