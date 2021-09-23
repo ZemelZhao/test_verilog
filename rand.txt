@@ -1,0 +1,205 @@
+		else if(state == TX00) begin
+			state_goto <= TX01;
+			chip_rxd0 <= D000;
+			chip_rxd1 <= D100;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX01) begin
+			state_goto <= TX02;
+			chip_rxd0 <= D001;
+			chip_rxd1 <= D101;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX02) begin
+			state_goto <= TX03;
+			chip_rxd0 <= D002;
+			chip_rxd1 <= D102;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX03) begin
+			state_goto <= TX04;
+			chip_rxd0 <= D003;
+			chip_rxd1 <= D103;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX04) begin
+			state_goto <= TX05;
+			chip_rxd0 <= D004;
+			chip_rxd1 <= D104;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX05) begin
+			state_goto <= TX06;
+			chip_rxd0 <= D005;
+			chip_rxd1 <= D105;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX06) begin
+			state_goto <= TX07;
+			chip_rxd0 <= D006;
+			chip_rxd1 <= D106;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX07) begin
+			state_goto <= TX08;
+			chip_rxd0 <= D007;
+			chip_rxd1 <= D107;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX08) begin
+			state_goto <= TX09;
+			chip_rxd0 <= D008;
+			chip_rxd1 <= D108;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX09) begin
+			state_goto <= TX0A;
+			chip_rxd0 <= D009;
+			chip_rxd1 <= D109;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX0A) begin
+			state_goto <= TX0B;
+			chip_rxd0 <= D00A;
+			chip_rxd1 <= D10A;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX0B) begin
+			state_goto <= TX0C;
+			chip_rxd0 <= D00B;
+			chip_rxd1 <= D10B;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX0C) begin
+			state_goto <= TX0D;
+			chip_rxd0 <= D00C;
+			chip_rxd1 <= D10C;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX0D) begin
+			state_goto <= TX0E;
+			chip_rxd0 <= D00D;
+			chip_rxd1 <= D10D;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX0E) begin
+			state_goto <= TX0F;
+			chip_rxd0 <= D00E;
+			chip_rxd1 <= D10E;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX0F) begin
+			state_goto <= TX10;
+			chip_rxd0 <= D00F;
+			chip_rxd1 <= D10F;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX10) begin
+			state_goto <= TX11;
+			chip_rxd0 <= D010;
+			chip_rxd1 <= D110;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX11) begin
+			state_goto <= TX12;
+			chip_rxd0 <= D011;
+			chip_rxd1 <= D111;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX12) begin
+			state_goto <= TX13;
+			chip_rxd0 <= D012;
+			chip_rxd1 <= D112;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX13) begin
+			state_goto <= TX14;
+			chip_rxd0 <= D013;
+			chip_rxd1 <= D113;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX14) begin
+			state_goto <= TX15;
+			chip_rxd0 <= D014;
+			chip_rxd1 <= D114;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX15) begin
+			state_goto <= TX16;
+			chip_rxd0 <= D015;
+			chip_rxd1 <= D115;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX16) begin
+			state_goto <= TX17;
+			chip_rxd0 <= D016;
+			chip_rxd1 <= D116;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX17) begin
+			state_goto <= TX18;
+			chip_rxd0 <= D017;
+			chip_rxd1 <= D117;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX18) begin
+			state_goto <= TX19;
+			chip_rxd0 <= D018;
+			chip_rxd1 <= D118;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX19) begin
+			state_goto <= TX1A;
+			chip_rxd0 <= D019;
+			chip_rxd1 <= D119;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX1A) begin
+			state_goto <= TX1B;
+			chip_rxd0 <= D01A;
+			chip_rxd1 <= D11A;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX1B) begin
+			state_goto <= TX1C;
+			chip_rxd0 <= D01B;
+			chip_rxd1 <= D11B;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX1C) begin
+			state_goto <= TX1D;
+			chip_rxd0 <= D01C;
+			chip_rxd1 <= D11C;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX1D) begin
+			state_goto <= TX1E;
+			chip_rxd0 <= D01D;
+			chip_rxd1 <= D11D;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX1E) begin
+			state_goto <= TX1F;
+			chip_rxd0 <= D01E;
+			chip_rxd1 <= D11E;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX1F) begin
+			state_goto <= TX20;
+			chip_rxd0 <= D01F;
+			chip_rxd1 <= D11F;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX20) begin
+			state_goto <= TX21;
+			chip_rxd0 <= D020;
+			chip_rxd1 <= D120;
+			{fs0, fs1} <= 2'b11;
+		end
+		else if(state == TX21) begin
+			state_goto <= FIST;
+			chip_rxd0 <= D021;
+			chip_rxd1 <= D121;
+			{fs0, fs1} <= 2'b11;
+		end
+		

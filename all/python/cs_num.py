@@ -27,7 +27,7 @@ def test(width):
 
 def wr(num, width):
     r0, r1, r2, r3 = cal(num)
-    cmd, ind, lor, end = cal1(num)
+    cmd, ind, lrt, vtb, end = cal1(num)
     res = (width + 1) * "\t"
     res += "8'h%s: begin\n" % r0
     res += (width + 2)*"\t"
@@ -41,7 +41,9 @@ def wr(num, width):
     res += (width + 2)*"\t"
     res += "intan_ind <= 64'h%s;\n" % ind
     res += (width + 2)*"\t"
-    res += "intan_lor <= 8'h%s;\n" % lor
+    res += "intan_lrt <= 8'h%s;\n" % lrt
+    res += (width + 2)*"\t"
+    res += "intan_vtb <= 8'h%s;\n" % vtb
     res += (width + 2)*"\t"
     res += "intan_end <= 8'h%s;\n" % end
     res += (width + 1)*"\t"
@@ -53,39 +55,45 @@ def cal1(num):
     tmp = bin(num)[2:].zfill(8)
     list_cmd = []
     list_ind = []
-    list_lor = []
+    list_lrt = []
     list_end = []
+    list_vtb = []
     for i in range(4):
         num = tmp[i*2: i*2+2]
         if num == '01':
             list_cmd.append(1 << (7-2*i))
             list_ind.append(63 - 16*i)
-            list_lor.append(0)
+            list_lrt.append(0)
             list_end.append(0)
+            list_vtb.append(1)
         elif num == '10':
             list_cmd.append(1 << (7-2*i))
             list_ind.append(63 - 16*i)
-            list_lor.append(1)
+            list_lrt.append(1)
             list_end.append(0)
+            list_vtb.append(1)
         elif num == '11':
             list_cmd.append(1 << (7-2*i))
             list_cmd.append(1 << (6-2*i))
             list_ind.append(63 - 16*i)
             list_ind.append(55 - 16*i)
-            list_lor.append(1)
-            list_lor.append(1)
+            list_lrt.append(1)
+            list_lrt.append(1)
             list_end.append(0)
             list_end.append(0)
+            list_vtb.append(0)
+            list_vtb.append(1)
         else:
             pass
     if len(list_end):
         list_end[-1] = 1
     cmd = list2str0(list_cmd)
     ind = list2str0(list_ind)
-    lor = list2str1(list_lor)
+    lrt = list2str1(list_lrt)
     end = list2str1(list_end)
+    vtb = list2str1(list_vtb)
 
-    return cmd, ind, lor, end
+    return cmd, ind, lrt, vtb, end
 
 
 def cal(num):
@@ -124,6 +132,6 @@ def main(w):
 
 
 if __name__ == '__main__':
-    main(2)
+    main(3)
     print('Done')
 

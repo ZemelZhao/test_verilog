@@ -43,18 +43,21 @@ module fifo2adc(
     localparam D26H = 8'h74, D26L = 8'h75, D27H = 8'h76, D27L = 8'h77;
     localparam D28H = 8'h78, D28L = 8'h79, D29H = 8'h7A, D29L = 8'h7B;
     localparam D30H = 8'h7C, D30L = 8'h7D, D31H = 8'h7E, D31L = 8'h7F;
+    localparam VDDH = 8'h80, VDDL = 8'h81, TMPH = 8'h82, TMPL = 8'h83;
     localparam PART = 8'hA0, DONE = 8'hA1, LAST = 8'hA2;
 
-    reg [7:0] state, next_state;
+    (* MARK_DEBUG="true" *)reg [7:0] state; 
+    reg [7:0] next_state;
     wire [7:0] fifoi_gcmd[8:0];
     wire [7:0] fifoi_gind[8:0];
     wire [8:0] fifoi_glrt;
     wire [8:0] fifoi_gvtb;
     wire [8:0] fifoi_gend;
 
-    reg [7:0] hdat;
+    (* MARK_DEBUG="true" *)reg [7:0] hdat;
 
-    reg flag_hrd, flag_lrt, flag_vtb, flag_end;
+    (* MARK_DEBUG="true" *)reg flag_hrd; 
+    reg flag_lrt, flag_vtb, flag_end;
     reg [7:0] flag_cmd, flag_ind, flag_num;
 
     assign fifoi_gcmd[8] = 8'h00;
@@ -135,8 +138,7 @@ module fifo2adc(
             D15H: next_state <= D15L;
             D15L: begin
                 if(flag_lrt) next_state <= D16H;
-                else if(flag_end) next_state <= PART;
-                else next_state <= D00H;
+                else next_state <= VDDH;
             end
             D16H: next_state <= D16L;
             D16L: next_state <= D17H;
@@ -170,6 +172,13 @@ module fifo2adc(
             D30L: next_state <= D31H;
             D31H: next_state <= D31L;
             D31L: begin
+                if(flag_vtb) next_state <= VDDH;
+                else next_state <= D00H;
+            end
+            VDDH: next_state <= VDDL;
+            VDDL: next_state <= TMPH;
+            TMPH: next_state <= TMPL;
+            TMPL: begin
                 if(flag_end) next_state <= PART;
                 else next_state <= D00H;
             end
@@ -197,7 +206,6 @@ module fifo2adc(
         if(rst) flag_num <= 8'h08;
         else if(state == IDLE) flag_num <= 8'h07;
         else if(state == DONE) flag_num <= 8'h08;
-        else if(flag_end) flag_num <= flag_num;
         else if(state == D15L && (~flag_lrt)) flag_num <= flag_num - 1'b1;
         else if(state == D31L) flag_num <= flag_num - 1'b1;
         else flag_num <= flag_num;

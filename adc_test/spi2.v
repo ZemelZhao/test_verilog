@@ -67,7 +67,7 @@ module spi (
 
     // #1 1. VARIABLE SECTION
     // #region
-    (* MARK_DEBUG="true" *)reg[6:0] state; // 主状态机
+    reg[6:0] state; // 主状态机
     // #endregion
 
     // #1 2. LOGICAL SECTION
